@@ -1,0 +1,286 @@
+---
+/**
+ * ProgressCheck Component for DevHub
+ * Checklist that saves progress to localStorage
+ */
+
+interface Props {
+  title?: string;
+  items: string[];
+  id: string; // Unique ID for localStorage
+}
+
+const { title = "Progress Tracker", items, id } = Astro.props;
+---
+
+<div class="progress-container" data-id={id} data-total={items.length}>
+  <div class="progress-header">
+    <span class="icon">📋</span>
+    <h4>{title}</h4>
+    <span class="progress-count" id={`count-${id}`}>0/{items.length}</span>
+  </div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id={`bar-${id}`}></div>
+    </div>
+    <span class="progress-percent" id={`percent-${id}`}>0%</span>
+  </div>
+
+  <ul class="progress-list" id={`list-${id}`}>
+    {items.map((item, index) => (
+      <li class="progress-item" data-index={index}>
+        <label>
+          <input 
+            type="checkbox" 
+            class="progress-checkbox" 
+            onchange={`updateProgress('${id}')`}
+          />
+          <span class="checkmark"></span>
+          <span class="item-text">{item}</span>
+        </label>
+      </li>
+    ))}
+  </ul>
+
+  <div class="progress-actions">
+    <button class="reset-progress-btn" onclick={`resetProgress('${id}')`}>
+      ↺ Reset Progress
+    </button>
+  </div>
+
+  <div class="completion-message" id={`complete-${id}`}>
+    🎉 Congratulations! You've completed all items!
+  </div>
+</div>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize all progress trackers
+    document.querySelectorAll('.progress-container').forEach(container => {
+      const id = container.dataset.id;
+      loadProgress(id);
+    });
+  });
+
+  function loadProgress(id) {
+    const saved = localStorage.getItem(`devhub-progress-${id}`);
+    if (saved) {
+      const checked = JSON.parse(saved);
+      const checkboxes = document.querySelectorAll(`#list-${id} .progress-checkbox`);
+      checkboxes.forEach((cb, index) => {
+        cb.checked = checked.includes(index);
+      });
+    }
+    updateProgress(id);
+  }
+
+  function updateProgress(id) {
+    const container = document.querySelector(`[data-id="${id}"]`);
+    const total = parseInt(container.dataset.total);
+    const checkboxes = container.querySelectorAll('.progress-checkbox');
+    const checked = Array.from(checkboxes)
+      .map((cb, i) => cb.checked ? i : null)
+      .filter(i => i !== null);
+    
+    const count = checked.length;
+    const percent = Math.round((count / total) * 100);
+    
+    // Update UI
+    document.getElementById(`count-${id}`).textContent = `${count}/${total}`;
+    document.getElementById(`percent-${id}`).textContent = `${percent}%`;
+    document.getElementById(`bar-${id}`).style.width = `${percent}%`;
+    
+    // Save to localStorage
+    localStorage.setItem(`devhub-progress-${id}`, JSON.stringify(checked));
+    
+    // Show completion message
+    const completeMsg = document.getElementById(`complete-${id}`);
+    if (count === total) {
+      completeMsg.classList.add('show');
+    } else {
+      completeMsg.classList.remove('show');
+    }
+  }
+
+  function resetProgress(id) {
+    const checkboxes = document.querySelectorAll(`#list-${id} .progress-checkbox`);
+    checkboxes.forEach(cb => cb.checked = false);
+    localStorage.removeItem(`devhub-progress-${id}`);
+    updateProgress(id);
+  }
+</script>
+
+<style>
+  .progress-container {
+    background: rgba(17, 24, 39, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .progress-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .progress-header .icon {
+    font-size: 1.5rem;
+  }
+
+  .progress-header h4 {
+    color: #f9fafb;
+    margin: 0;
+    flex: 1;
+  }
+
+  .progress-count {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #22c55e);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  .progress-percent {
+    color: #22c55e;
+    font-size: 0.875rem;
+    font-weight: 600;
+    min-width: 40px;
+  }
+
+  .progress-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .progress-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .progress-item:last-child {
+    border-bottom: none;
+  }
+
+  .progress-item label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .progress-checkbox {
+    display: none;
+  }
+
+  .checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .checkmark::after {
+    content: '✓';
+    color: transparent;
+    font-size: 0.75rem;
+    font-weight: bold;
+    transition: color 0.15s ease;
+  }
+
+  .progress-checkbox:checked + .checkmark {
+    background: #22c55e;
+    border-color: #22c55e;
+  }
+
+  .progress-checkbox:checked + .checkmark::after {
+    color: #fff;
+  }
+
+  .progress-checkbox:checked ~ .item-text {
+    color: #6b7280;
+    text-decoration: line-through;
+  }
+
+  .item-text {
+    color: #e5e7eb;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+  }
+
+  .progress-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .reset-progress-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    transition: all 0.15s ease;
+  }
+
+  .reset-progress-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #9ca3af;
+  }
+
+  .completion-message {
+    display: none;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 8px;
+    color: #22c55e;
+    margin-top: 1rem;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .completion-message.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

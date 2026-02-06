@@ -7,6 +7,12 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "DevHub",
+      favicon: "favicon.png",
+      customCss: ["./src/styles/custom.css"],
+      // Désactiver le toggle de thème - forcer le dark mode
+      components: {
+        ThemeSelect: "./src/components/EmptyThemeSelect.astro",
+      },
       social: [
         {
           icon: "github",

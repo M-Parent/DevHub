@@ -1,0 +1,357 @@
+---
+/**
+ * DragDrop Component for DevHub
+ * Drag words into the correct blanks
+ */
+
+interface Props {
+  instruction: string;
+  sentence: string; // Use [BLANK] for blanks
+  words: string[];
+  correctOrder: number[]; // Index of correct word for each blank
+}
+
+const { instruction, sentence, words, correctOrder } = Astro.props;
+const id = `dragdrop-${Math.random().toString(36).substr(2, 9)}`;
+
+// Split sentence by [BLANK]
+const parts = sentence.split('[BLANK]');
+---
+
+<div class="dragdrop-container" data-id={id} data-correct={JSON.stringify(correctOrder)}>
+  <div class="dragdrop-instruction">
+    <span class="icon">🎯</span>
+    <p>{instruction}</p>
+  </div>
+
+  <div class="word-bank" id={`bank-${id}`}>
+    <span class="bank-label">Word Bank:</span>
+    <div class="words">
+      {words.map((word, index) => (
+        <div 
+          class="draggable-word" 
+          draggable="true" 
+          data-word-index={index}
+          data-word={word}
+        >
+          {word}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="sentence-area">
+    {parts.map((part, index) => (
+      <>
+        <span class="text-part">{part}</span>
+        {index < parts.length - 1 && (
+          <div class="drop-zone" data-blank-index={index}>
+            <span class="placeholder">Drop here</span>
+          </div>
+        )}
+      </>
+    ))}
+  </div>
+
+  <div class="dragdrop-actions">
+    <button class="check-btn" onclick={`checkDragDrop('${id}')`}>
+      ✓ Check Answer
+    </button>
+    <button class="reset-btn" onclick={`resetDragDrop('${id}')`}>
+      ↺ Reset
+    </button>
+  </div>
+
+  <div class="feedback" id={`feedback-${id}`}></div>
+</div>
+
+<script is:inline>
+  // Initialize drag and drop
+  document.addEventListener('DOMContentLoaded', () => {
+    const draggables = document.querySelectorAll('.draggable-word');
+    const dropZones = document.querySelectorAll('.drop-zone');
+
+    draggables.forEach(word => {
+      word.addEventListener('dragstart', (e) => {
+        e.target.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', e.target.dataset.wordIndex);
+        e.dataTransfer.setData('word', e.target.dataset.word);
+      });
+
+      word.addEventListener('dragend', (e) => {
+        e.target.classList.remove('dragging');
+      });
+    });
+
+    dropZones.forEach(zone => {
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+
+      zone.addEventListener('dragleave', (e) => {
+        zone.classList.remove('drag-over');
+      });
+
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        
+        const wordIndex = e.dataTransfer.getData('text/plain');
+        const word = e.dataTransfer.getData('word');
+        
+        // Clear existing content
+        zone.innerHTML = '';
+        
+        // Create dropped word element
+        const droppedWord = document.createElement('div');
+        droppedWord.className = 'dropped-word';
+        droppedWord.dataset.wordIndex = wordIndex;
+        droppedWord.textContent = word;
+        droppedWord.onclick = () => {
+          zone.innerHTML = '<span class="placeholder">Drop here</span>';
+        };
+        
+        zone.appendChild(droppedWord);
+      });
+    });
+  });
+
+  function checkDragDrop(id) {
+    const container = document.querySelector(`[data-id="${id}"]`);
+    const correctOrder = JSON.parse(container.dataset.correct);
+    const dropZones = container.querySelectorAll('.drop-zone');
+    const feedback = document.getElementById(`feedback-${id}`);
+    
+    let allCorrect = true;
+    let filledCount = 0;
+
+    dropZones.forEach((zone, index) => {
+      const droppedWord = zone.querySelector('.dropped-word');
+      if (droppedWord) {
+        filledCount++;
+        const wordIndex = parseInt(droppedWord.dataset.wordIndex);
+        if (wordIndex === correctOrder[index]) {
+          zone.classList.add('correct');
+          zone.classList.remove('incorrect');
+        } else {
+          zone.classList.add('incorrect');
+          zone.classList.remove('correct');
+          allCorrect = false;
+        }
+      } else {
+        allCorrect = false;
+      }
+    });
+
+    if (filledCount < dropZones.length) {
+      feedback.innerHTML = '<span class="warning">⚠️ Fill in all blanks first!</span>';
+    } else if (allCorrect) {
+      feedback.innerHTML = '<span class="success">🎉 Perfect! All answers are correct!</span>';
+    } else {
+      feedback.innerHTML = '<span class="error">❌ Some answers are incorrect. Try again!</span>';
+    }
+    feedback.classList.add('show');
+  }
+
+  function resetDragDrop(id) {
+    const container = document.querySelector(`[data-id="${id}"]`);
+    const dropZones = container.querySelectorAll('.drop-zone');
+    const feedback = document.getElementById(`feedback-${id}`);
+    
+    dropZones.forEach(zone => {
+      zone.innerHTML = '<span class="placeholder">Drop here</span>';
+      zone.classList.remove('correct', 'incorrect');
+    });
+    
+    feedback.classList.remove('show');
+    feedback.innerHTML = '';
+  }
+</script>
+
+<style>
+  .dragdrop-container {
+    background: rgba(17, 24, 39, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .dragdrop-instruction {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .dragdrop-instruction .icon {
+    font-size: 1.5rem;
+  }
+
+  .dragdrop-instruction p {
+    color: #f9fafb;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .word-bank {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .bank-label {
+    color: #6b7280;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .draggable-word {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 6px;
+    color: #fff;
+    cursor: grab;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+
+  .draggable-word:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  }
+
+  .draggable-word.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+  }
+
+  .sentence-area {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    line-height: 2.5;
+    color: #e5e7eb;
+    font-size: 1rem;
+  }
+
+  .text-part {
+    white-space: pre-wrap;
+  }
+
+  .drop-zone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    margin: 0 0.25rem;
+    transition: all 0.15s ease;
+  }
+
+  .drop-zone .placeholder {
+    color: #6b7280;
+    font-size: 0.75rem;
+  }
+
+  .drop-zone.drag-over {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  .drop-zone.correct {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.15);
+  }
+
+  .drop-zone.incorrect {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.15);
+  }
+
+  .dropped-word {
+    background: #3b82f6;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    cursor: pointer;
+  }
+
+  .drop-zone.correct .dropped-word {
+    background: #22c55e;
+  }
+
+  .drop-zone.incorrect .dropped-word {
+    background: #ef4444;
+  }
+
+  .dragdrop-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+
+  .check-btn, .reset-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.15s ease;
+  }
+
+  .check-btn:hover {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: #22c55e;
+    color: #22c55e;
+  }
+
+  .reset-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e5e7eb;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+  }
+
+  .feedback.show {
+    display: block;
+  }
+
+  .feedback .success {
+    color: #22c55e;
+  }
+
+  .feedback .error {
+    color: #ef4444;
+  }
+
+  .feedback .warning {
+    color: #f59e0b;
+  }
+</style>

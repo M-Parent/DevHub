@@ -1,0 +1,113 @@
+---
+title: "[TITLE]"
+description: "[DESCRIPTION]"
+sidebar:
+  label: "[SIDEBAR_LABEL]"
+  order: [ORDER]
+  badge:
+    text: "[BADGE_TEXT]"
+    variant: "[BADGE_VARIANT]"
+tableOfContents: true
+---
+
+{/* 
+  ═══════════════════════════════════════════════════════════
+  DEVHUB CHEATSHEET TEMPLATE (MDX)
+  Reading time: ~2 minutes
+  ═══════════════════════════════════════════════════════════
+  
+  VARIABLES FOR GEMINI/N8N AUTOMATION:
+  [TITLE]           → Article title
+  [DESCRIPTION]     → Short description for SEO
+  [SIDEBAR_LABEL]   → Short label for sidebar
+  [ORDER]           → Number for sidebar ordering
+  [BADGE_TEXT]      → Badge text (New, Updated, etc.)
+  [BADGE_VARIANT]   → note | tip | caution | danger | success
+  [CATEGORY]        → docker|linux|networking|cyber|etc.
+  [TAGS]            → Comma separated tags
+  [SECTION_TITLE]   → Section heading
+  [COMMAND]         → Terminal command
+  [CODE_LANG]       → bash|yaml|json|python|javascript|etc.
+  [EXPLANATION]     → Brief explanation
+  [NOTE_CONTENT]    → Note/tip content
+  [TIP_CONTENT]     → Helpful tip
+  [QUESTION]        → Quick review question
+  [ANSWER]          → Question answer
+  ═══════════════════════════════════════════════════════════
+*/}
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+import Question from '../../../components/Question.astro';
+import Quiz from '../../../components/Quiz.astro';
+
+## Quick Reference
+
+| Command | Description |
+|---------|-------------|
+| `[COMMAND]` | [EXPLANATION] |
+| `[COMMAND]` | [EXPLANATION] |
+| `[COMMAND]` | [EXPLANATION] |
+| `[COMMAND]` | [EXPLANATION] |
+
+---
+
+## [SECTION_TITLE]
+
+[EXPLANATION]
+
+```[CODE_LANG]
+[COMMAND]
+```
+
+---
+
+## [SECTION_TITLE]
+
+[EXPLANATION]
+
+```[CODE_LANG]
+[COMMAND]
+```
+
+<Aside type="tip" title="Pro Tip">
+[TIP_CONTENT]
+</Aside>
+
+---
+
+## [SECTION_TITLE]
+
+[EXPLANATION]
+
+```[CODE_LANG]
+[COMMAND]
+```
+
+<Aside type="note">
+[NOTE_CONTENT]
+</Aside>
+
+---
+
+## Common Errors
+
+| Error | Solution |
+|-------|----------|
+| [ERROR_MESSAGE] | [SOLUTION] |
+| [ERROR_MESSAGE] | [SOLUTION] |
+
+---
+
+## Quick Check
+
+<Question
+  question="[QUESTION]"
+  answer="[ANSWER]"
+/>
+
+---
+
+## Related
+
+- [[RELATED_ARTICLE_1]]
+- [[RELATED_ARTICLE_2]]

@@ -1,0 +1,203 @@
+---
+title: "ARR Stack Cheatsheet"
+description: "Quick-reference guide to all ARR Stack applications - from Plex/Jellyfin media servers to Sonarr, Radarr, and the complete media automation ecosystem."
+sidebar:
+  label: "ARR Stack"
+  order: 10
+  badge:
+    text: "Homelab"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Card, CardGrid } from "@astrojs/starlight/components";
+import Question from "../../../components/Question.astro";
+import Quiz from "../../../components/Quiz.astro";
+import Flashcard from "../../../components/Flashcard.astro";
+import MatchPairs from "../../../components/MatchPairs.astro";
+
+Your quick-reference guide to the most common apps used in a full **ARR automation ecosystem**. Each tool plays a unique role — from downloading to organizing, streaming, and monitoring your media.
+
+<Aside type="tip" title="What is the ARR Stack?">
+  The ARR Stack is like having your own personal Netflix — fully automated,
+  completely private, and entirely under your control.
+</Aside>
+
+---
+
+## 🎬 Media Servers
+
+The foundation of your media streaming setup.
+
+| Tool            | Description                                                                                                       |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Plex** 💎     | Polished media server that organizes and streams movies, shows, and music. Supports remote access via Plex Cloud. |
+| **Jellyfin** 🐧 | 100% free, open-source alternative to Plex. Self-hosted, fully private, with extensive plugin support.            |
+
+<Flashcard
+  title="Plex vs Jellyfin"
+  cards={[
+    {
+      front: "Which is fully open-source?",
+      back: "Jellyfin - 100% free and open-source",
+    },
+    {
+      front: "Which supports Plex Cloud?",
+      back: "Plex - built-in remote access via cloud",
+    },
+    {
+      front: "Which requires no account?",
+      back: "Jellyfin - fully self-hosted, no external account needed",
+    },
+  ]}
+/>
+
+---
+
+## 📺 Media Management & Automation
+
+The core "\*arr" applications that automate your library.
+
+| Tool              | Description                                                    |
+| ----------------- | -------------------------------------------------------------- |
+| **Sonarr** 📺     | Tracks, searches, and downloads TV show episodes automatically |
+| **Radarr** 🎥     | Same as Sonarr, but for movies                                 |
+| **Readarr** 📚    | Manages ebooks and audiobooks                                  |
+| **Lidarr** 🎵     | Automates music downloads and metadata                         |
+| **Profilearr** ⚙️ | Syncs quality profiles across multiple Sonarr/Radarr instances |
+| **Cleanuparr** 🧹 | Auto-cleans empty folders and leftover downloads               |
+| **Huntarr** 🕵️    | Scans library for missing or incomplete media                  |
+
+<Aside type="note">
+  **Memory Trick**: All the main apps end in "arr" — Sonarr (TV), Radarr
+  (movies), Lidarr (music), Readarr (books).
+</Aside>
+
+---
+
+## ⚡ Download & Privacy
+
+Secure downloading with VPN protection.
+
+| Tool                | Description                                       |
+| ------------------- | ------------------------------------------------- |
+| **qBittorrent** ⚡  | Open-source torrent client with WebUI integration |
+| **Gluetun** 🔒      | VPN container that routes traffic securely        |
+| **FlareSolverr** 🔥 | Bypasses Cloudflare anti-bot for indexers         |
+
+<Aside type="caution" title="Always Use a VPN">
+  Route qBittorrent through Gluetun to protect your IP address and maintain
+  privacy while downloading.
+</Aside>
+
+---
+
+## 💬 Subtitles & Transcoding
+
+Enhance your media with subtitles and optimization.
+
+| Tool          | Description                                             |
+| ------------- | ------------------------------------------------------- |
+| **Bazarr** 💬 | Auto-downloads subtitles, integrates with Sonarr/Radarr |
+| **Tdarr** 🎞️  | Transcodes/optimizes media using GPU or CPU             |
+
+---
+
+## 🕵️ Indexing & User Requests
+
+Manage indexers and let users request content.
+
+| Tool              | Description                                    |
+| ----------------- | ---------------------------------------------- |
+| **Prowlarr** 🧭   | Centralized indexer manager for all \*arr apps |
+| **Overseerr** 🍿  | Request system for Plex users                  |
+| **Jellyseerr** 🍿 | Request system for Jellyfin users              |
+| **Wizarr** 🧙     | User onboarding with custom invitation links   |
+
+---
+
+## 📊 Monitoring
+
+Track usage and performance.
+
+| Tool            | Description                                                   |
+| --------------- | ------------------------------------------------------------- |
+| **Tautulli** 📈 | Monitors Plex activity — who's watching what, when, and where |
+
+---
+
+## 🔄 Data Flow Overview
+
+The complete ARR Stack workflow:
+
+1. **🔍 Find** — Prowlarr, Overseerr/Jellyseerr, Huntarr
+2. **⬇️ Download** — Sonarr, Radarr, Lidarr, Readarr → qBittorrent (via Gluetun)
+3. **✨ Organize** — Bazarr, Tdarr, Cleanuparr, Profilearr
+4. **📺 Stream** — Plex or Jellyfin
+5. **👥 Manage** — Tautulli, Wizarr
+
+---
+
+## 🧪 Quick Check
+
+<MatchPairs
+  title="Match the Tool to Its Purpose"
+  pairs={[
+    { left: "Sonarr", right: "TV Shows" },
+    { left: "Radarr", right: "Movies" },
+    { left: "Lidarr", right: "Music" },
+    { left: "Readarr", right: "Books" },
+    { left: "Prowlarr", right: "Indexers" },
+  ]}
+/>
+
+<Quiz
+  question="Which tool routes torrent traffic through a VPN?"
+  options={["FlareSolverr", "Gluetun", "Prowlarr", "Tdarr"]}
+  correct={1}
+  explanation="Gluetun is a VPN container that securely routes traffic from qBittorrent and other apps."
+/>
+
+<Quiz
+  question="What's the difference between Overseerr and Jellyseerr?"
+  options={[
+    "Overseerr is for movies, Jellyseerr for TV",
+    "Overseerr is for Plex, Jellyseerr for Jellyfin",
+    "They are the same tool",
+    "Overseerr is paid, Jellyseerr is free",
+  ]}
+  correct={1}
+  explanation="Overseerr integrates with Plex, while Jellyseerr is a fork specifically for Jellyfin servers."
+/>
+
+<Question
+  question="What does FlareSolverr do?"
+  answer="FlareSolverr acts as a proxy to bypass Cloudflare and other anti-bot challenges, allowing Prowlarr to access protected indexer sites."
+/>
+
+---
+
+## 📋 Default Ports Reference
+
+| App         | Default Port |
+| ----------- | ------------ |
+| Plex        | `32400`      |
+| Jellyfin    | `8096`       |
+| Sonarr      | `8989`       |
+| Radarr      | `7878`       |
+| Lidarr      | `8686`       |
+| Readarr     | `8787`       |
+| Prowlarr    | `9696`       |
+| qBittorrent | `8080`       |
+| Bazarr      | `6767`       |
+| Overseerr   | `5055`       |
+| Tautulli    | `8181`       |
+| Tdarr       | `8265`       |
+
+---
+
+## Related
+
+- Docker Compose for ARR Stack
+- Reverse Proxy with Traefik
+- Hardening Your Homelab

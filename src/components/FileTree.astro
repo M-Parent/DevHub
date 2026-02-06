@@ -1,0 +1,241 @@
+---
+/**
+ * FileTree Component for DevHub
+ * Displays directory structure with file icons and badges
+ */
+
+interface FileItem {
+  name: string;
+  type?: 'file' | 'folder';
+  badge?: 'create' | 'edit' | 'delete';
+  children?: FileItem[];
+}
+
+interface Props {
+  title?: string;
+  structure: FileItem[];
+}
+
+const { title = "Project Structure", structure } = Astro.props;
+
+function getIcon(type: string, name: string): string {
+  if (type === 'folder') return '📁';
+  
+  // File type icons
+  if (name.endsWith('.yaml') || name.endsWith('.yml')) return '⚙️';
+  if (name.endsWith('.sh')) return '🔧';
+  if (name.endsWith('.md') || name.endsWith('.mdx')) return '📝';
+  if (name.endsWith('.json')) return '📋';
+  if (name.endsWith('.ts') || name.endsWith('.js')) return '📜';
+  if (name.endsWith('.css')) return '🎨';
+  if (name.endsWith('.iso')) return '💿';
+  if (name.endsWith('.cfg') || name.endsWith('.conf')) return '⚙️';
+  if (name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.svg')) return '🖼️';
+  
+  return '📄';
+}
+
+function getBadgeClass(badge: string): string {
+  switch (badge) {
+    case 'create': return 'badge-create';
+    case 'edit': return 'badge-edit';
+    case 'delete': return 'badge-delete';
+    default: return '';
+  }
+}
+
+function getBadgeText(badge: string): string {
+  switch (badge) {
+    case 'create': return 'CREATE';
+    case 'edit': return 'EDIT';
+    case 'delete': return 'DELETE';
+    default: return '';
+  }
+}
+---
+
+<div class="filetree-container">
+  <div class="filetree-header">
+    <span class="folder-icon">📂</span>
+    <span class="title">{title}</span>
+  </div>
+  
+  <div class="filetree-content">
+    {structure.map((item) => (
+      <div class="tree-item">
+        <div class="item-row">
+          <span class="icon">{getIcon(item.type || 'file', item.name)}</span>
+          <span class={`name ${item.type === 'folder' ? 'folder-name' : ''}`}>{item.name}</span>
+          {item.badge && (
+            <span class={`badge ${getBadgeClass(item.badge)}`}>
+              {getBadgeText(item.badge)}
+            </span>
+          )}
+        </div>
+        
+        {item.children && item.children.length > 0 && (
+          <div class="children">
+            {item.children.map((child) => (
+              <div class="tree-item child">
+                <div class="item-row">
+                  <span class="connector">├─</span>
+                  <span class="icon">{getIcon(child.type || 'file', child.name)}</span>
+                  <span class={`name ${child.type === 'folder' ? 'folder-name' : ''}`}>{child.name}</span>
+                  {child.badge && (
+                    <span class={`badge ${getBadgeClass(child.badge)}`}>
+                      {getBadgeText(child.badge)}
+                    </span>
+                  )}
+                </div>
+                
+                {child.children && child.children.length > 0 && (
+                  <div class="children nested">
+                    {child.children.map((grandchild, idx) => (
+                      <div class="tree-item grandchild">
+                        <div class="item-row">
+                          <span class="connector">{idx === child.children!.length - 1 ? '└─' : '├─'}</span>
+                          <span class="icon">{getIcon(grandchild.type || 'file', grandchild.name)}</span>
+                          <span class={`name ${grandchild.type === 'folder' ? 'folder-name' : ''}`}>{grandchild.name}</span>
+                          {grandchild.badge && (
+                            <span class={`badge ${getBadgeClass(grandchild.badge)}`}>
+                              {getBadgeText(grandchild.badge)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+  
+  <div class="filetree-legend">
+    <span class="legend-item"><span class="badge badge-create">CREATE</span> New file</span>
+    <span class="legend-item"><span class="badge badge-edit">EDIT</span> Modify existing</span>
+  </div>
+</div>
+
+<style>
+  .filetree-container {
+    background: rgba(17, 24, 39, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.875rem;
+  }
+
+  .filetree-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 0.75rem;
+  }
+
+  .filetree-header .folder-icon {
+    font-size: 1.25rem;
+  }
+
+  .filetree-header .title {
+    color: #f9fafb;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .filetree-content {
+    padding-left: 0.5rem;
+  }
+
+  .tree-item {
+    margin: 0.25rem 0;
+  }
+
+  .item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+  }
+
+  .connector {
+    color: #4b5563;
+    font-size: 0.75rem;
+    width: 1.25rem;
+  }
+
+  .icon {
+    font-size: 1rem;
+    width: 1.25rem;
+    text-align: center;
+  }
+
+  .name {
+    color: #d1d5db;
+  }
+
+  .folder-name {
+    color: #60a5fa;
+    font-weight: 500;
+  }
+
+  .children {
+    margin-left: 1.5rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    padding-left: 0.5rem;
+  }
+
+  .children.nested {
+    margin-left: 1.25rem;
+  }
+
+  .badge {
+    font-size: 0.625rem;
+    font-weight: 700;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-create {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+
+  .badge-edit {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  .badge-delete {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  .filetree-legend {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: #6b7280;
+    font-size: 0.75rem;
+  }
+</style>

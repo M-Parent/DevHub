@@ -1,16 +1,16 @@
 ---
-title: Welcome to DevHub
-description: About Self-learning platform!
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: DevHub
+description: Interactive learning platform for DevOps, Linux, and Homelab.
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  tagline: Learn by doing. Master DevOps, Linux, and Homelab — one interactive guide at a time.
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/img/personna/personna-3.png
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Start Learning
+      link: /guides/custom-ubuntu-iso/
       icon: right-arrow
-    - text: GitHub Repository
+    - text: GitHub
       link: https://github.com/M-Parent/DevHub
       icon: external
       variant: minimal
@@ -18,23 +18,46 @@ hero:
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
 
-## Next steps
+## Why DevHub?
 
-<CardGrid stagger>
-  <Card title="Update content" icon="pencil">
-    Edit `src/content/docs/index.mdx` to see this page change.
+Documentation should be **interactive**, not passive. DevHub transforms technical notes into hands-on learning experiences with quizzes, flashcards, and practice exercises.
+
+<CardGrid>
+  <Card title="Guides" icon="rocket">
+    Step-by-step tutorials with interactive checkpoints and practice sections.
   </Card>
-  <Card title="Change page layout" icon="document">
-    Delete `template: splash` in `src/content/docs/index.mdx` to display a
-    sidebar on this page.
+  <Card title="Cheatsheets" icon="list-format">
+    Quick-reference cards for commands, tools, and configurations.
   </Card>
-  <Card title="Add new content" icon="add-document">
-    Add Markdown or MDX files to `src/content/docs` to create new pages.
+  <Card title="Roadmaps" icon="star">
+    Structured learning paths from beginner to advanced.
   </Card>
-  <Card title="Configure your site" icon="setting">
-    Edit your `sidebar` and other config in `astro.config.mjs`.
+  <Card title="Practice" icon="laptop">
+    Quizzes, flashcards, and terminal simulations to reinforce learning.
   </Card>
-  <Card title="Read the docs" icon="open-book">
-    Learn more in [the Starlight Docs](https://starlight.astro.build/).
+</CardGrid>
+
+---
+
+## Topics
+
+<CardGrid>
+  <Card title="🌐 Networking" icon="network">
+    DNS, VPN, firewalls, routing
+  </Card>
+  <Card title="🖥️ Server" icon="server">
+    Linux, Docker, homelab, automation
+  </Card>
+  <Card title="📡 Radio" icon="radio">
+    SDR, amateur radio, RF projects
+  </Card>
+  <Card title="🔒 Cybersecurity" icon="warning">
+    Hardening, pentesting, monitoring
+  </Card>
+  <Card title="⚡ Electronics" icon="puzzle">
+    Arduino, Raspberry Pi, circuits
+  </Card>
+  <Card title="💪 Productivity" icon="heart">
+    Gym, running, nutrition, sleep
   </Card>
 </CardGrid>

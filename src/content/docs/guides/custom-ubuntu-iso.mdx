@@ -1,0 +1,478 @@
+---
+title: "Automated Ubuntu Server ISO (≥20.04)"
+description: "Learn how to create a fully automated Ubuntu Server installation ISO with autoinstall, custom packages, and zero prompts - ready for Ansible/Terraform provisioning."
+sidebar:
+  label: "Custom Ubuntu ISO"
+  order: 10
+  badge:
+    text: "Linux"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Steps, Aside, Card, CardGrid } from "@astrojs/starlight/components";
+import Question from "../../../components/Question.astro";
+import Quiz from "../../../components/Quiz.astro";
+import Flashcard from "../../../components/Flashcard.astro";
+import Terminal from "../../../components/Terminal.astro";
+import FillBlank from "../../../components/FillBlank.astro";
+import ProgressCheck from "../../../components/ProgressCheck.astro";
+import FileTree from "../../../components/FileTree.astro";
+
+## Overview
+
+Creating automated Ubuntu Server installations is essential for DevOps workflows, homelab deployments, and enterprise infrastructure. This guide walks you through building a **custom Ubuntu ISO** that installs completely unattended - no prompts, no manual intervention.
+
+<Aside type="tip" title="Why Automate?">
+  Automated installations ensure consistency across all your servers, reduce
+  human error, and integrate seamlessly with infrastructure-as-code tools like
+  Ansible and Terraform.
+</Aside>
+
+![Automated Ubuntu Server ISO creation workflow](../../../assets/img/content/ubuntu-autoinstall-diagram.png)
+
+### Prerequisites
+
+<ProgressCheck
+  id="ubuntu-iso-prereqs"
+  title="Before You Begin"
+  items={[
+    "Ubuntu host machine (for building the ISO)",
+    "Downloaded Ubuntu Server 24.04 LTS ISO",
+    "xorriso package installed",
+    "Basic understanding of YAML syntax",
+    "Terminal/command line familiarity",
+  ]}
+/>
+
+### Key Concepts
+
+<Flashcard
+  title="Ubuntu Autoinstall Terminology"
+  cards={[
+    {
+      front: "autoinstall.yaml",
+      back: "Configuration file that defines all installation parameters (user, network, packages, etc.)",
+    },
+    {
+      front: "cloud-init",
+      back: "Industry standard for cloud instance initialization, used by Ubuntu's autoinstall",
+    },
+    {
+      front: "nocloud datasource",
+      back: "Method to provide cloud-init data via local files instead of cloud metadata",
+    },
+    {
+      front: "GRUB",
+      back: "Grand Unified Bootloader - manages the boot process and kernel loading",
+    },
+    {
+      front: "xorriso",
+      back: "Tool for creating and manipulating ISO 9660 filesystem images",
+    },
+  ]}
+/>
+
+---
+
+## Getting Started
+
+### Files Overview
+
+<FileTree
+  title="Files to Create/Edit"
+  structure={[
+    { name: "autoinstall.yaml", badge: "create" },
+    {
+      name: "custom_iso/",
+      type: "folder",
+      children: [
+        {
+          name: "nocloud/",
+          type: "folder",
+          children: [
+            { name: "user-data", badge: "create" },
+            { name: "meta-data", badge: "create" },
+          ],
+        },
+        {
+          name: "boot/",
+          type: "folder",
+          children: [
+            {
+              name: "grub/",
+              type: "folder",
+              children: [{ name: "grub.cfg", badge: "edit" }],
+            },
+          ],
+        },
+      ],
+    },
+  ]}
+/>
+
+### Download the Official ISO
+
+First, download the Ubuntu Server ISO from the official website.
+
+<CardGrid>
+  <Card title="Ubuntu Server 24.04 LTS" icon="download">
+    [Download from
+    Ubuntu](https://ubuntu.com/download/server/thank-you?version=24.04.3&architecture=amd64&lts=true)
+    Recommended for production servers with 5 years of support.
+  </Card>
+  <Card title="Requirements" icon="list-format">
+    - 2GB RAM minimum - 25GB disk space - 64-bit processor
+  </Card>
+</CardGrid>
+
+<Aside type="note" title="Import the ISO">
+  Transfer the downloaded ISO to your Ubuntu host machine where you'll build the
+  custom image.
+</Aside>
+
+### Create the autoinstall.yaml File
+
+This is the heart of the automated installation. Create a file named `autoinstall.yaml`:
+
+```yaml title="autoinstall.yaml"
+#cloud-config
+autoinstall:
+  version: 1
+
+  locale: en_US
+  keyboard:
+    layout: us
+
+  identity:
+    hostname: devbox
+    username: ubuntu
+    password: "$6$rounds=4096$REPLACE_WITH_HASH"
+
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  network:
+    network:
+      version: 2
+      ethernets:
+        all:
+          match:
+            name: "e*"
+          dhcp4: false
+          addresses:
+            - 10.10.10.x/24
+          gateway4: 10.10.10.1
+          nameservers:
+            addresses:
+              - 1.1.1.1
+              - 8.8.8.8
+
+  storage:
+    layout:
+      name: direct
+
+  packages:
+    - openssh-server
+    - curl
+    - git
+    - vim
+    - htop
+
+  late-commands:
+    - curtin in-target -- systemctl enable ssh
+```
+
+<Aside type="caution" title="Security Warning">
+  Never commit plain text passwords! Always use hashed passwords in your
+  autoinstall configuration.
+</Aside>
+
+### Generate a Hashed Password
+
+Generate a secure password hash with:
+
+```bash
+openssl passwd -6
+```
+
+Replace `$6$rounds=4096$REPLACE_WITH_HASH` with your generated hash.
+
+<Question
+  question="Why do we use a hashed password instead of plain text in autoinstall.yaml?"
+  answer="Hashed passwords provide security even if the configuration file is exposed. The hash is one-way and cannot be reversed to reveal the original password."
+  hint="Think about what happens if someone gets access to your ISO file"
+/>
+
+---
+
+## Building the Custom ISO
+
+### Mount and Copy the Official ISO
+
+<Steps>
+1. Create a mount point and mount the ISO
+   ```bash
+   mkdir iso
+   sudo mount -o loop ubuntu-24.04-live-server.iso iso
+   ```
+
+2. Create a directory for your custom ISO
+
+   ```bash
+   mkdir custom_iso
+   ```
+
+3. Copy all contents from the mounted ISO
+
+   ```bash
+   cp -r iso/* custom_iso/
+   ```
+
+4. Unmount the original ISO
+
+   ```bash
+   sudo umount iso
+   ```
+
+</Steps>
+
+### Add Autoinstall Files
+
+Create the nocloud directory structure and add your configuration:
+
+```bash
+mkdir -p custom_iso/nocloud
+cp autoinstall.yaml custom_iso/nocloud/user-data
+touch custom_iso/nocloud/meta-data
+```
+
+<Aside type="note" title="Why meta-data?">
+  The `meta-data` file can be empty, but it must exist. Cloud-init requires both
+  `user-data` and `meta-data` files to be present in the nocloud datasource.
+</Aside>
+
+<FillBlank
+  instruction="Complete the command to copy autoinstall.yaml to the correct location"
+  sentence="cp autoinstall.yaml custom_iso/[BLANK:nocloud]/[BLANK:user-data]"
+/>
+
+### Update GRUB Configuration
+
+Edit `custom_iso/boot/grub/grub.cfg` to enable autoinstall. Find and replace the linux lines:
+
+**Before (Original):**
+
+```bash
+linux   /casper/vmlinuz ---
+linux   /casper/hwe-vmlinuz ---
+```
+
+**After (Modified):**
+
+```bash
+linux   /casper/vmlinuz autoinstall ds=nocloud\;s=/cdrom/nocloud/ ---
+linux   /casper/hwe-vmlinuz autoinstall ds=nocloud\;s=/cdrom/nocloud/ ---
+```
+
+**GRUB Parameters:**
+
+| Parameter           | Purpose                                     |
+| ------------------- | ------------------------------------------- |
+| `autoinstall`       | Enables the automated installation mode     |
+| `ds=nocloud`        | Specifies the datasource type (local files) |
+| `s=/cdrom/nocloud/` | Path to the autoinstall configuration       |
+| `---`               | Required end-of-options marker              |
+
+<Question
+  question="What does the 'ds=nocloud' parameter tell Ubuntu's installer?"
+  answer="It tells cloud-init to look for configuration data in local files (the nocloud datasource) rather than querying a cloud metadata service like AWS or Azure."
+  hint="Think about where the installer should look for configuration"
+/>
+
+### Build the Custom ISO
+
+Use xorriso to create your bootable custom ISO:
+
+```bash title="Build Command"
+xorriso -as mkisofs \
+  -r -V "DevBox-Autoinstall" \
+  -o devbox-ubuntu24.04-server.iso \
+  -J -l \
+  -b boot/grub/i386-pc/eltorito.img \
+  -no-emul-boot \
+  -boot-load-size 4 \
+  -boot-info-table \
+  custom_iso
+```
+
+**xorriso Flags:**
+
+| Flag            | Purpose                                                   |
+| --------------- | --------------------------------------------------------- |
+| `-r`            | Generate Rock Ridge directory information                 |
+| `-V`            | Volume ID (label shown when mounting)                     |
+| `-o`            | Output filename                                           |
+| `-J`            | Generate Joliet directory records (Windows compatibility) |
+| `-b`            | Boot image file                                           |
+| `-no-emul-boot` | Boot image is not a floppy emulation                      |
+
+---
+
+## Deployment & Verification
+
+### Boot and Verify
+
+<Steps>
+
+1. **Flash to USB** or attach ISO to VM
+
+2. **Boot from the ISO**
+
+3. **Watch the magic** - installation runs completely unattended
+
+4. **Verify** - SSH into your new server
+
+</Steps>
+
+After installation, verify your server:
+
+```bash
+ssh ubuntu@10.0.20.x
+hostname              # Should show: devbox
+which git curl vim    # Verify packages installed
+systemctl status ssh  # SSH should be enabled
+```
+
+<Aside type="tip" title="Ready for Automation">
+  Your server is now ready for Ansible playbooks or Terraform provisioning!
+</Aside>
+
+### Complete Workflow Checklist
+
+<ProgressCheck
+  id="ubuntu-iso-complete"
+  title="Build Checklist"
+  items={[
+    "Downloaded Ubuntu Server ISO",
+    "Created autoinstall.yaml with hashed password",
+    "Mounted and copied ISO contents",
+    "Added nocloud directory with user-data and meta-data",
+    "Updated GRUB configuration",
+    "Built custom ISO with xorriso",
+    "Tested automated installation",
+    "Verified SSH access and packages",
+  ]}
+/>
+
+---
+
+## Knowledge Check
+
+Test your understanding of Ubuntu autoinstall:
+
+<Quiz
+  question="Where should you place the autoinstall.yaml file in the custom ISO?"
+  options={[
+    "/boot/autoinstall.yaml",
+    "/nocloud/user-data",
+    "/casper/autoinstall.yaml",
+    "/preseed/autoinstall.yaml",
+  ]}
+  correct={1}
+  explanation="The autoinstall configuration must be placed at /nocloud/user-data (renamed from autoinstall.yaml). The nocloud datasource expects this specific path and filename."
+/>
+
+<Quiz
+  question="What command generates a SHA-512 hashed password for autoinstall.yaml?"
+  options={[
+    "passwd -hash",
+    "sha512sum password",
+    "openssl passwd -6",
+    "mkpasswd --sha512",
+  ]}
+  correct={2}
+  explanation="The command 'openssl passwd -6' generates a SHA-512 hashed password suitable for use in autoinstall.yaml. The -6 flag specifically requests SHA-512 hashing."
+/>
+
+<Question
+  question="Why is the meta-data file required even when empty?"
+  answer="Cloud-init's nocloud datasource requires both user-data and meta-data files to be present. The meta-data file can contain instance information like instance-id, but even an empty file satisfies the requirement for the datasource to function."
+/>
+
+### Practice: Server Verification
+
+Try these commands to practice verifying your autoinstall server:
+
+<Terminal
+  title="Practice: Verify Server Setup"
+  prompt="local@machine:~$"
+  commands={[
+    { input: "ssh ubuntu@10.0.20.x", output: "ubuntu@devbox:~$" },
+    { input: "hostname", output: "devbox" },
+    {
+      input: "cat /etc/os-release | grep VERSION",
+      output: 'VERSION="24.04 LTS (Noble Numbat)"',
+    },
+    { input: "systemctl is-enabled ssh", output: "enabled" },
+  ]}
+/>
+
+---
+
+## 📺 Video Tutorial
+
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/DtXZ6BMaKbA"
+  title="Automate Ubuntu Server Install with Autoinstall"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+> **Recommended Video**: "Ubuntu Autoinstall" by Learn Linux TV - Clear walkthrough of the autoinstall process
+
+---
+
+## 📚 Sources & References
+
+<Aside type="note" title="Learn More">
+  This guide was compiled from the following trusted sources:
+</Aside>
+
+### Official Documentation
+
+- [Ubuntu Autoinstall Reference](https://ubuntu.com/server/docs/install/autoinstall-reference) - Complete autoinstall schema
+- [Ubuntu Server Installation Guide](https://ubuntu.com/server/docs/installation) - Official installation docs
+- [Cloud-init Documentation](https://cloudinit.readthedocs.io/) - Datasources and configuration
+
+### Recommended Reading
+
+- [Canonical Blog: Automated Server Installs](https://canonical.com/blog/automated-ubuntu-server-installs) - Introduction to autoinstall
+- [DigitalOcean: Cloud-init Tutorial](https://www.digitalocean.com/community/tutorials/how-to-use-cloud-config-for-your-initial-server-setup) - Cloud-init basics
+
+### Tools
+
+- [xorriso Manual](https://www.gnu.org/software/xorriso/) - ISO manipulation tool documentation
+
+---
+
+## Conclusion
+
+You've successfully created a fully automated Ubuntu Server ISO! This custom image:
+
+- ✅ Installs without any prompts
+- ✅ Configures hostname, user, and network
+- ✅ Enables SSH on first boot
+- ✅ Installs essential packages
+- ✅ Is ready for Ansible/Terraform automation
+
+### Next Steps
+
+- Add more packages to the `packages` section
+- Configure additional `late-commands` for post-install scripts
+- Create multiple ISOs for different server roles
+- Integrate with your CI/CD pipeline for image building

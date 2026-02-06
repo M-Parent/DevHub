@@ -1,0 +1,219 @@
+---
+title: "[TITLE]"
+description: "[DESCRIPTION]"
+sidebar:
+  label: "[SIDEBAR_LABEL]"
+  order: [ORDER]
+  badge:
+    text: "Advanced"
+    variant: "caution"
+tableOfContents: true
+---
+
+{/* 
+  ═══════════════════════════════════════════════════════════
+  DEVHUB ADVANCED GUIDE TEMPLATE (MDX)
+  In-depth technical content for experienced users
+  ═══════════════════════════════════════════════════════════
+  
+  VARIABLES FOR GEMINI/N8N AUTOMATION:
+  [TITLE]              → Article title
+  [DESCRIPTION]        → Short description for SEO
+  [SIDEBAR_LABEL]      → Short label for sidebar
+  [ORDER]              → Number for sidebar ordering
+  [CATEGORY]           → docker|linux|networking|cyber|etc.
+  [TIME_ESTIMATE]      → Estimated reading/completion time
+  [INTRODUCTION]       → Article introduction paragraph
+  [ARCHITECTURE_DESC]  → Architecture explanation
+  [CONCEPT_TITLE]      → Technical concept title
+  [CONCEPT_CONTENT]    → Technical concept explanation
+  [SECTION_TITLE]      → Section heading
+  [STEP_CONTENT]       → Step explanation
+  [CODE_LANG]          → bash|yaml|json|python|javascript|etc.
+  [CODE_BLOCK]         → Code snippet
+  [CONFIG_FILE]        → Configuration file name
+  [CONFIG_CONTENT]     → Configuration content
+  [WARNING_CONTENT]    → Warning/caution content
+  [SECURITY_NOTE]      → Security consideration
+  [PERFORMANCE_TIP]    → Performance optimization tip
+  [QUESTION]           → Review question
+  [ANSWER]             → Question answer
+  [QUIZ_QUESTION]      → Quiz question
+  [QUIZ_OPTIONS]       → Array of options
+  [QUIZ_CORRECT]       → Correct option index (0-based)
+  ═══════════════════════════════════════════════════════════
+*/}
+
+import { Tabs, TabItem, Aside, Badge, Card, CardGrid } from '@astrojs/starlight/components';
+import Question from '../../../components/Question.astro';
+import Quiz from '../../../components/Quiz.astro';
+
+## Overview
+
+[INTRODUCTION]
+
+<Aside type="caution" title="Advanced Content">
+This guide assumes familiarity with [PREREQUISITE_KNOWLEDGE]. Make sure you have completed the basic guides before proceeding.
+</Aside>
+
+### Architecture
+
+[ARCHITECTURE_DESC]
+
+```mermaid
+[DIAGRAM_CONTENT]
+```
+
+---
+
+## Key Concepts
+
+### [CONCEPT_TITLE]
+
+[CONCEPT_CONTENT]
+
+### [CONCEPT_TITLE]
+
+[CONCEPT_CONTENT]
+
+<Question
+  question="[CONCEPT_QUESTION]"
+  answer="[CONCEPT_ANSWER]"
+  hint="[CONCEPT_HINT]"
+/>
+
+---
+
+## Implementation
+
+### [SECTION_TITLE]
+
+[STEP_CONTENT]
+
+<Tabs>
+  <TabItem label="[TAB_1_LABEL]">
+    ```[CODE_LANG]
+    [CODE_BLOCK_1]
+    ```
+  </TabItem>
+  <TabItem label="[TAB_2_LABEL]">
+    ```[CODE_LANG]
+    [CODE_BLOCK_2]
+    ```
+  </TabItem>
+</Tabs>
+
+---
+
+### [SECTION_TITLE]
+
+[STEP_CONTENT]
+
+**Configuration file:** `[CONFIG_FILE]`
+
+```[CODE_LANG] title="[CONFIG_FILE]"
+[CONFIG_CONTENT]
+```
+
+<Aside type="danger" title="Security Warning">
+[SECURITY_NOTE]
+</Aside>
+
+---
+
+### [SECTION_TITLE]
+
+[STEP_CONTENT]
+
+```[CODE_LANG]
+[CODE_BLOCK]
+```
+
+<Aside type="tip" title="Performance">
+[PERFORMANCE_TIP]
+</Aside>
+
+---
+
+## Advanced Configuration
+
+### [CONFIG_SECTION_TITLE]
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `[PARAM_NAME]` | [PARAM_TYPE] | `[DEFAULT]` | [PARAM_DESC] |
+| `[PARAM_NAME]` | [PARAM_TYPE] | `[DEFAULT]` | [PARAM_DESC] |
+| `[PARAM_NAME]` | [PARAM_TYPE] | `[DEFAULT]` | [PARAM_DESC] |
+
+---
+
+## Monitoring & Debugging
+
+### Logs
+
+```[CODE_LANG]
+[LOG_COMMAND]
+```
+
+### Metrics
+
+[METRICS_DESCRIPTION]
+
+```[CODE_LANG]
+[METRICS_COMMAND]
+```
+
+---
+
+## Knowledge Check
+
+Test your understanding of this advanced topic:
+
+<Question
+  question="[QUESTION_1]"
+  answer="[ANSWER_1]"
+  hint="[HINT_1]"
+/>
+
+<Question
+  question="[QUESTION_2]"
+  answer="[ANSWER_2]"
+/>
+
+<Quiz
+  question="[QUIZ_QUESTION]"
+  options={["[OPTION_A]", "[OPTION_B]", "[OPTION_C]", "[OPTION_D]"]}
+  correct={[CORRECT_INDEX]}
+  explanation="[QUIZ_EXPLANATION]"
+/>
+
+---
+
+## Production Considerations
+
+<CardGrid>
+  <Card title="Scaling" icon="rocket">
+    [SCALING_CONTENT]
+  </Card>
+  <Card title="Backup & Recovery" icon="document">
+    [BACKUP_CONTENT]
+  </Card>
+  <Card title="Security Hardening" icon="warning">
+    [SECURITY_CONTENT]
+  </Card>
+  <Card title="Monitoring" icon="magnifier">
+    [MONITORING_CONTENT]
+  </Card>
+</CardGrid>
+
+---
+
+## Conclusion
+
+[CONCLUSION]
+
+### Further Reading
+
+- [[ADVANCED_TOPIC_1]]
+- [[ADVANCED_TOPIC_2]]
+- [External Resource]([EXTERNAL_URL])

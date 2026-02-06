@@ -1,0 +1,181 @@
+---
+title: "[TITLE]"
+description: "[DESCRIPTION]"
+sidebar:
+  label: "[SIDEBAR_LABEL]"
+  order: [ORDER]
+  badge:
+    text: "[BADGE_TEXT]"
+    variant: "[BADGE_VARIANT]"
+tableOfContents: true
+---
+
+{/* 
+  ═══════════════════════════════════════════════════════════
+  DEVHUB GUIDE TEMPLATE (MDX)
+  Standard tutorial/walkthrough format with questions
+  ═══════════════════════════════════════════════════════════
+  
+  VARIABLES FOR GEMINI/N8N AUTOMATION:
+  [TITLE]           → Article title
+  [DESCRIPTION]     → Short description for SEO
+  [SIDEBAR_LABEL]   → Short label for sidebar
+  [ORDER]           → Number for sidebar ordering
+  [BADGE_TEXT]      → Badge text (New, Updated, etc.)
+  [BADGE_VARIANT]   → note | tip | caution | danger | success
+  [CATEGORY]        → docker|linux|networking|cyber|etc.
+  [DIFFICULTY]      → Beginner | Intermediate | Advanced
+  [TIME_ESTIMATE]   → Estimated reading/completion time
+  [PREREQUISITES]   → Required knowledge or setup
+  [INTRODUCTION]    → Article introduction paragraph
+  [SECTION_TITLE]   → Section heading
+  [STEP_NUMBER]     → Step number (1, 2, 3...)
+  [STEP_TITLE]      → Step title
+  [STEP_CONTENT]    → Step explanation
+  [CODE_LANG]       → bash|yaml|json|python|javascript|etc.
+  [CODE_BLOCK]      → Code snippet
+  [NOTE_CONTENT]    → Note content
+  [TIP_CONTENT]     → Helpful tip
+  [WARNING_CONTENT] → Warning/caution content
+  [QUESTION]        → Review question
+  [ANSWER]          → Question answer
+  [HINT]            → Optional hint
+  [QUIZ_QUESTION]   → Quiz question
+  [QUIZ_OPTIONS]    → Array of options
+  [QUIZ_CORRECT]    → Correct option index (0-based)
+  [QUIZ_EXPLANATION]→ Why the answer is correct
+  [CONCLUSION]      → Article conclusion
+  ═══════════════════════════════════════════════════════════
+*/}
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+import Question from '../../../components/Question.astro';
+import Quiz from '../../../components/Quiz.astro';
+
+## Overview
+
+[INTRODUCTION]
+
+### Prerequisites
+
+- [PREREQUISITE_1]
+- [PREREQUISITE_2]
+- [PREREQUISITE_3]
+
+### What You'll Learn
+
+- [LEARNING_OBJECTIVE_1]
+- [LEARNING_OBJECTIVE_2]
+- [LEARNING_OBJECTIVE_3]
+
+---
+
+## Step [STEP_NUMBER]: [STEP_TITLE]
+
+[STEP_CONTENT]
+
+```[CODE_LANG]
+[CODE_BLOCK]
+```
+
+<Aside type="note">
+[NOTE_CONTENT]
+</Aside>
+
+---
+
+## Step [STEP_NUMBER]: [STEP_TITLE]
+
+[STEP_CONTENT]
+
+```[CODE_LANG]
+[CODE_BLOCK]
+```
+
+<Aside type="tip" title="Pro Tip">
+[TIP_CONTENT]
+</Aside>
+
+---
+
+## Step [STEP_NUMBER]: [STEP_TITLE]
+
+[STEP_CONTENT]
+
+```[CODE_LANG]
+[CODE_BLOCK]
+```
+
+<Aside type="caution">
+[WARNING_CONTENT]
+</Aside>
+
+---
+
+## Verification
+
+To verify everything is working correctly:
+
+```[CODE_LANG]
+[VERIFICATION_COMMAND]
+```
+
+Expected output:
+
+```
+[EXPECTED_OUTPUT]
+```
+
+---
+
+## Knowledge Check
+
+Test your understanding of this guide:
+
+<Question
+  question="[QUESTION_1]"
+  answer="[ANSWER_1]"
+  hint="[HINT_1]"
+/>
+
+<Question
+  question="[QUESTION_2]"
+  answer="[ANSWER_2]"
+/>
+
+<Quiz
+  question="[QUIZ_QUESTION]"
+  options={["[OPTION_A]", "[OPTION_B]", "[OPTION_C]", "[OPTION_D]"]}
+  correct={[CORRECT_INDEX]}
+  explanation="[QUIZ_EXPLANATION]"
+/>
+
+---
+
+## Troubleshooting
+
+### [PROBLEM_TITLE]
+
+**Problem:** [PROBLEM_DESCRIPTION]
+
+**Solution:** [SOLUTION_DESCRIPTION]
+
+```[CODE_LANG]
+[SOLUTION_CODE]
+```
+
+---
+
+## Conclusion
+
+[CONCLUSION]
+
+### Next Steps
+
+- [NEXT_STEP_1]
+- [NEXT_STEP_2]
+
+### Related Guides
+
+- [[RELATED_GUIDE_1]]
+- [[RELATED_GUIDE_2]]

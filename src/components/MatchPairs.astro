@@ -1,0 +1,310 @@
+---
+/**
+ * MatchPairs Component for DevHub
+ * Connect matching items by clicking
+ */
+
+interface Props {
+  title?: string;
+  pairs: { left: string; right: string }[];
+}
+
+const { title = "Match the Pairs", pairs } = Astro.props;
+const id = `match-${Math.random().toString(36).substr(2, 9)}`;
+
+// Shuffle right side
+const shuffledRight = [...pairs].sort(() => Math.random() - 0.5);
+---
+
+<div class="match-container" data-id={id} data-total={pairs.length}>
+  <div class="match-header">
+    <span class="icon">🔗</span>
+    <h4>{title}</h4>
+    <span class="score" id={`score-${id}`}>0 / {pairs.length}</span>
+  </div>
+
+  <div class="match-area">
+    <div class="match-column left">
+      {pairs.map((pair, index) => (
+        <button 
+          class="match-item" 
+          data-pair-id={index}
+          data-side="left"
+          onclick={`selectMatchItem(this, '${id}')`}
+        >
+          {pair.left}
+        </button>
+      ))}
+    </div>
+
+    <div class="match-lines" id={`lines-${id}`}>
+      <svg width="100%" height="100%"></svg>
+    </div>
+
+    <div class="match-column right">
+      {shuffledRight.map((pair) => (
+        <button 
+          class="match-item" 
+          data-pair-id={pairs.indexOf(pair)}
+          data-side="right"
+          onclick={`selectMatchItem(this, '${id}')`}
+        >
+          {pair.right}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div class="match-actions">
+    <button class="reset-btn" onclick={`resetMatch('${id}')`}>
+      ↺ Reset
+    </button>
+  </div>
+
+  <div class="feedback" id={`feedback-${id}`}></div>
+</div>
+
+<script is:inline>
+  const matchState = {};
+
+  function selectMatchItem(item, id) {
+    if (item.classList.contains('matched')) return;
+
+    const side = item.dataset.side;
+    const container = document.querySelector(`[data-id="${id}"]`);
+    
+    if (!matchState[id]) {
+      matchState[id] = { left: null, right: null, matched: 0 };
+    }
+
+    // Deselect previous item on same side
+    if (matchState[id][side]) {
+      matchState[id][side].classList.remove('selected');
+    }
+
+    // Select this item
+    item.classList.add('selected');
+    matchState[id][side] = item;
+
+    // Check if we have both sides selected
+    if (matchState[id].left && matchState[id].right) {
+      const leftId = matchState[id].left.dataset.pairId;
+      const rightId = matchState[id].right.dataset.pairId;
+
+      if (leftId === rightId) {
+        // Correct match
+        matchState[id].left.classList.add('matched', 'correct');
+        matchState[id].right.classList.add('matched', 'correct');
+        matchState[id].left.classList.remove('selected');
+        matchState[id].right.classList.remove('selected');
+        matchState[id].matched++;
+
+        // Draw line
+        drawLine(matchState[id].left, matchState[id].right, id, true);
+
+        // Update score
+        const total = parseInt(container.dataset.total);
+        document.getElementById(`score-${id}`).textContent = `${matchState[id].matched} / ${total}`;
+
+        // Check completion
+        if (matchState[id].matched === total) {
+          const feedback = document.getElementById(`feedback-${id}`);
+          feedback.innerHTML = '<span class="success">🎉 Excellent! All pairs matched correctly!</span>';
+          feedback.classList.add('show');
+        }
+      } else {
+        // Wrong match - flash red
+        matchState[id].left.classList.add('wrong');
+        matchState[id].right.classList.add('wrong');
+        
+        setTimeout(() => {
+          matchState[id].left.classList.remove('selected', 'wrong');
+          matchState[id].right.classList.remove('selected', 'wrong');
+        }, 500);
+      }
+
+      // Reset selection
+      matchState[id].left = null;
+      matchState[id].right = null;
+    }
+  }
+
+  function drawLine(left, right, id, correct) {
+    const svg = document.querySelector(`#lines-${id} svg`);
+    const container = document.getElementById(`lines-${id}`);
+    const containerRect = container.getBoundingClientRect();
+
+    const leftRect = left.getBoundingClientRect();
+    const rightRect = right.getBoundingClientRect();
+
+    const x1 = 0;
+    const y1 = leftRect.top + leftRect.height / 2 - containerRect.top;
+    const x2 = containerRect.width;
+    const y2 = rightRect.top + rightRect.height / 2 - containerRect.top;
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1);
+    line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.setAttribute('stroke', correct ? '#22c55e' : '#ef4444');
+    line.setAttribute('stroke-width', '2');
+    line.setAttribute('stroke-linecap', 'round');
+    
+    svg.appendChild(line);
+  }
+
+  function resetMatch(id) {
+    const container = document.querySelector(`[data-id="${id}"]`);
+    const items = container.querySelectorAll('.match-item');
+    const svg = document.querySelector(`#lines-${id} svg`);
+    const feedback = document.getElementById(`feedback-${id}`);
+
+    items.forEach(item => {
+      item.classList.remove('selected', 'matched', 'correct', 'wrong');
+    });
+
+    svg.innerHTML = '';
+    feedback.classList.remove('show');
+    document.getElementById(`score-${id}`).textContent = `0 / ${container.dataset.total}`;
+    matchState[id] = { left: null, right: null, matched: 0 };
+  }
+</script>
+
+<style>
+  .match-container {
+    background: rgba(17, 24, 39, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .match-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .match-header .icon {
+    font-size: 1.5rem;
+  }
+
+  .match-header h4 {
+    color: #f9fafb;
+    margin: 0;
+    flex: 1;
+  }
+
+  .score {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .match-area {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .match-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .match-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e5e7eb;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    transition: all 0.15s ease;
+  }
+
+  .match-item:hover:not(.matched) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .match-item.selected {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+    color: #60a5fa;
+  }
+
+  .match-item.matched.correct {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: #22c55e;
+    color: #22c55e;
+    cursor: default;
+  }
+
+  .match-item.wrong {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    animation: shake 0.3s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  .match-lines {
+    position: relative;
+  }
+
+  .match-lines svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .match-actions {
+    display: flex;
+    justify-content: center;
+  }
+
+  .reset-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.15s ease;
+  }
+
+  .reset-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e5e7eb;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    text-align: center;
+  }
+
+  .feedback.show {
+    display: block;
+  }
+
+  .feedback .success {
+    color: #22c55e;
+  }
+</style>

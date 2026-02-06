@@ -1,0 +1,549 @@
+/* ═══════════════════════════════════════════════════════════
+   DevHub - Minimal Dark Theme
+   Clean, modern, and readable
+═══════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────
+   Color System
+───────────────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+  /* Background */
+  --sl-color-bg: #070a12;
+  --sl-color-bg-nav: rgba(7, 10, 18, 0.85);
+  --sl-color-bg-sidebar: #070a12;
+  --sl-color-bg-inline-code: #111827;
+
+  /* Surfaces */
+  --sl-color-black: #070a12;
+  --sl-color-gray-6: #0c1018;
+  --sl-color-gray-5: #111827;
+  --sl-color-gray-4: #1f2937;
+  --sl-color-gray-3: #374151;
+  --sl-color-gray-2: #4b5563;
+  --sl-color-gray-1: #6b7280;
+
+  /* Text */
+  --sl-color-white: #f9fafb;
+  --sl-color-text: #e5e7eb;
+  --sl-color-text-accent: #f9fafb;
+
+  /* Accent - subtle blue */
+  --sl-color-accent: #3b82f6;
+  --sl-color-accent-low: rgba(59, 130, 246, 0.15);
+  --sl-color-accent-high: #60a5fa;
+
+  /* Borders */
+  --sl-color-hairline: rgba(255, 255, 255, 0.06);
+  --sl-color-hairline-light: rgba(255, 255, 255, 0.1);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Base
+───────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #070a12;
+  color: #e5e7eb;
+  font-feature-settings:
+    "kern" 1,
+    "liga" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Typography
+───────────────────────────────────────────────────────── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #f9fafb;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 2.25rem;
+}
+h2 {
+  font-size: 1.75rem;
+  margin-top: 2.5rem;
+}
+h3 {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+}
+
+p,
+li {
+  color: #d1d5db;
+  line-height: 1.75;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Links
+───────────────────────────────────────────────────────── */
+a {
+  color: #60a5fa;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: #93c5fd;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Navigation
+───────────────────────────────────────────────────────── */
+header.header {
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.site-title {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Sidebar
+───────────────────────────────────────────────────────── */
+nav.sidebar {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+nav.sidebar a,
+.sidebar-content a {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0.125rem 0;
+  border-radius: 6px;
+  display: block;
+  transition: all 0.15s ease;
+}
+
+nav.sidebar a:hover,
+.sidebar-content a:hover {
+  color: #e5e7eb;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Lien actif - background foncé + texte blanc */
+nav.sidebar a[aria-current="page"],
+.sidebar-content a[aria-current="page"],
+[data-current="true"] a {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  font-weight: 500;
+}
+
+nav.sidebar a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Sidebar groups */
+.sidebar-group summary {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Table of Contents
+───────────────────────────────────────────────────────── */
+starlight-toc a {
+  color: #9ca3af;
+  transition: color 0.15s ease;
+}
+
+starlight-toc a:hover {
+  color: #f9fafb;
+}
+
+/* H2 headings in TOC - Pink */
+starlight-toc > nav > ul > li > a {
+  color: #ec4899;
+  font-weight: 500;
+}
+
+starlight-toc > nav > ul > li > a:hover {
+  color: #f472b6;
+}
+
+/* H3 headings in TOC - Blue (like DevHub title) */
+starlight-toc > nav > ul > li > ul > li > a {
+  color: #3b82f6;
+  font-weight: 400;
+}
+
+starlight-toc > nav > ul > li > ul > li > a:hover {
+  color: #60a5fa;
+}
+
+/* Current/active TOC item */
+starlight-toc a[aria-current="true"] {
+  color: #60a5fa !important;
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Content
+───────────────────────────────────────────────────────── */
+.sl-markdown-content {
+  max-width: 70ch;
+}
+
+/* Inline code */
+code:not(pre code) {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  color: #e5e7eb;
+  font-size: 0.875em;
+  padding: 0.15em 0.4em;
+}
+
+/* Code blocks */
+pre {
+  background: #0c1018 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+pre code {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Cards & Callouts
+───────────────────────────────────────────────────────── */
+.card,
+.starlight-aside {
+  background: rgba(17, 24, 39, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.starlight-aside {
+  padding: 1rem 1.25rem;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Tables
+───────────────────────────────────────────────────────── */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  background: #111827;
+  color: #f9fafb;
+  font-weight: 600;
+  text-align: left;
+}
+
+th,
+td {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.75rem 1rem;
+}
+
+tr:nth-child(even) {
+  background: rgba(17, 24, 39, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Buttons
+───────────────────────────────────────────────────────── */
+button,
+.action-link {
+  background: #1f2937;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #e5e7eb;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
+}
+
+button:hover,
+.action-link:hover {
+  background: #374151;
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Hero action buttons */
+.hero .action,
+.sl-link-button,
+a.sl-link-button {
+  background: #1f2937 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  color: #f9fafb !important;
+  font-weight: 500 !important;
+  padding: 0.75rem 1.5rem !important;
+  text-decoration: none !important;
+}
+
+.hero .action:hover,
+.sl-link-button:hover,
+a.sl-link-button:hover {
+  background: #374151 !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* Primary variant - accent blue */
+.hero .action.primary,
+.sl-link-button[data-variant="primary"],
+a.sl-link-button.primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  border: 1px solid rgba(59, 130, 246, 0.5) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.hero .action.primary:hover,
+.sl-link-button[data-variant="primary"]:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+/* Minimal variant - ghost style */
+.hero .action.minimal,
+.sl-link-button[data-variant="minimal"],
+a.sl-link-button.minimal {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #9ca3af !important;
+}
+
+.hero .action.minimal:hover,
+.sl-link-button[data-variant="minimal"]:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #e5e7eb !important;
+}
+
+/* Secondary style */
+.hero-html a,
+.action.secondary,
+a.action {
+  background: #1f2937 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.hero-html a:hover,
+.action.secondary:hover,
+a.action:hover {
+  background: #374151 !important;
+  color: #ffffff !important;
+}
+
+/* Primary action button */
+.action.primary,
+a.action.primary {
+  background: #3b82f6 !important;
+  border: 1px solid #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+.action.primary:hover {
+  background: #2563eb !important;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Search
+───────────────────────────────────────────────────────── */
+.search-input,
+input[type="search"],
+site-search button,
+[data-pagefind-ui] input,
+button.DocSearch,
+.pagefind-ui__search-input {
+  background: #070a12 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 6px;
+  color: #6b7280 !important;
+}
+
+/* Starlight search button */
+starlight-menu-button + div button,
+.search-toggle,
+button[aria-label*="earch"] {
+  background: #070a12 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #6b7280 !important;
+}
+
+.search-input:focus,
+input[type="search"]:focus {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  outline: none;
+  box-shadow: none;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Scrollbar
+───────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Selection
+───────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(59, 130, 246, 0.4);
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Transitions
+───────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Splash Page Content - Centered
+───────────────────────────────────────────────────────── */
+[data-template="splash"] .sl-markdown-content {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+[data-template="splash"] .sl-markdown-content h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  color: #f9fafb;
+}
+
+[data-template="splash"] .sl-markdown-content ul {
+  display: inline-block;
+  text-align: left;
+}
+
+[data-template="splash"] .sl-markdown-content .card-grid {
+  justify-content: center;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Hero - Splash Page Layout
+───────────────────────────────────────────────────────── */
+.hero {
+  padding: 3rem 2rem 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rem;
+}
+
+/* Bigger hero image */
+.hero img,
+.hero picture,
+.hero picture img,
+.hero .hero-image,
+.hero .hero-image img,
+[data-template="splash"] .hero img,
+[data-template="splash"] .hero picture img {
+  width: 425px !important;
+  min-width: 425px !important;
+  max-width: 425px !important;
+  height: auto !important;
+}
+
+.hero h1#_top {
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(135deg, #f9fafb 0%, #9ca3af 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero .tagline {
+  font-size: 1.25rem;
+  color: #9ca3af;
+  line-height: 1.6;
+  max-width: 45ch;
+}
+
+.hero .sl-flex.actions {
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+/* Cards styling for splash */
+[data-template="splash"] .card {
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: left;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+[data-template="splash"] .card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+[data-template="splash"] .card .card-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Divider styling */
+[data-template="splash"] hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 3rem auto;
+  max-width: 200px;
+}

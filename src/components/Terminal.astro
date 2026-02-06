@@ -1,0 +1,236 @@
+---
+/**
+ * Terminal Component for DevHub
+ * Interactive fake terminal for practice
+ */
+
+interface Props {
+  title?: string;
+  prompt?: string;
+  commands: { input: string; output: string }[];
+}
+
+const { title = "Terminal", prompt = "$ ", commands } = Astro.props;
+const id = `terminal-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class="terminal-container" data-id={id} data-commands={JSON.stringify(commands)}>
+  <div class="terminal-header">
+    <div class="terminal-buttons">
+      <span class="btn close"></span>
+      <span class="btn minimize"></span>
+      <span class="btn maximize"></span>
+    </div>
+    <span class="terminal-title">{title}</span>
+  </div>
+
+  <div class="terminal-body" id={`body-${id}`}>
+    <div class="terminal-output" id={`output-${id}`}></div>
+    <div class="terminal-input-line">
+      <span class="prompt">{prompt}</span>
+      <input 
+        type="text" 
+        class="terminal-input" 
+        id={`input-${id}`}
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        placeholder="Type a command..."
+      />
+    </div>
+  </div>
+
+  <div class="terminal-hint">
+    💡 Try: {commands.map(c => <code>{c.input}</code>)}
+  </div>
+</div>
+
+<script is:inline define:vars={{ id }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.querySelector(`[data-id="${id}"]`);
+    const input = document.getElementById(`input-${id}`);
+    const output = document.getElementById(`output-${id}`);
+    const commands = JSON.parse(container.dataset.commands);
+    const history = [];
+    let historyIndex = -1;
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const cmd = input.value.trim();
+        if (!cmd) return;
+
+        // Add to history
+        history.unshift(cmd);
+        historyIndex = -1;
+
+        // Display input
+        const inputLine = document.createElement('div');
+        inputLine.className = 'output-line input-echo';
+        inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
+        output.appendChild(inputLine);
+
+        // Find matching command
+        const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
+        
+        // Display output
+        const outputLine = document.createElement('div');
+        outputLine.className = 'output-line';
+        
+        if (match) {
+          outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
+          outputLine.classList.add('success');
+        } else {
+          outputLine.textContent = `Command not found: ${cmd}`;
+          outputLine.classList.add('error');
+        }
+        
+        output.appendChild(outputLine);
+        
+        // Clear input and scroll
+        input.value = '';
+        output.scrollTop = output.scrollHeight;
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (historyIndex < history.length - 1) {
+          historyIndex++;
+          input.value = history[historyIndex];
+        }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex > 0) {
+          historyIndex--;
+          input.value = history[historyIndex];
+        } else {
+          historyIndex = -1;
+          input.value = '';
+        }
+      } else if (e.key === 'l' && e.ctrlKey) {
+        e.preventDefault();
+        output.innerHTML = '';
+      }
+    });
+
+    // Focus on click
+    container.addEventListener('click', () => input.focus());
+  });
+</script>
+
+<style>
+  .terminal-container {
+    background: #0c0c0c;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    overflow: hidden;
+    font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+  }
+
+  .terminal-header {
+    background: #1f1f1f;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .terminal-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .terminal-buttons .btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .btn.close { background: #ff5f56; }
+  .btn.minimize { background: #ffbd2e; }
+  .btn.maximize { background: #27c93f; }
+
+  .terminal-title {
+    color: #6b7280;
+    font-size: 0.75rem;
+  }
+
+  .terminal-body {
+    min-height: 200px;
+    max-height: 400px;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  .terminal-output {
+    margin-bottom: 0.5rem;
+  }
+
+  .output-line {
+    color: #d1d5db;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-bottom: 0.25rem;
+  }
+
+  .output-line.input-echo {
+    color: #9ca3af;
+  }
+
+  .output-line.input-echo .prompt {
+    color: #22c55e;
+  }
+
+  .output-line.success {
+    color: #e5e7eb;
+  }
+
+  .output-line.error {
+    color: #ef4444;
+  }
+
+  .terminal-input-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .prompt {
+    color: #22c55e;
+    font-weight: 500;
+  }
+
+  .terminal-input {
+    background: transparent;
+    border: none;
+    color: #f9fafb;
+    font-family: inherit;
+    font-size: 0.875rem;
+    flex: 1;
+    outline: none;
+  }
+
+  .terminal-input::placeholder {
+    color: #4b5563;
+  }
+
+  .terminal-hint {
+    background: rgba(255, 255, 255, 0.03);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: #6b7280;
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .terminal-hint code {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #9ca3af;
+    padding: 0.125rem 0.375rem;
+    margin-left: 0.25rem;
+  }
+</style>

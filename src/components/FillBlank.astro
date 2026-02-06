@@ -1,0 +1,275 @@
+---
+/**
+ * FillBlank Component for DevHub
+ * Type in the missing words
+ */
+
+interface Props {
+  instruction?: string;
+  sentence: string; // Use [BLANK:answer] for blanks
+}
+
+const { instruction = "Fill in the blanks", sentence } = Astro.props;
+const id = `fillblank-${Math.random().toString(36).substr(2, 9)}`;
+
+// Parse sentence to extract blanks and answers
+const regex = /\[BLANK:([^\]]+)\]/g;
+const parts: { type: 'text' | 'blank'; content: string; answer?: string }[] = [];
+let lastIndex = 0;
+let match;
+let blankIndex = 0;
+
+const tempSentence = sentence;
+while ((match = regex.exec(tempSentence)) !== null) {
+  if (match.index > lastIndex) {
+    parts.push({ type: 'text', content: tempSentence.slice(lastIndex, match.index) });
+  }
+  parts.push({ type: 'blank', content: '', answer: match[1] });
+  lastIndex = match.index + match[0].length;
+}
+if (lastIndex < tempSentence.length) {
+  parts.push({ type: 'text', content: tempSentence.slice(lastIndex) });
+}
+
+const answers = parts.filter(p => p.type === 'blank').map(p => p.answer);
+---
+
+<div class="fillblank-container" data-id={id} data-answers={JSON.stringify(answers)}>
+  <div class="fillblank-header">
+    <span class="icon">✏️</span>
+    <p>{instruction}</p>
+  </div>
+
+  <div class="sentence-area">
+    {parts.map((part, index) => (
+      part.type === 'text' 
+        ? <span class="text-part">{part.content}</span>
+        : <input 
+            type="text" 
+            class="blank-input" 
+            data-blank-index={parts.slice(0, index).filter(p => p.type === 'blank').length}
+            placeholder="..."
+            autocomplete="off"
+          />
+    ))}
+  </div>
+
+  <div class="fillblank-actions">
+    <button class="check-btn" onclick={`checkFillBlank('${id}')`}>
+      ✓ Check Answers
+    </button>
+    <button class="reveal-btn" onclick={`revealFillBlank('${id}')`}>
+      👁️ Show Answers
+    </button>
+    <button class="reset-btn" onclick={`resetFillBlank('${id}')`}>
+      ↺ Reset
+    </button>
+  </div>
+
+  <div class="feedback" id={`feedback-${id}`}></div>
+</div>
+
+<script is:inline>
+  function checkFillBlank(id) {
+    const container = document.querySelector(`[data-id="${id}"]`);
+    const answers = JSON.parse(container.dataset.answers);
+    const inputs = container.querySelectorAll('.blank-input');
+    const feedback = document.getElementById(`feedback-${id}`);
+    
+    let correct = 0;
+    let total = answers.length;
+
+    inputs.forEach((input, index) => {
+      const userAnswer = input.value.trim().toLowerCase();
+      const correctAnswer = answers[index].toLowerCase();
+      
+      if (userAnswer === correctAnswer) {
+        input.classList.add('correct');
+        input.classList.remove('incorrect');
+        correct++;
+      } else if (userAnswer === '') {
+        input.classList.remove('correct', 'incorrect');
+      } else {
+        input.classList.add('incorrect');
+        input.classList.remove('correct');
+      }
+    });
+
+    if (correct === total) {
+      feedback.innerHTML = `<span class="success">🎉 Perfect! All ${total} answers correct!</span>`;
+    } else {
+      feedback.innerHTML = `<span class="partial">📊 ${correct}/${total} correct. Keep trying!</span>`;
+    }
+    feedback.classList.add('show');
+  }
+
+  function revealFillBlank(id) {
+    const container = document.querySelector(`[data-id="${id}"]`);
+    const answers = JSON.parse(container.dataset.answers);
+    const inputs = container.querySelectorAll('.blank-input');
+    const feedback = document.getElementById(`feedback-${id}`);
+
+    inputs.forEach((input, index) => {
+      input.value = answers[index];
+      input.classList.add('revealed');
+      input.classList.remove('correct', 'incorrect');
+    });
+
+    feedback.innerHTML = '<span class="info">💡 Answers revealed. Try again to test yourself!</span>';
+    feedback.classList.add('show');
+  }
+
+  function resetFillBlank(id) {
+    const container = document.querySelector(`[data-id="${id}"]`);
+    const inputs = container.querySelectorAll('.blank-input');
+    const feedback = document.getElementById(`feedback-${id}`);
+
+    inputs.forEach(input => {
+      input.value = '';
+      input.classList.remove('correct', 'incorrect', 'revealed');
+    });
+
+    feedback.classList.remove('show');
+  }
+</script>
+
+<style>
+  .fillblank-container {
+    background: rgba(17, 24, 39, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .fillblank-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .fillblank-header .icon {
+    font-size: 1.5rem;
+  }
+
+  .fillblank-header p {
+    color: #f9fafb;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .sentence-area {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1.25rem;
+    line-height: 2.5;
+    color: #e5e7eb;
+    font-size: 1rem;
+  }
+
+  .text-part {
+    white-space: pre-wrap;
+  }
+
+  .blank-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 2px solid #3b82f6;
+    border-radius: 4px;
+    color: #f9fafb;
+    font-size: 0.875rem;
+    font-family: inherit;
+    padding: 0.25rem 0.5rem;
+    margin: 0 0.25rem;
+    min-width: 80px;
+    text-align: center;
+    transition: all 0.15s ease;
+  }
+
+  .blank-input:focus {
+    outline: none;
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+  }
+
+  .blank-input::placeholder {
+    color: #6b7280;
+  }
+
+  .blank-input.correct {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: #22c55e;
+    border-bottom-color: #22c55e;
+  }
+
+  .blank-input.incorrect {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: #ef4444;
+    border-bottom-color: #ef4444;
+  }
+
+  .blank-input.revealed {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+    color: #60a5fa;
+  }
+
+  .fillblank-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .check-btn, .reveal-btn, .reset-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.15s ease;
+  }
+
+  .check-btn:hover {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: #22c55e;
+    color: #22c55e;
+  }
+
+  .reveal-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+    color: #60a5fa;
+  }
+
+  .reset-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e5e7eb;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+  }
+
+  .feedback.show {
+    display: block;
+  }
+
+  .feedback .success {
+    color: #22c55e;
+  }
+
+  .feedback .partial {
+    color: #f59e0b;
+  }
+
+  .feedback .info {
+    color: #60a5fa;
+  }
+</style>

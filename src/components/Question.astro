@@ -1,0 +1,126 @@
+---
+/**
+ * Question Component for DevHub
+ * Interactive Q&A for knowledge consolidation
+ */
+
+interface Props {
+  question: string;
+  answer: string;
+  hint?: string;
+}
+
+const { question, answer, hint } = Astro.props;
+const id = `question-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class="question-card" data-question-id={id}>
+  <div class="question-header">
+    <span class="question-icon">❓</span>
+    <p class="question-text">{question}</p>
+  </div>
+  
+  {hint && (
+    <button class="hint-btn" onclick={`document.getElementById('hint-${id}').classList.toggle('show')`}>
+      💡 Show Hint
+    </button>
+    <div id={`hint-${id}`} class="hint-content">
+      {hint}
+    </div>
+  )}
+  
+  <button 
+    class="reveal-btn"
+    onclick={`document.getElementById('answer-${id}').classList.toggle('show'); this.textContent = this.textContent === '👁️ Reveal Answer' ? '🙈 Hide Answer' : '👁️ Reveal Answer'`}
+  >
+    👁️ Reveal Answer
+  </button>
+  
+  <div id={`answer-${id}`} class="answer-content">
+    <div class="answer-label">Answer:</div>
+    <p>{answer}</p>
+  </div>
+</div>
+
+<style>
+  .question-card {
+    background: rgba(17, 24, 39, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+  }
+
+  .question-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .question-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .question-text {
+    color: #f9fafb;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .hint-btn,
+  .reveal-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.15s ease;
+  }
+
+  .hint-btn:hover,
+  .reveal-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e5e7eb;
+  }
+
+  .hint-content,
+  .answer-content {
+    display: none;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+  }
+
+  .hint-content.show {
+    display: block;
+    background: rgba(251, 191, 36, 0.1);
+    border-left: 3px solid #fbbf24;
+  }
+
+  .answer-content.show {
+    display: block;
+    background: rgba(34, 197, 94, 0.1);
+    border-left: 3px solid #22c55e;
+  }
+
+  .answer-label {
+    color: #22c55e;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .answer-content p {
+    color: #e5e7eb;
+    margin: 0;
+  }
+</style>
