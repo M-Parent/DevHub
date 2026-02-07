@@ -1,0 +1,244 @@
+---
+title: "Cloudflare Tunnel Setup"
+description: "Expose self-hosted applications without opening firewall ports using Cloudflare Tunnels and Docker."
+sidebar:
+  label: "Cloudflare Tunnel"
+  order: 3
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import {
+  Aside,
+  Badge,
+  Steps,
+  CardGrid,
+  LinkCard,
+} from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FileTree from "../../../../components/FileTree.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Networking" class="networking" />
+<Badge text="Docker" class="docker" />
+
+This guide shows the simplest way to expose your self-hosted Docker applications to the internet using a **Cloudflare Tunnel** — **without opening any firewall ports**.
+
+<Aside type="caution" title="Security Note">
+  This is a basic setup. For enhanced security, consider adding Traefik and
+  CrowdSec as additional protection layers.
+</Aside>
+
+---
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- A registered **domain name** managed by Cloudflare DNS
+- **Docker** and **Docker Compose** installed on your server
+
+---
+
+## Step 1: Create the Tunnel
+
+<Steps>
+
+1. **Log in to Cloudflare** and navigate to the **Zero Trust** dashboard
+
+2. Go to **Networks** → **Manage Tunnels** and click **Add a Tunnel**
+
+3. **Name the Tunnel** (e.g., `homeserver-tunnel`) and click **Save Tunnel**
+
+4. **Copy the Token**:
+   - Select **Docker** as your installation environment
+   - Copy the long token string (starting with `ey...`)
+
+</Steps>
+
+<Aside type="tip" title="Save Your Token">
+  Keep this token safe — you'll need it for your Docker configuration. You can
+  ignore the Public Hostname section for now.
+</Aside>
+
+---
+
+## Step 2: Configure Docker
+
+Create a dedicated directory for your tunnel:
+
+```bash
+mkdir ~/cloudflare-tunnel
+cd ~/cloudflare-tunnel
+touch docker-compose.yml
+```
+
+<FileTree
+  title="Project Structure"
+  structure={[
+    {
+      name: "cloudflare-tunnel/",
+      type: "folder",
+      children: [{ name: "docker-compose.yml", badge: "create" }],
+    },
+  ]}
+/>
+
+### Docker Compose Configuration
+
+```yaml
+services:
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token PASTE_TOKEN_HERE
+```
+
+Replace `PASTE_TOKEN_HERE` with your actual tunnel token.
+
+---
+
+## Step 3: Deploy and Verify
+
+<Steps>
+
+1. **Deploy the tunnel**
+
+   ```bash
+   docker compose up -d
+   ```
+
+2. **Check Cloudflare Dashboard**
+
+   Refresh the Tunnel Dashboard — your tunnel should show **HEALTHY**
+
+3. **Verify container logs**
+
+   ```bash
+   docker logs cloudflare-tunnel
+   ```
+
+</Steps>
+
+<Terminal
+  commands={[
+    {
+      input: "docker compose up -d",
+      output: "[+] Running 1/1\n ✔ Container cloudflare-tunnel  Started",
+    },
+    {
+      input: "docker logs cloudflare-tunnel",
+      output:
+        "INF Starting tunnel tunnelID=abc123\nINF Connection registered connIndex=0",
+    },
+  ]}
+/>
+
+---
+
+## Adding Public Hostnames
+
+Once your tunnel is running, configure public hostnames in Cloudflare:
+
+1. Go to **Zero Trust** → **Networks** → **Tunnels**
+2. Click your tunnel → **Public Hostname** tab
+3. Add a hostname pointing to your local service
+
+| Field     | Example                 |
+| --------- | ----------------------- |
+| Subdomain | `app`                   |
+| Domain    | `yourdomain.com`        |
+| Service   | `http://localhost:8080` |
+
+---
+
+## Key Concepts
+
+<Flashcard
+  title="Cloudflare Tunnel Concepts"
+  cards={[
+    {
+      front: "What is a Cloudflare Tunnel?",
+      back: "A secure outbound connection from your server to Cloudflare's edge, exposing services without opening ports",
+    },
+    {
+      front: "What is cloudflared?",
+      back: "The daemon/agent that runs on your server and maintains the tunnel connection",
+    },
+    {
+      front: "What is Zero Trust?",
+      back: "Cloudflare's security platform that includes tunnels, access policies, and identity management",
+    },
+    {
+      front: "Why no port forwarding?",
+      back: "The tunnel creates an outbound connection, so no inbound ports need to be opened on your firewall",
+    },
+  ]}
+/>
+
+<MatchPairs
+  title="Tunnel Components"
+  pairs={[
+    { left: "cloudflared", right: "Agent running on your server" },
+    { left: "Tunnel Token", right: "Authentication credential" },
+    { left: "Public Hostname", right: "DNS record pointing to service" },
+    { left: "Zero Trust Dashboard", right: "Management interface" },
+  ]}
+/>
+
+---
+
+## Knowledge Check
+
+<FillBlank
+  instruction="Complete the Docker command to start the tunnel:"
+  sentence="docker compose [BLANK:up] -d"
+/>
+
+<Quiz
+  question="What is the main security benefit of Cloudflare Tunnels?"
+  options={[
+    "Faster internet speed",
+    "No need to open firewall ports",
+    "Free SSL certificates",
+    "Built-in load balancing",
+  ]}
+  correct={1}
+  explanation="Cloudflare Tunnels create outbound connections, eliminating the need to open inbound ports on your firewall, significantly reducing your attack surface."
+/>
+
+<Quiz
+  question="What format does the Cloudflare tunnel token start with?"
+  options={["cf-", "token-", "ey", "tunnel-"]}
+  correct={2}
+  explanation="Cloudflare tunnel tokens are JWTs (JSON Web Tokens) which always start with 'ey'."
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Domain configured in Cloudflare DNS",
+    "Created tunnel in Zero Trust dashboard",
+    "Copied tunnel token",
+    "Created docker-compose.yml",
+    "Deployed cloudflared container",
+    "Verified tunnel is HEALTHY",
+    "Added public hostname (optional)",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Cloudflare Tunnel Documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/) and DevHub examples.

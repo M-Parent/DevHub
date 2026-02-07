@@ -1,0 +1,556 @@
+---
+title: "ARR Stack Complete Setup"
+description: "Build a fully automated, self-hosted media stack with Sonarr, Radarr, Prowlarr, qBittorrent, and VPN protection."
+sidebar:
+  label: "ARR Stack Setup"
+  order: 2
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import {
+  Aside,
+  Badge,
+  Steps,
+  CardGrid,
+  LinkCard,
+} from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FileTree from "../../../../components/FileTree.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="ARR-Stack" class="arr-stack" />
+<Badge text="Docker" class="docker" />
+
+This guide walks you through building your own self-hosted **ARR Stack** — a fully automated media setup that runs privately on your server with VPN protection.
+
+<Aside type="tip" title="Video Guide">
+  <iframe
+    width="100%"
+    height="400"
+    src="https://www.youtube.com/embed/twJDyoj0tDc"
+    title="Virtual Machines vs Containers"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+  Watch [TechHut's video](https://www.youtube.com/watch?v=twJDyoj0tDc) for the
+  full explanation. You can skip the NZBGet section — you won't need it.
+</Aside>
+
+---
+
+## Overview
+
+This stack includes:
+
+| Service             | Purpose                      | Port |
+| ------------------- | ---------------------------- | ---- |
+| 🛡️ **Gluetun**      | VPN gateway for all services | 8001 |
+| ⚡ **qBittorrent**  | Torrent download client      | 9090 |
+| 🕵️ **Prowlarr**     | Central indexer manager      | 9696 |
+| 📺 **Sonarr**       | TV show automation           | 8989 |
+| 🎥 **Radarr**       | Movie automation             | 7878 |
+| 💬 **Bazarr**       | Subtitle downloader          | 6767 |
+| 🔓 **FlareSolverr** | Bypass Cloudflare protection | 8191 |
+| 🧭 **Overseerr**    | Media requests (Plex)        | 5055 |
+| 🍿 **Jellyseerr**   | Media requests (Jellyfin)    | 5065 |
+| ❤️ **Deunhealth**   | Container health monitor     | -    |
+
+All services except Deunhealth share the **Gluetun network**, routing all traffic through the VPN.
+
+---
+
+## Folder Structure
+
+<FileTree
+  title="ARR Stack Directory"
+  structure={[
+    {
+      name: "arr-stack",
+      type: "folder",
+      children: [
+        { name: "docker-compose.yml", badge: "create" },
+        { name: ".env", badge: "create" },
+        {
+          name: "gluetun",
+          type: "folder",
+          children: [{ name: "config.toml", badge: "create" }],
+        },
+        { name: "qbittorrent-config", type: "folder" },
+        { name: "prowlarr-config", type: "folder" },
+        { name: "sonarr-config", type: "folder" },
+        { name: "radarr-config", type: "folder" },
+        { name: "bazarr-config", type: "folder" },
+        { name: "overseerr-config", type: "folder" },
+        { name: "jellyseerr-config", type: "folder" },
+      ],
+    },
+    {
+      name: "Media-Drive",
+      type: "folder",
+      children: [
+        { name: "Movies", type: "folder" },
+        { name: "TV Shows", type: "folder" },
+        {
+          name: "downloads",
+          type: "folder",
+          children: [
+            {
+              name: "qbittorrent",
+              type: "folder",
+              children: [
+                { name: "completed", type: "folder" },
+                { name: "incomplete", type: "folder" },
+                { name: "torrents", type: "folder" },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ]}
+/>
+
+<Aside type="note" title="Media Drive">
+  The Media-Drive can be a local folder or a CIFS/SMB mount to a NAS or external
+  drive.
+</Aside>
+
+---
+
+## Docker Compose Configuration
+
+Create `docker-compose.yml`:
+
+```yaml
+services:
+  gluetun:
+    image: qmcgaw/gluetun:v3.41.0
+    container_name: gluetun
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8001:8000 # Gluetun
+      - 9090:9090 # qbittorrent
+      - 6881:6881 # qbittorrent torrent
+      - 9696:9696 # prowlarr
+      - 8989:8989 # Sonarr
+      - 7878:7878 # Radarr
+    volumes:
+      - ./gluetun:/gluetun
+      - ./gluetun/config.toml:/gluetun/auth/config.toml
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=${VPN_TYPE}
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+      - SERVER_CITIES=${SERVER_CITIES}
+      - TZ=${TZ}
+      - UPDATER_PERIOD=24h
+      - DNS_SERVER=off
+      - HEALTH_VPN_DURATION_INITIAL=120s
+      # IMPORTANT: Add these if Gluetun's internal firewall is active and blocking inbound connections
+      # - FIREWALL_VPN_INPUT_PORTS=8787,8989,7878,8686,6767,9696,9090,6881,6789
+    healthcheck:
+      test: ping -c 1 www.google.com || exit 1
+      interval: 60s
+      timeout: 20s
+      retries: 5
+
+  deunhealth:
+    image: qmcgaw/deunhealth
+    container_name: deunhealth
+    network_mode: "none"
+    environment:
+      - LOG_LEVEL=info
+      - HEALTH_SERVER_ADDRESS=127.0.0.1:9999
+      - TZ=${TZ}
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=9090
+      - TORRENTING_PORT=6881
+    volumes:
+      - ./qbittorrent-config:/config
+      - Media-Drive:/data
+    network_mode: service:gluetun
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./prowlarr-config:/config
+    network_mode: service:gluetun
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./sonarr-config:/config
+      - Media-Drive:/data
+    network_mode: service:gluetun
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./radarr-config:/config
+      - Media-Drive:/data
+    network_mode: service:gluetun
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./bazarr-config:/config
+      - Media-Drive:/data
+    network_mode: service:gluetun
+
+  overseerr:
+    image: sctx/overseerr:latest
+    container_name: overseerr
+    restart: unless-stopped
+    ports:
+      - 5055:5055
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./overseerr-config:/app/config
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    restart: unless-stopped
+    ports:
+      - 5065:5055
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=${TZ}
+    volumes:
+      - ./jellyseerr-config:/app/config
+
+  flaresolverr:
+    image: flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    network_mode: service:gluetun
+
+volumes:
+  Media-Drive:
+    driver_opts:
+      type: cifs
+      o: username=${USERNAME},password=${PASSWORD},uid=${PUID},gid=${PGID}
+      device: ${DEVICE_PATH}
+```
+
+<Aside type="tip" title="Port Conflicts">
+  If a port is already in use, change the first number in the mapping (e.g.,
+  `8798:8989` changes external port to 8798).
+</Aside>
+
+---
+
+## Environment Variables
+
+Create `.env` file:
+
+```bash
+# 🌐 Gluetun VPN Settings
+VPN_SERVICE_PROVIDER=                   # e.g., protonvpn, nordvpn, mullvad
+VPN_TYPE=                               # openvpn or wireguard
+OPENVPN_USER=                           # Your VPN username
+OPENVPN_PASSWORD=                       # Your VPN password
+SERVER_COUNTRIES=                       # e.g., Canada
+SERVER_CITIES=                          # e.g., Toronto,Montreal,Vancouver
+
+# 💾 Volume Mount Credentials (for network drives)
+USERNAME=                               # Network drive username
+PASSWORD=                               # Network drive password
+DEVICE_PATH=                            # e.g., //192.168.1.50/Media-Drive
+
+# 🕒 Global Settings
+TZ=America/Toronto                      # Your timezone
+PUID=1000                               # User ID
+PGID=1000                               # Group ID
+```
+
+### VPN Provider Guides
+
+- [NordVPN Setup](https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/nordvpn.md)
+- [ProtonVPN Setup](https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/protonvpn.md)
+- [Surfshark Setup](https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/surfshark.md)
+- [Mullvad Setup](https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/mullvad.md)
+- [All Providers](https://github.com/qdm12/gluetun-wiki/tree/main/setup/providers)
+
+---
+
+## Gluetun config.toml
+
+Create `gluetun/config.toml`:
+
+```toml
+[[roles]]
+name = "qBittorrent"
+routes = ["GET /v1/openvpn/portforwarded"]
+auth = "none"
+
+[[roles]]
+name = "Radarr"
+routes = ["GET /v1/openvpn/portforwarded"]
+auth = "none"
+
+[[roles]]
+name = "Sonarr"
+routes = ["GET /v1/openvpn/portforwarded"]
+auth = "none"
+
+[[roles]]
+name = "Prowlarr"
+routes = ["GET /v1/openvpn/portforwarded"]
+auth = "none"
+
+[[roles]]
+name = "Bazarr"
+routes = ["GET /v1/openvpn/portforwarded"]
+auth = "none"
+```
+
+<Aside type="note" title="WireGuard Users">
+  If using WireGuard instead of OpenVPN, check the [Gluetun
+  documentation](https://github.com/qdm12/gluetun-wiki/blob/main/setup/advanced/control-server.md)
+  for the correct route paths.
+</Aside>
+
+---
+
+## Launch the Stack
+
+```bash
+docker compose up -d
+```
+
+<Terminal
+  commands={[
+    {
+      input: "docker compose up -d",
+      output:
+        "[+] Running 9/9\n ✔ Container gluetun        Started\n ✔ Container qbittorrent    Started\n ✔ Container sonarr         Started\n ✔ Container radarr         Started\n ✔ Container prowlarr       Started\n ✔ Container bazarr         Started\n ✔ Container overseerr      Started\n ✔ Container jellyseerr     Started\n ✔ Container deunhealth     Started",
+    },
+  ]}
+/>
+
+---
+
+## Verify Services
+
+| Service     | URL                   |
+| ----------- | --------------------- |
+| Sonarr      | http://localhost:8989 |
+| Radarr      | http://localhost:7878 |
+| qBittorrent | http://localhost:9090 |
+| Prowlarr    | http://localhost:9696 |
+| Bazarr      | http://localhost:6767 |
+| Overseerr   | http://localhost:5055 |
+| Jellyseerr  | http://localhost:5065 |
+
+<Aside type="tip" title="Remote Access">
+  Replace `localhost` with your server's IP for remote access (e.g.,
+  `http://192.168.1.50:8989`).
+</Aside>
+
+---
+
+## Key Concepts
+
+<Flashcard
+  title="ARR Stack Components"
+  cards={[
+    {
+      front: "What does Gluetun do?",
+      back: "VPN gateway container that routes all ARR traffic through a VPN tunnel",
+    },
+    {
+      front: "What is Prowlarr?",
+      back: "Indexer manager that centralizes torrent/usenet indexers for all ARR apps",
+    },
+    {
+      front: "Sonarr vs Radarr?",
+      back: "Sonarr automates TV shows, Radarr automates movies",
+    },
+    {
+      front: "What is network_mode: service:gluetun?",
+      back: "Makes containers share Gluetun's network, routing their traffic through VPN",
+    },
+    {
+      front: "Overseerr vs Jellyseerr?",
+      back: "Overseerr is for Plex users, Jellyseerr is for Jellyfin users",
+    },
+  ]}
+/>
+
+<MatchPairs
+  title="Service Purposes"
+  pairs={[
+    { left: "Sonarr", right: "TV show automation" },
+    { left: "Radarr", right: "Movie automation" },
+    { left: "Prowlarr", right: "Indexer management" },
+    { left: "Bazarr", right: "Subtitle downloads" },
+  ]}
+/>
+
+---
+
+## Configuration Order
+
+After deployment, configure services in this order:
+
+<Steps>
+
+1. **qBittorrent** — Configure download paths
+
+   <Aside type="caution" title="Important: VPN Network Interface">
+     To ensure downloads go through the VPN, go to **qBittorrent Settings** →
+     **Advanced** and change the **Network Interface** to `tun0`. This forces
+     all torrent traffic through Gluetun's VPN tunnel.
+   </Aside>
+
+2. **Prowlarr** — Add indexers, link to Sonarr/Radarr
+3. **Sonarr** — Configure TV show automation
+4. **Radarr** — Configure movie automation
+5. **Bazarr** — Configure subtitle sources
+6. **Overseerr/Jellyseerr** — Set up media requests
+
+</Steps>
+
+---
+
+## Knowledge Check
+
+<FillBlank
+  instruction="Complete the command to start all containers:"
+  sentence="docker compose [BLANK:up] -d"
+/>
+
+<Quiz
+  question="Why do ARR containers use network_mode: service:gluetun?"
+  options={[
+    "For faster downloads",
+    "To share the VPN connection",
+    "To save disk space",
+    "For automatic updates",
+  ]}
+  correct={1}
+  explanation="Using network_mode: service:gluetun makes containers share Gluetun's network stack, routing all their traffic through the VPN tunnel."
+/>
+
+<Quiz
+  question="Which service manages torrent indexers for the entire stack?"
+  options={["Sonarr", "Radarr", "Prowlarr", "qBittorrent"]}
+  correct={2}
+  explanation="Prowlarr is the central indexer manager that syncs indexers to Sonarr, Radarr, and other ARR apps."
+/>
+
+---
+
+## Troubleshooting
+
+### Gluetun Issues
+
+- [Jim's Garage - Gluetun Setup](https://www.youtube.com/watch?v=9dJPOd0XbN8)
+- [TechHut - VPN Troubleshooting](https://www.youtube.com/watch?v=_tz2wUFT8VQ)
+
+### Overseerr Setup
+
+- [AlienTech42 - Overseerr Guide](https://www.youtube.com/watch?v=TfuwG-OHccI)
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Created folder structure",
+    "Configured docker-compose.yml",
+    "Set up .env with VPN credentials",
+    "Created Gluetun config.toml",
+    "Launched the stack",
+    "Verified all services are running",
+    "Configured qBittorrent",
+    "Set up Prowlarr with indexers",
+    "Configured Sonarr and Radarr",
+    "Set up Overseerr or Jellyseerr",
+  ]}
+/>
+
+---
+
+## Expand Your Stack
+
+Want to add more services to your ARR suite? Check out the complete list of \*arr apps:
+
+👉 [Self-Hosted ARR Apps Directory](https://selfh.st/apps/?tag=*arr)
+
+### Recommended Additions
+
+| Service         | Why You Need It                                                                                                                               |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Wizarr**      | Simplifies user onboarding for Plex/Jellyfin — send invite links that automatically configure new users with libraries and permissions        |
+| **Huntarr**     | Automatically searches for missing or upgraded content across Sonarr/Radarr — ensures your library stays complete without manual intervention |
+| **Maintainerr** | Automatically removes watched content based on rules — keeps your library clean and saves disk space                                          |
+
+<Aside type="tip" title="Start Simple">
+  Get your base stack working first, then gradually add these services as
+  needed. Each one adds complexity but also automation.
+</Aside>
+
+---
+
+## Source
+
+Based on [TechHut's ARR Stack Guide](https://www.youtube.com/watch?v=twJDyoj0tDc) and DevHub examples.

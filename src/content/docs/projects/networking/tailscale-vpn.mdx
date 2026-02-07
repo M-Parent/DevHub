@@ -1,0 +1,205 @@
+---
+title: "Tailscale VPN Client Setup"
+description: "The easiest VPN for homelabbers - zero-config mesh networking with WireGuard."
+sidebar:
+  label: "Tailscale VPN"
+  order: 2
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import {
+  Aside,
+  Badge,
+  Steps,
+  CardGrid,
+  LinkCard,
+} from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Networking" class="networking" />
+
+**Tailscale** is a modern, zero-config VPN built on top of **WireGuard**. It lets your devices connect to each other privately as if they were all on the same LAN — anywhere in the world.
+
+<Aside type="tip" title="Why Tailscale?">
+  Unlike traditional VPNs, Tailscale requires no port forwarding, no public IP,
+  and no complex configuration. It just works.
+</Aside>
+
+---
+
+## Core Principles
+
+Tailscale creates your own private network called a **Tailnet**:
+
+| Feature                 | Benefit                                     |
+| ----------------------- | ------------------------------------------- |
+| ✔ Private Tailnet       | Your own secure mesh network                |
+| ✔ No port forwarding    | Works behind any NAT/firewall               |
+| ✔ No public IP required | Perfect for home networks                   |
+| ✔ Zero configuration    | Install and connect instantly               |
+| ✔ Cross-platform        | Windows, Linux, macOS, iOS, Android, Docker |
+
+---
+
+## Ubuntu / Debian Installation
+
+<Steps>
+
+1. **Install Tailscale**
+
+   ```bash
+   curl -fsSL https://tailscale.com/install.sh | sh
+   ```
+
+2. **Join your Tailnet**
+
+   ```bash
+   sudo tailscale up
+   ```
+
+3. **Authenticate**
+
+   This will give you a login URL — open it in a browser, log in, and the server joins your network.
+
+4. **Verify connection**
+
+   You will now see all machines in your Tailnet with their IPs (100.x.x.x). Add a second device and try to ping!
+
+</Steps>
+
+<Terminal
+  commands={[
+    {
+      input: "curl -fsSL https://tailscale.com/install.sh | sh",
+      output: "Installation complete.",
+    },
+    {
+      input: "sudo tailscale up",
+      output:
+        "To authenticate, visit:\n  https://login.tailscale.com/a/abc123xyz",
+    },
+    {
+      input: "tailscale status",
+      output:
+        "100.100.100.1   myserver        linux   -\n100.100.100.2   mylaptop        macos   -",
+    },
+  ]}
+/>
+
+---
+
+## Advanced Options
+
+### Exit Node
+
+An **exit node** routes all your internet traffic through a specific device in your Tailnet — like a personal VPN server.
+
+```bash
+sudo tailscale up --advertise-exit-node
+```
+
+<Aside type="note" title="Enable in Admin Console">
+  After advertising, you must approve the exit node in the Tailscale admin
+  console.
+</Aside>
+
+### Subnet Router
+
+Advertise your local LAN so other Tailnet devices can access machines that don't have Tailscale installed:
+
+```bash
+sudo tailscale up --advertise-routes=192.168.1.0/24
+```
+
+Replace `192.168.1.0/24` with your actual home network subnet.
+
+---
+
+## Key Concepts
+
+<Flashcard
+  title="Tailscale Terminology"
+  cards={[
+    {
+      front: "What is a Tailnet?",
+      back: "Your private Tailscale network containing all your connected devices",
+    },
+    {
+      front: "What is an Exit Node?",
+      back: "A device that routes all your internet traffic through it, acting as a VPN gateway",
+    },
+    {
+      front: "What is a Subnet Router?",
+      back: "A device that advertises local network routes, allowing access to non-Tailscale devices",
+    },
+    {
+      front: "What protocol does Tailscale use?",
+      back: "WireGuard - a modern, fast, and secure VPN protocol",
+    },
+  ]}
+/>
+
+<MatchPairs
+  title="Tailscale Features"
+  pairs={[
+    {
+      left: "--advertise-exit-node",
+      right: "Route all traffic through this device",
+    },
+    { left: "--advertise-routes", right: "Share local network with Tailnet" },
+    { left: "tailscale up", right: "Connect to your Tailnet" },
+    { left: "tailscale status", right: "Show connected devices" },
+  ]}
+/>
+
+---
+
+## Knowledge Check
+
+<FillBlank
+  instruction="Complete the command to join your Tailnet:"
+  sentence="sudo tailscale [BLANK:up]"
+/>
+
+<Quiz
+  question="What VPN protocol does Tailscale use under the hood?"
+  options={["OpenVPN", "IPSec", "WireGuard", "PPTP"]}
+  correct={2}
+  explanation="Tailscale is built on WireGuard, a modern VPN protocol known for its speed, simplicity, and strong cryptography."
+/>
+
+<Quiz
+  question="What IP range does Tailscale use for devices?"
+  options={["192.168.x.x", "10.0.x.x", "172.16.x.x", "100.x.x.x"]}
+  correct={3}
+  explanation="Tailscale assigns IPs from the 100.x.x.x range (CGNAT range) to avoid conflicts with local networks."
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Installed Tailscale on your server",
+    "Joined your Tailnet",
+    "Added a second device",
+    "Successfully pinged between devices",
+    "Configured exit node (optional)",
+    "Set up subnet routing (optional)",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Tailscale Documentation](https://tailscale.com/kb/) and DevHub examples.
