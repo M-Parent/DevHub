@@ -1,0 +1,255 @@
+---
+title: "Linux User Management"
+description: "Learn how to create users, manage groups, and configure permissions in Linux."
+sidebar:
+  label: "User Management"
+  order: 5
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Question from "../../../../components/Question.astro";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" />
+
+User management is a fundamental skill for Linux system administrators. This guide covers creating users, managing groups, and configuring user settings.
+
+---
+
+## Creating Users
+
+Linux provides two commands for creating users: `useradd` (basic) and `adduser` (interactive).
+
+### Using useradd (Manual)
+
+```bash
+sudo useradd -m devuser
+```
+
+| Flag | Description                 |
+| ---- | --------------------------- |
+| `-m` | Create home directory       |
+| `-s` | Specify shell               |
+| `-G` | Add to supplementary groups |
+
+### Set Password
+
+```bash
+sudo passwd devuser
+```
+
+```
+New password:
+Retype new password:
+passwd: password updated successfully
+```
+
+### Using adduser (Interactive)
+
+The `adduser` command is more user-friendly and handles everything automatically:
+
+```bash
+sudo adduser devuser
+```
+
+This will:
+
+- Create the user
+- Create home directory
+- Create user group
+- Prompt for password
+- Prompt for user info (optional)
+
+---
+
+## Group Management
+
+Groups allow you to assign permissions to multiple users at once.
+
+### Create a Group
+
+```bash
+sudo groupadd devadmin
+```
+
+### Add User to Group
+
+**Method 1: usermod**
+
+```bash
+sudo usermod -aG devadmin devuser
+```
+
+| Flag | Description                             |
+| ---- | --------------------------------------- |
+| `-a` | Append (don't remove from other groups) |
+| `-G` | Specify supplementary group             |
+
+**Method 2: adduser**
+
+```bash
+sudo adduser devuser devadmin
+```
+
+### View User's Groups
+
+```bash
+groups devuser
+```
+
+Or check the groups file:
+
+```bash
+cat /etc/group | grep devuser
+```
+
+---
+
+## The passwd File
+
+User information is stored in `/etc/passwd`:
+
+```bash
+cat /etc/passwd
+```
+
+Format:
+
+```
+devuser:x:1001:1001:Dev User,,,:/home/devuser:/bin/bash
+```
+
+| Field           | Description                                           |
+| --------------- | ----------------------------------------------------- |
+| `devuser`       | Username                                              |
+| `x`             | Password placeholder (actual password in /etc/shadow) |
+| `1001`          | User ID (UID)                                         |
+| `1001`          | Group ID (GID)                                        |
+| `Dev User,,,`   | GECOS (full name, room, phone)                        |
+| `/home/devuser` | Home directory                                        |
+| `/bin/bash`     | Login shell                                           |
+
+---
+
+## Change Home Directory
+
+Move a user's home directory:
+
+```bash
+sudo usermod -m -d /new/path/devuser devuser
+```
+
+| Flag | Description                |
+| ---- | -------------------------- |
+| `-m` | Move existing content      |
+| `-d` | Specify new home directory |
+
+---
+
+## Change User's Shell
+
+View available shells:
+
+```bash
+cat /etc/shells
+```
+
+Change a user's shell:
+
+```bash
+sudo chsh devuser
+```
+
+Or directly:
+
+```bash
+sudo usermod -s /bin/zsh devuser
+```
+
+---
+
+## Delete a User
+
+Remove user but keep home directory:
+
+```bash
+sudo userdel devuser
+```
+
+Remove user AND home directory:
+
+```bash
+sudo userdel -r devuser
+```
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="User Management Commands"
+  cards={[
+    {
+      front: "Create user with home directory",
+      back: "sudo useradd -m username",
+    },
+    {
+      front: "Add user to group (append)",
+      back: "sudo usermod -aG groupname username",
+    },
+    { front: "Change user password", back: "sudo passwd username" },
+    { front: "View user's groups", back: "groups username" },
+    { front: "Change user's shell", back: "sudo chsh username" },
+  ]}
+/>
+
+<Quiz
+  question="What does the -a flag do in 'usermod -aG'?"
+  options={[
+    "Add a new user",
+    "Append to groups without removing from others",
+    "Add administrator privileges",
+    "Activate the user account",
+  ]}
+  correct={1}
+  explanation="The -a flag appends the user to supplementary groups without removing them from other groups they belong to."
+/>
+
+<Quiz
+  question="Where is user information stored?"
+  options={["/etc/users", "/etc/passwd", "/home/users", "/var/users"]}
+  correct={1}
+  explanation="User information is stored in /etc/passwd, while encrypted passwords are in /etc/shadow."
+/>
+
+<Question
+  question="What's the difference between useradd and adduser?"
+  answer="useradd is a low-level command that requires manual flags. adduser is an interactive wrapper that automatically creates home directory, sets password, and prompts for user info."
+  hint="One is interactive, one is not"
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Create users with useradd and adduser",
+    "Set and change user passwords",
+    "Create groups and add users to them",
+    "Understand the /etc/passwd file format",
+    "Change user's home directory and shell",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)

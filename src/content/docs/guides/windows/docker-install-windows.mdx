@@ -1,0 +1,135 @@
+---
+title: "Installing Docker Desktop on Windows"
+description: "Step-by-step guide to install Docker Desktop on Windows with WSL 2 integration."
+sidebar:
+  label: "Docker Windows Install"
+  order: 3
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Question from "../../../../components/Question.astro";
+import Quiz from "../../../../components/Quiz.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+
+Installing Docker Desktop is quite simple!
+
+You can follow the **official Docker Hub documentation** for a complete step-by-step guide:  
+👉 [Docker Desktop Installation Docs](https://docs.docker.com/desktop/setup/install/windows-install)
+
+<Aside type="tip" title="Quick Tip">
+  You can skip the video if you want and go straight to the checklist below.
+</Aside>
+
+---
+
+## Video Tutorial
+
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/YeF7ObTnDwc"
+  title="Docker Desktop Installation Tutorial"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+_Source: Bret Fisher, Agentic DevOps_
+
+---
+
+## Docker Desktop Setup Checklist
+
+<Steps>
+
+1. **Enable Virtualization in BIOS**
+   - Usually found under CPU or Advanced settings
+   - Required for Docker to run containers efficiently
+
+2. **Download and run the Docker Desktop installer**
+   - Download the `.exe` installer from Docker Hub
+   - Run it and follow the setup wizard
+
+3. **Enable WSL 2 (Windows Subsystem for Linux)**
+
+   Run PowerShell as Administrator:
+
+   ```powershell
+   wsl --install
+   ```
+
+   Reboot your system if prompted.
+
+4. **Link Docker Desktop with WSL 2**
+   - Open Docker Desktop → **Settings → General**
+   - Ensure "Use the WSL 2 based engine" is checked
+   - Under **Resources → WSL Integration**, select which distros Docker can access
+
+5. **Verify the installation**
+
+   Open a terminal (CMD or PowerShell) and run:
+
+   ```bash
+   docker version
+   ```
+
+   <Aside type="tip">
+     If you see a Docker version number in the terminal output, Docker is
+     successfully installed!
+   </Aside>
+
+</Steps>
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="What is required before installing Docker Desktop on Windows?"
+  options={[
+    "Python installed",
+    "Virtualization enabled in BIOS",
+    "Linux dual boot",
+    "Visual Studio installed",
+  ]}
+  correct={1}
+  explanation="Docker requires hardware virtualization to be enabled in BIOS to run containers efficiently."
+/>
+
+<Quiz
+  question="What command enables WSL 2 on Windows?"
+  options={[
+    "docker wsl enable",
+    "wsl --install",
+    "Enable-WSL2",
+    "apt install wsl",
+  ]}
+  correct={1}
+  explanation="The wsl --install command enables WSL 2 on Windows 10/11."
+/>
+
+<Question
+  question="Why does Docker Desktop use WSL 2?"
+  answer="WSL 2 provides a real Linux kernel on Windows, allowing Docker to run Linux containers natively without a full VM."
+  hint="Think about Linux containers on Windows"
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Enabled virtualization in BIOS",
+    "Downloaded Docker Desktop installer",
+    "Installed WSL 2",
+    "Linked Docker Desktop with WSL 2",
+    "Verified installation with docker version",
+  ]}
+/>

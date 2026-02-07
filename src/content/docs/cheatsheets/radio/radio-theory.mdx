@@ -1,0 +1,148 @@
+---
+title: "Radio Theory Cheatsheet"
+description: "Quick reference for radio frequency bands, propagation types, modulation, and key RF concepts."
+sidebar:
+  label: "Radio Theory"
+  order: 5
+  badge:
+    text: "Theory"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Aside, Badge } from "@astrojs/starlight/components";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Quiz from "../../../../components/Quiz.astro";
+
+<Badge text="Radio" class="radio" />
+
+Quick reference for radio communications — frequency bands, propagation, and modulation.
+
+---
+
+## Electromagnetic Spectrum
+
+| Band         | Wavelength  | Use            |
+| ------------ | ----------- | -------------- |
+| 📡 Radio     | 1m – 100km  | Communications |
+| 🍕 Microwave | 1mm – 1m    | Radar, WiFi    |
+| 🔥 Infrared  | 700nm – 1mm | Heat, remotes  |
+| 👁️ Visible   | 400 – 700nm | Human vision   |
+| ☀️ UV        | 10 – 400nm  | Sterilization  |
+| 🦴 X-ray     | 0.01 – 10nm | Medical        |
+| ☢️ Gamma     | < 0.01nm    | Nuclear        |
+
+---
+
+## Radio Frequency Bands
+
+| Band    | Frequency      | Wavelength | Propagation        |
+| ------- | -------------- | ---------- | ------------------ |
+| **HF**  | 3 – 30 MHz     | 100 – 10m  | Ionospheric (BLOS) |
+| **VHF** | 30 – 300 MHz   | 10 – 1m    | Line of Sight      |
+| **UHF** | 300 – 3000 MHz | 1m – 30cm  | Line of Sight      |
+
+---
+
+## Propagation Types
+
+| Type        | Description                                        |
+| ----------- | -------------------------------------------------- |
+| **LOS**     | Line of Sight — antennas must "see" each other     |
+| **BLOS**    | Beyond Line of Sight — no direct visibility needed |
+| **Skywave** | HF bouncing off ionosphere                         |
+| **NVIS**    | Near Vertical — reduces skip zones                 |
+
+---
+
+## HF vs VHF vs UHF
+
+|                  | HF            | VHF        | UHF       |
+| ---------------- | ------------- | ---------- | --------- |
+| **Range**        | Long          | Medium     | Short     |
+| **Propagation**  | BLOS          | LOS        | LOS       |
+| **Antenna size** | Large         | Medium     | Small     |
+| **Penetration**  | Poor          | Moderate   | Excellent |
+| **Bandwidth**    | Low           | Medium     | High      |
+| **Best for**     | Long-distance | Open areas | Urban     |
+
+---
+
+## Modulation
+
+| Type   | Method           | Pros        | Cons              | Use      |
+| ------ | ---------------- | ----------- | ----------------- | -------- |
+| **AM** | Varies amplitude | Long range  | Noise susceptible | Aircraft |
+| **FM** | Varies frequency | Clear audio | Rapid fade        | VHF/UHF  |
+
+---
+
+## NVIS Quick Reference
+
+**Purpose**: Reduce skip zones in HF
+
+**How**: Aim signal straight up → bounces back nearby
+
+**Range**: 0 – 400 km
+
+**Benefit**: Harder to locate transmitter
+
+---
+
+## Key Formulas
+
+**Wavelength ↔ Frequency**:
+
+```
+λ = c / f
+```
+
+- λ = wavelength (meters)
+- c = speed of light (3×10⁸ m/s)
+- f = frequency (Hz)
+
+**Longer wavelength = Lower frequency = Farther travel**
+
+---
+
+## Quick Check
+
+<Flashcard
+  title="RF Quick Facts"
+  cards={[
+    { front: "HF frequency range?", back: "3 – 30 MHz" },
+    { front: "VHF frequency range?", back: "30 – 300 MHz" },
+    { front: "UHF frequency range?", back: "300 – 3000 MHz" },
+    { front: "What is LOS?", back: "Line of Sight" },
+    { front: "What is BLOS?", back: "Beyond Line of Sight" },
+    { front: "AM varies what?", back: "Amplitude" },
+    { front: "FM varies what?", back: "Frequency" },
+    { front: "Best for urban?", back: "UHF" },
+  ]}
+/>
+
+<MatchPairs
+  title="Match Band to Characteristic"
+  pairs={[
+    { left: "HF", right: "Ionospheric skip" },
+    { left: "VHF", right: "Open area coverage" },
+    { left: "UHF", right: "Building penetration" },
+    { left: "NVIS", right: "Reduces skip zones" },
+  ]}
+/>
+
+<Quiz
+  question="Which band requires the smallest antenna?"
+  options={["HF", "VHF", "UHF"]}
+  correct={2}
+  explanation="UHF has the shortest wavelength (30cm – 1m), requiring the smallest antennas."
+/>
+
+---
+
+## Related
+
+- Radio Fundamentals Roadmap
+- Antenna Theory Guide
+- SDR Getting Started

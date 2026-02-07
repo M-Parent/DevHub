@@ -1,0 +1,374 @@
+---
+title: "Terraform Variables"
+description: "Learn how to use variables in Terraform for reusable, flexible infrastructure configurations."
+sidebar:
+  label: "Terraform Variables"
+  order: 3
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Terraform" class="terraform" />
+
+Variables make your Terraform configurations reusable and flexible. Instead of hardcoding values, you can define them once and use them throughout your configuration—or change them for different environments.
+
+<Aside type="tip" title="Why Variables?">
+  Variables let you: define values once and reuse them, prompt for sensitive
+  data at runtime, and maintain different configurations for dev/staging/prod.
+</Aside>
+
+---
+
+## Variable Types
+
+Terraform supports several variable types:
+
+| Type     | Description        | Example                         |
+| -------- | ------------------ | ------------------------------- |
+| `string` | Text value         | `"hello"`                       |
+| `number` | Numeric value      | `42`                            |
+| `bool`   | True/false         | `true`                          |
+| `list`   | Ordered collection | `["a", "b", "c"]`               |
+| `map`    | Key-value pairs    | `{key = "value"}`               |
+| `object` | Complex structure  | `{name = "vm", size = "small"}` |
+
+---
+
+## Defining Variables
+
+### Basic Variable with Default
+
+```hcl
+variable "lab_ip" {
+  type        = string
+  default     = "173.177.234.212/32"
+  description = "IP address allowed to access resources"
+}
+```
+
+Use the variable with `var.variable_name`:
+
+```hcl
+resource "aws_security_group" "sg" {
+  name   = "DevHub SG"
+  vpc_id = aws_vpc.vpc.id
+
+  ingress {
+    description = "SSH access"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.lab_ip]  # Using the variable
+  }
+}
+```
+
+### Variable Without Default (Prompts User)
+
+If no default is provided, Terraform prompts for a value:
+
+```hcl
+variable "user" {
+  type        = string
+  description = "User identifier for resource naming"
+}
+```
+
+```bash
+terraform apply
+# Terraform will ask: var.user
+# Enter a value: devhub
+```
+
+---
+
+## String Interpolation
+
+Combine variables with strings using `${}` syntax:
+
+```hcl
+variable "user" {
+  type = string
+}
+
+resource "aws_vpc" "vpc" {
+  cidr_block = "10.${var.user}.0.0/16"
+
+  tags = {
+    Name = "user${var.user}-vpc"
+  }
+}
+
+resource "aws_subnet" "public" {
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = "10.${var.user}.1.0/24"
+  availability_zone = "ca-central-1a"
+
+  tags = {
+    Name = "user${var.user}-subnet"
+  }
+}
+
+resource "aws_security_group" "sg" {
+  name   = "User${var.user} SG"
+  vpc_id = aws_vpc.vpc.id
+  # ...
+}
+
+resource "aws_key_pair" "key" {
+  key_name = "user${var.user}"
+  # ...
+}
+
+resource "aws_instance" "vm" {
+  # ...
+  tags = {
+    Name = "user${var.user}-server"
+  }
+}
+```
+
+<Flashcard
+  title="Interpolation Syntax"
+  cards={[
+    {
+      front: "How do you reference a variable inside a string in Terraform?",
+      back: "Use the interpolation syntax: ${var.variable_name}. For example: Hello ${var.name} or 10.${var.user}.0.0/16",
+    },
+  ]}
+/>
+
+---
+
+## Count: Creating Multiple Resources
+
+The `count` meta-argument creates multiple instances of a resource:
+
+```hcl
+variable "num_vms" {
+  type        = number
+  description = "Number of VMs to create"
+}
+
+resource "aws_instance" "vm" {
+  count                       = var.num_vms
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t2.micro"
+  key_name                    = aws_key_pair.key.key_name
+  vpc_security_group_ids      = [aws_security_group.sg.id]
+  subnet_id                   = aws_subnet.public.id
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "user${var.user}-server-${count.index + 1}"
+  }
+}
+```
+
+<Aside type="note" title="count.index">
+  Inside a resource with `count`, use `count.index` to get the current iteration
+  number (starts at 0). Add 1 for human-readable numbering.
+</Aside>
+
+---
+
+## Organizing Variables
+
+### variables.tf
+
+Best practice: define all variables in a separate `variables.tf` file:
+
+```hcl
+# variables.tf
+
+variable "num_vms" {
+  type        = number
+  description = "Number of VMs to create"
+}
+
+variable "user" {
+  type        = string
+  description = "User identifier"
+}
+
+variable "lab_ip" {
+  type        = string
+  default     = "173.177.234.212/32"
+  description = "Allowed IP address"
+}
+
+variable "region" {
+  type        = string
+  default     = "ca-central-1"
+  description = "AWS region"
+}
+
+variable "instance_type" {
+  type        = string
+  default     = "t2.micro"
+  description = "EC2 instance type"
+}
+```
+
+### .tfvars Files
+
+Store variable values in `.tfvars` files:
+
+```hcl
+# dev.tfvars
+num_vms = 1
+user    = "devhub-dev"
+
+# prod.tfvars
+num_vms = 3
+user    = "devhub-prod"
+```
+
+Apply with a specific variable file:
+
+```bash
+# Development
+terraform apply -var-file=dev.tfvars
+
+# Production
+terraform apply -var-file=prod.tfvars
+```
+
+---
+
+## Variable Precedence
+
+Terraform loads variables in this order (later sources override earlier ones):
+
+1. Default values in variable definitions
+2. Environment variables (`TF_VAR_name`)
+3. `terraform.tfvars` file (auto-loaded)
+4. `*.auto.tfvars` files (auto-loaded, alphabetically)
+5. `-var-file` flag
+6. `-var` flag on command line
+
+```bash
+# Override via command line
+terraform apply -var="user=override"
+
+# Override via environment variable
+export TF_VAR_user="from-env"
+terraform apply
+```
+
+---
+
+## Sensitive Variables
+
+Mark variables as sensitive to prevent them from showing in logs:
+
+```hcl
+variable "db_password" {
+  type        = string
+  description = "Database password"
+  sensitive   = true
+}
+```
+
+---
+
+## Validation Rules
+
+Add validation to ensure variables meet requirements:
+
+```hcl
+variable "instance_type" {
+  type        = string
+  default     = "t2.micro"
+  description = "EC2 instance type"
+
+  validation {
+    condition     = contains(["t2.micro", "t2.small", "t2.medium"], var.instance_type)
+    error_message = "Instance type must be t2.micro, t2.small, or t2.medium."
+  }
+}
+
+variable "num_vms" {
+  type        = number
+  description = "Number of VMs"
+
+  validation {
+    condition     = var.num_vms >= 1 && var.num_vms <= 10
+    error_message = "Number of VMs must be between 1 and 10."
+  }
+}
+```
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="What happens if a variable has no default value?"
+  options={[
+    "Terraform uses null",
+    "Terraform prompts the user",
+    "Terraform fails",
+    "Terraform uses empty string",
+  ]}
+  correct={1}
+  explanation="Variables without default values must be provided at runtime, either via prompt, -var flag, or .tfvars file."
+/>
+
+<Quiz
+  question="How do you reference a variable in Terraform?"
+  options={["$variable", "{{variable}}", "var.variable", "${variable}"]}
+  correct={2}
+  explanation="Use var.variable_name to reference variables. Inside strings, use ${var.variable_name}."
+/>
+
+<Quiz
+  question="What is the purpose of .tfvars files?"
+  options={[
+    "Store variable definitions",
+    "Store variable values",
+    "Store provider configs",
+    "Store state",
+  ]}
+  correct={1}
+  explanation=".tfvars files store variable values, keeping them separate from definitions in variables.tf."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="terraform-variables"
+  title="Terraform Variables Checklist"
+  items={[
+    "Define variables with types and defaults",
+    "Use string interpolation",
+    "Create multiple resources with count",
+    "Organize variables in variables.tf",
+    "Use .tfvars files for different environments",
+  ]}
+/>
+
+---
+
+## Save Your Progress
+
+```bash
+git add .
+git commit -m "Terraform variables"
+git push
+```
+
+---
+
+## Source
+
+Based on HashiCorp Terraform documentation and DevHub examples.

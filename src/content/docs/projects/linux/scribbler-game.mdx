@@ -1,0 +1,293 @@
+---
+title: "Build & Deploy Scribbler Game"
+description: "Build and deploy Scribbler-rs, an open-source multiplayer drawing game, from source using Go."
+sidebar:
+  label: "Scribbler Game"
+  order: 1
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import {
+  Aside,
+  Badge,
+  Steps,
+  Card,
+  CardGrid,
+} from "@astrojs/starlight/components";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
+
+Build and deploy Scribbler-rs, an open-source multiplayer drawing and guessing game similar to Skribbl.io. This project teaches you how to build Go applications from source and deploy them as a service.
+
+<Aside type="note" title="Project Overview">
+  **Difficulty**: Mid **Time**: ~30 minutes **Skills**: Go, Git, Linux services
+</Aside>
+
+---
+
+## What You'll Build
+
+Scribbler-rs is a real-time multiplayer game where:
+
+- One player draws a word
+- Other players guess what's being drawn
+- Points are awarded for correct guesses
+
+<CardGrid>
+  <Card title="Skills Learned" icon="rocket">
+    - Installing Go from source - Building Go applications - Creating systemd
+    services - Port configuration
+  </Card>
+  <Card title="Prerequisites" icon="warning">
+    - Linux server (Ubuntu/Debian) - Basic terminal knowledge - Git installed
+  </Card>
+</CardGrid>
+
+---
+
+## Step 1: Install Go
+
+Go (Golang) is required to build the application.
+
+<Steps>
+
+1. **Download Go**
+
+   ```bash
+   wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
+   ```
+
+   <Aside type="tip">
+     Check [go.dev/dl](https://go.dev/dl/) for the latest version.
+   </Aside>
+
+2. **Extract to /usr/local**
+
+   ```bash
+   sudo tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
+   ```
+
+3. **Add Go to PATH**
+
+   Edit your profile:
+
+   ```bash
+   echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
+   source ~/.profile
+   ```
+
+4. **Verify installation**
+
+   ```bash
+   go version
+   ```
+
+   Expected output:
+
+   ```
+   go version go1.22.0 linux/amd64
+   ```
+
+</Steps>
+
+---
+
+## Step 2: Install Git
+
+If Git isn't already installed:
+
+```bash
+sudo apt update
+sudo apt install git -y
+```
+
+Verify:
+
+```bash
+git --version
+```
+
+---
+
+## Step 3: Clone the Repository
+
+```bash
+cd ~
+git clone https://github.com/scribble-rs/scribble.rs.git
+cd scribble.rs
+```
+
+---
+
+## Step 4: Configure the Port
+
+By default, Scribbler runs on port 8080. To run on port 80:
+
+<Steps>
+
+1. **Edit the config file**
+
+   ```bash
+   nano internal/config/config.go
+   ```
+
+2. **Find and change the port**
+
+   Look for the port definition and change `8080` to `80`:
+
+   ```go
+   Port: 80,
+   ```
+
+3. **Save and exit** (Ctrl+X, Y, Enter)
+
+</Steps>
+
+<Aside type="caution" title="Port 80 Requires Root">
+  Ports below 1024 require root privileges. You'll need to run with `sudo` or
+  configure capabilities.
+</Aside>
+
+---
+
+## Step 5: Build the Application
+
+```bash
+go build ./cmd/scribblers
+```
+
+This creates an executable named `scribblers` in the current directory.
+
+---
+
+## Step 6: Run the Game
+
+### Quick Test
+
+```bash
+sudo ./scribblers
+```
+
+Open your browser and navigate to `http://your-server-ip`
+
+### Stop with Ctrl+C
+
+---
+
+## Bonus: Create a Systemd Service
+
+Make Scribbler run as a background service that starts on boot.
+
+<Steps>
+
+1. **Move the binary**
+
+   ```bash
+   sudo mv scribblers /usr/local/bin/
+   ```
+
+2. **Create service file**
+
+   ```bash
+   sudo tee /etc/systemd/system/scribbler.service << 'EOF'
+   [Unit]
+   Description=Scribbler Drawing Game
+   After=network.target
+
+   [Service]
+   Type=simple
+   User=root
+   WorkingDirectory=/usr/local/bin
+   ExecStart=/usr/local/bin/scribblers
+   Restart=always
+   RestartSec=5
+
+   [Install]
+   WantedBy=multi-user.target
+   EOF
+   ```
+
+3. **Reload systemd**
+
+   ```bash
+   sudo systemctl daemon-reload
+   ```
+
+4. **Start and enable the service**
+
+   ```bash
+   sudo systemctl start scribbler
+   sudo systemctl enable scribbler
+   ```
+
+5. **Check status**
+
+   ```bash
+   sudo systemctl status scribbler
+   ```
+
+</Steps>
+
+### Service Commands
+
+```bash
+# Start the game
+sudo systemctl start scribbler
+
+# Stop the game
+sudo systemctl stop scribbler
+
+# Restart
+sudo systemctl restart scribbler
+
+# View logs
+sudo journalctl -u scribbler -f
+```
+
+---
+
+## Troubleshooting
+
+| Problem           | Solution                                       |
+| ----------------- | ---------------------------------------------- |
+| Port 80 in use    | Stop NGINX/Apache: `sudo systemctl stop nginx` |
+| Permission denied | Use `sudo` or run on port 8080                 |
+| Build fails       | Ensure Go is in PATH: `source ~/.profile`      |
+| Can't connect     | Check firewall: `sudo ufw allow 80/tcp`        |
+
+---
+
+## Challenge Complete! 🎉
+
+You've successfully:
+
+- Installed Go from source
+- Built a Go application
+- Configured a custom port
+- Created a systemd service
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Installed Go",
+    "Cloned the repository",
+    "Configured the port",
+    "Built the application",
+    "Created systemd service (bonus)",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [Scribble.rs GitHub](https://github.com/scribble-rs/scribble.rs)
+- [Go Installation Guide](https://go.dev/doc/install)
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)

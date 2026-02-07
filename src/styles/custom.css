@@ -547,3 +547,315 @@ input[type="search"]:focus {
   margin: 3rem auto;
   max-width: 200px;
 }
+
+/* ─────────────────────────────────────────────────────────
+   Category Badge Colors - Unique color per category
+   Each category has its own distinct color
+───────────────────────────────────────────────────────── */
+
+/* Docker - Emerald Green */
+.sl-badge.docker {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: #34d399 !important;
+}
+
+/* Linux - Sky Blue */
+.sl-badge.linux {
+  background: rgba(14, 165, 233, 0.15) !important;
+  border-color: rgba(14, 165, 233, 0.4) !important;
+  color: #38bdf8 !important;
+}
+
+/* Server - Indigo */
+.sl-badge.server {
+  background: rgba(99, 102, 241, 0.15) !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  color: #818cf8 !important;
+}
+
+/* Networking - Amber */
+.sl-badge.networking {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  color: #fbbf24 !important;
+}
+
+/* Cyber - Red */
+.sl-badge.cyber {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #f87171 !important;
+}
+
+/* Radio - Purple */
+.sl-badge.radio {
+  background: rgba(168, 85, 247, 0.15) !important;
+  border-color: rgba(168, 85, 247, 0.4) !important;
+  color: #c084fc !important;
+}
+
+/* Electronics - Fuchsia/Pink */
+.sl-badge.electronics {
+  background: rgba(217, 70, 239, 0.15) !important;
+  border-color: rgba(217, 70, 239, 0.4) !important;
+  color: #e879f9 !important;
+}
+
+/* Productivity - Teal */
+.sl-badge.productivity {
+  background: rgba(20, 184, 166, 0.15) !important;
+  border-color: rgba(20, 184, 166, 0.4) !important;
+  color: #2dd4bf !important;
+}
+
+/* Homelab - Lime Green */
+.sl-badge.homelab {
+  background: rgba(132, 204, 22, 0.15) !important;
+  border-color: rgba(132, 204, 22, 0.4) !important;
+  color: #a3e635 !important;
+}
+
+/* Kubernetes - Orange */
+.sl-badge.kubernetes {
+  background: rgba(249, 115, 22, 0.15) !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+  color: #fb923c !important;
+}
+
+/* Ansible - Rose */
+.sl-badge.ansible {
+  background: rgba(244, 63, 94, 0.15) !important;
+  border-color: rgba(244, 63, 94, 0.4) !important;
+  color: #fb7185 !important;
+}
+
+/* Terraform - Violet */
+.sl-badge.terraform {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border-color: rgba(139, 92, 246, 0.4) !important;
+  color: #a78bfa !important;
+}
+
+/* VM - Slate Blue */
+.sl-badge.vm {
+  background: rgba(100, 116, 139, 0.15) !important;
+  border-color: rgba(100, 116, 139, 0.4) !important;
+  color: #94a3b8 !important;
+}
+
+/* SSH - Cyan */
+.sl-badge.ssh {
+  background: rgba(6, 182, 212, 0.15) !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+  color: #22d3ee !important;
+}
+
+/* Windows - Blue */
+.sl-badge.windows {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  color: #60a5fa !important;
+}
+
+/* ARR-Stack - Yellow Green */
+.sl-badge.arr-stack {
+  background: rgba(163, 230, 53, 0.15) !important;
+  border-color: rgba(163, 230, 53, 0.4) !important;
+  color: #bef264 !important;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Programming Language Badges
+───────────────────────────────────────────────────────── */
+
+/* Python - Yellow */
+.sl-badge.python {
+  background: rgba(234, 179, 8, 0.15) !important;
+  border-color: rgba(234, 179, 8, 0.4) !important;
+  color: #facc15 !important;
+}
+
+/* JavaScript - Yellow/Gold */
+.sl-badge.javascript {
+  background: rgba(250, 204, 21, 0.15) !important;
+  border-color: rgba(250, 204, 21, 0.4) !important;
+  color: #fde047 !important;
+}
+
+/* TypeScript - Blue */
+.sl-badge.typescript {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  color: #60a5fa !important;
+}
+
+/* HTML - Orange/Red */
+.sl-badge.html {
+  background: rgba(249, 115, 22, 0.15) !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+  color: #fb923c !important;
+}
+
+/* CSS - Blue/Purple */
+.sl-badge.css {
+  background: rgba(99, 102, 241, 0.15) !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  color: #818cf8 !important;
+}
+
+/* C# - Purple */
+.sl-badge.csharp {
+  background: rgba(168, 85, 247, 0.15) !important;
+  border-color: rgba(168, 85, 247, 0.4) !important;
+  color: #c084fc !important;
+}
+
+/* C++ - Blue */
+.sl-badge.cpp {
+  background: rgba(37, 99, 235, 0.15) !important;
+  border-color: rgba(37, 99, 235, 0.4) !important;
+  color: #3b82f6 !important;
+}
+
+/* PHP - Indigo/Purple */
+.sl-badge.php {
+  background: rgba(129, 140, 248, 0.15) !important;
+  border-color: rgba(129, 140, 248, 0.4) !important;
+  color: #a5b4fc !important;
+}
+
+/* SQL - Cyan */
+.sl-badge.sql {
+  background: rgba(6, 182, 212, 0.15) !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+  color: #22d3ee !important;
+}
+
+/* Go/Golang - Cyan/Teal */
+.sl-badge.go {
+  background: rgba(20, 184, 166, 0.15) !important;
+  border-color: rgba(20, 184, 166, 0.4) !important;
+  color: #2dd4bf !important;
+}
+
+/* Rust - Orange/Brown */
+.sl-badge.rust {
+  background: rgba(234, 88, 12, 0.15) !important;
+  border-color: rgba(234, 88, 12, 0.4) !important;
+  color: #f97316 !important;
+}
+
+/* Coding - Generic (for category) */
+.sl-badge.coding {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: #34d399 !important;
+}
+
+/* Default variants - mapped to difficulty levels for SIDEBAR */
+.sl-badge.success {
+  background: rgba(202, 138, 4, 0.15) !important;
+  border-color: rgba(202, 138, 4, 0.4) !important;
+  color: #eab308 !important;
+}
+
+.sl-badge.tip {
+  background: rgba(22, 163, 74, 0.15) !important;
+  border-color: rgba(22, 163, 74, 0.4) !important;
+  color: #22c55e !important;
+}
+
+.sl-badge.note {
+  background: rgba(37, 99, 235, 0.15) !important;
+  border-color: rgba(37, 99, 235, 0.4) !important;
+  color: #3b82f6 !important;
+}
+
+.sl-badge.caution {
+  background: rgba(234, 88, 12, 0.15) !important;
+  border-color: rgba(234, 88, 12, 0.4) !important;
+  color: #f97316 !important;
+}
+
+.sl-badge.danger {
+  background: rgba(220, 38, 38, 0.15) !important;
+  border-color: rgba(220, 38, 38, 0.4) !important;
+  color: #ef4444 !important;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Difficulty/Level Badges
+   Indicate content difficulty or type
+───────────────────────────────────────────────────────── */
+
+/* Advanced - Red */
+.sl-badge.advanced {
+  background: rgba(220, 38, 38, 0.15) !important;
+  border-color: rgba(220, 38, 38, 0.4) !important;
+  color: #ef4444 !important;
+}
+
+/* Theory - Blue */
+.sl-badge.theory {
+  background: rgba(37, 99, 235, 0.15) !important;
+  border-color: rgba(37, 99, 235, 0.4) !important;
+  color: #3b82f6 !important;
+}
+
+/* Novice - Green */
+.sl-badge.novice {
+  background: rgba(22, 163, 74, 0.15) !important;
+  border-color: rgba(22, 163, 74, 0.4) !important;
+  color: #22c55e !important;
+}
+
+/* Intermediate/Mid - Orange */
+.sl-badge.intermediate,
+.sl-badge.mid {
+  background: rgba(234, 88, 12, 0.15) !important;
+  border-color: rgba(234, 88, 12, 0.4) !important;
+  color: #f97316 !important;
+}
+
+/* Practical - Teal (hands-on labs/exercises) */
+.sl-badge.practical {
+  background: rgba(13, 148, 136, 0.15) !important;
+  border-color: rgba(13, 148, 136, 0.4) !important;
+  color: #14b8a6 !important;
+}
+
+/* Fundamentals - Indigo (core concepts) */
+.sl-badge.fundamentals {
+  background: rgba(79, 70, 229, 0.15) !important;
+  border-color: rgba(79, 70, 229, 0.4) !important;
+  color: #6366f1 !important;
+}
+
+/* Project - Pink (project-based learning) */
+.sl-badge.project {
+  background: rgba(219, 39, 119, 0.15) !important;
+  border-color: rgba(219, 39, 119, 0.4) !important;
+  color: #ec4899 !important;
+}
+
+/* Expert - Gold (mastery level) */
+.sl-badge.expert {
+  background: rgba(202, 138, 4, 0.15) !important;
+  border-color: rgba(202, 138, 4, 0.4) !important;
+  color: #eab308 !important;
+}
+
+/* Quick - Cyan (quick tips/cheatsheets) */
+.sl-badge.quick {
+  background: rgba(8, 145, 178, 0.15) !important;
+  border-color: rgba(8, 145, 178, 0.4) !important;
+  color: #06b6d4 !important;
+}
+
+/* Deep Dive - Purple (in-depth exploration) */
+.sl-badge.deep-dive {
+  background: rgba(124, 58, 237, 0.15) !important;
+  border-color: rgba(124, 58, 237, 0.4) !important;
+  color: #8b5cf6 !important;
+}

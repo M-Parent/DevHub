@@ -1,0 +1,186 @@
+---
+title: "ARR Stack Learning Path"
+description: "Complete learning path for building your own automated media server - from Docker basics to a full ARR ecosystem."
+sidebar:
+  label: "ARR Stack Path"
+  order: 2
+tableOfContents: true
+---
+
+import {
+  Badge,
+  CardGrid,
+  LinkCard,
+  Aside,
+} from "@astrojs/starlight/components";
+import ProgressCheck from "../../../components/ProgressCheck.astro";
+
+<Badge text="ARR-Stack" class="arr-stack" />
+<Badge text="Homelab" class="homelab" />
+
+Build your own automated media server from scratch. This learning path takes you from Docker basics to a fully functional ARR ecosystem with Plex/Jellyfin.
+
+<Aside type="tip" title="How to Use This Path">
+  Follow the guides in order. Each one builds on the previous. Check off items
+  as you complete them.
+</Aside>
+
+---
+
+## Overview
+
+|               |                                         |
+| ------------- | --------------------------------------- |
+| 📚 **Guides** | 2 available (more coming)               |
+| 🎯 **Goal**   | Build a complete automated media server |
+| ⏱️ **Time**   | ~4-6 hours for full setup               |
+
+---
+
+## Prerequisites
+
+Before starting, make sure you have:
+
+- A Linux server or Windows PC with Docker installed
+- Basic understanding of Docker (see Docker Learning Path)
+- At least 50GB of free storage
+
+<LinkCard
+  title="Docker Learning Path"
+  description="Learn Docker before building your ARR Stack"
+  href="/roadmaps/docker-learning-path/"
+/>
+
+---
+
+## Learning Path
+
+### Phase 1: Foundation
+
+#### 1. ARR Stack Theory <Badge text="Available" variant="tip" /> <Badge text="Theory" variant="note" />
+
+Understand what the ARR Stack is, how the tools work together, and the difference between Plex and Jellyfin.
+
+<LinkCard
+  title="Introduction to the ARR Stack"
+  description="What is ARR, common tools, Plex vs Jellyfin"
+  href="/guides/arr-stack/arr-stack-theory/"
+/>
+
+---
+
+#### 2. ARR Stack Cheatsheet <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Quick reference for all ARR applications and their purposes.
+
+<LinkCard
+  title="ARR Stack Cheatsheet"
+  description="Quick reference for all ARR apps"
+  href="/cheatsheets/arr-stack/arr-stack/"
+/>
+
+---
+
+### Phase 2: Core Setup
+
+#### 3. Docker Compose for ARR <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Create your first docker-compose.yml with Prowlarr, Sonarr, Radarr, and qBittorrent.
+
+---
+
+#### 4. Gluetun VPN Setup <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Secure your downloads by routing traffic through a VPN container.
+
+---
+
+#### 5. Media Server Setup <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Install and configure Plex or Jellyfin to stream your media.
+
+---
+
+### Phase 3: Automation
+
+#### 6. Prowlarr Configuration <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Set up indexers and connect them to Sonarr and Radarr.
+
+---
+
+#### 7. Sonarr & Radarr Setup <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Configure quality profiles, naming conventions, and automation rules.
+
+---
+
+#### 8. Bazarr Subtitles <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
+
+Automatically download subtitles for your media.
+
+---
+
+### Phase 4: Advanced
+
+#### 9. Overseerr Requests <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Let users request movies and TV shows through a beautiful interface.
+
+---
+
+#### 10. Tautulli Monitoring <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Monitor your Plex server activity and statistics.
+
+---
+
+#### 11. Reverse Proxy & SSL <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Expose your media server securely with HTTPS.
+
+---
+
+## 🛠️ Projects
+
+Hands-on projects to practice your ARR Stack skills.
+
+<Aside type="note" title="Coming Soon">
+  ARR Stack projects will be added here as they become available.
+</Aside>
+
+---
+
+## Track Your Progress
+
+<ProgressCheck
+  id="arr-stack-learning-path"
+  title="ARR Stack Checklist"
+  items={["ARR Stack Theory", "ARR Stack Cheatsheet"]}
+/>
+
+---
+
+## What's Next?
+
+After completing this path, you'll have:
+
+- A fully automated media downloading system
+- Your own personal Netflix with Plex or Jellyfin
+- Automatic subtitle downloads
+- VPN-protected downloads
+
+### Related
+
+<CardGrid>
+  <LinkCard
+    title="Docker Learning Path"
+    description="Learn Docker fundamentals first"
+    href="/roadmaps/docker-learning-path/"
+  />
+  <LinkCard
+    title="ARR Stack Cheatsheet"
+    description="Quick reference for all ARR apps"
+    href="/cheatsheets/arr-stack/arr-stack/"
+  />
+</CardGrid>

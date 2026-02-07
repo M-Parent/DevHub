@@ -1,0 +1,226 @@
+---
+title: "Introduction to DNS"
+description: "Learn how DNS (Domain Name System) works - the Internet's phonebook that converts domain names to IP addresses."
+sidebar:
+  label: "DNS Theory"
+  order: 5
+  badge:
+    text: "Theory"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Aside, Badge, Card, CardGrid } from "@astrojs/starlight/components";
+import Question from "../../../../components/Question.astro";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Networking" class="networking" />
+
+Every time you visit a website, your computer needs to know **where that site lives on the Internet**.  
+Instead of remembering numbers like `172.217.160.142`, you type friendly names like `google.com`. DNS (Domain Name System) is the **phonebook of the Internet** — it converts domain names into IP addresses so devices can communicate.
+
+<Aside type="tip" title="Think of it like...">
+  DNS is like your smartphone contacts: you type "Mom," and your phone knows her
+  number. DNS works the same way — you type `google.com`, and it finds the right
+  IP address behind it.
+</Aside>
+
+---
+
+## 📺 Video Introduction
+
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/UVR9lhUGAyU"
+  title="DNS Explained"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+_Source: Fireship_
+
+---
+
+## ⚙️ DNS Components
+
+<Flashcard
+  title="DNS Concepts"
+  cards={[
+    {
+      front: "What are DNS Forwarders?",
+      back: "DNS servers that forward queries to other resolvers (e.g., ISP or public DNS like 8.8.8.8 or 1.1.1.1).",
+    },
+    {
+      front: "What are DNS Zones?",
+      back: "Administrative sections of DNS. Forward lookup: name → IP. Reverse lookup: IP → name.",
+    },
+  ]}
+/>
+
+### DNS Record Types
+
+| Record  | Purpose                             |
+| ------- | ----------------------------------- |
+| `A`     | Domain → IPv4 address               |
+| `AAAA`  | Domain → IPv6 address               |
+| `CNAME` | Canonical name / alias              |
+| `MX`    | Mail exchanger                      |
+| `TXT`   | Arbitrary text (SPF, verification)  |
+| `SOA`   | Start of Authority (zone metadata)  |
+| `NS`    | Nameserver delegation               |
+| `SRV`   | Service records (e.g., \_sip.\_tcp) |
+
+<MatchPairs
+  instruction="Match each DNS record type with its purpose"
+  pairs={[
+    { left: "A Record", right: "Domain to IPv4" },
+    { left: "AAAA Record", right: "Domain to IPv6" },
+    { left: "CNAME", right: "Alias / Redirect" },
+    { left: "MX Record", right: "Mail Server" },
+    { left: "TXT Record", right: "SPF / Verification" },
+  ]}
+/>
+
+---
+
+## 🔄 How DNS Works — Step by Step
+
+![DNS hierarchy diagram](../../../../assets/img/content/DNS-Schema.png)
+
+When you type a domain in your browser, DNS translates it into an IP address:
+
+### 1. Browser / Stub Resolver (Your device)
+
+Your browser asks the OS resolver to find `example.com`.  
+If the IP is in cache and TTL hasn't expired → return immediately.
+
+### 2. Recursive Resolver (ISP or public DNS)
+
+If not cached, the query goes to a **recursive resolver** (like `1.1.1.1` or `8.8.8.8`).  
+This resolver can ask other servers and caches answers for future use.
+
+### 3. Root Servers (.)
+
+If the resolver doesn't know the answer, it asks a **root server**.  
+Root servers don't have the domain IP; they point to the correct **TLD server** (e.g., `.com`).
+
+### 4. TLD Servers (Top-Level Domain)
+
+The resolver asks the TLD server which **authoritative server** handles `example.com`.
+
+### 5. Authoritative Nameserver
+
+The authoritative server responds with the actual IP address for the domain.
+
+### 6. Return and Cache
+
+The resolver returns the IP to your device.  
+Both the resolver and your OS cache it to make future requests faster.
+
+<Aside type="note" title="DNS Flow Summary">
+  **Browser → Resolver → Root → TLD → Authoritative → Browser** DNS caches
+  responses at multiple points to speed up repeat lookups.
+</Aside>
+
+---
+
+## 🧠 Walkthrough Example
+
+Let's resolve `www.wikipedia.org`:
+
+1. Browser asks local resolver (e.g., `1.1.1.1`)
+2. Resolver checks cache → **miss**
+3. Resolver queries a root server → referral to `.org` TLD
+4. Resolver queries `.org` TLD → referral to Wikimedia authoritative server
+5. Resolver queries Wikimedia authoritative server → receives `208.80.154.224`
+6. Resolver returns `208.80.154.224` to the browser; result cached for TTL seconds
+
+<Question
+  question="In what order does DNS resolution happen?"
+  answer="Browser → Recursive Resolver → Root Server → TLD Server → Authoritative Server → Browser"
+  hint="Think from local to global, then back"
+/>
+
+---
+
+## 🎯 Knowledge Check
+
+<Quiz
+  question="What does an A record do?"
+  options={[
+    "Maps domain to IPv6",
+    "Maps domain to IPv4",
+    "Creates an alias",
+    "Handles mail routing",
+  ]}
+  correct={1}
+  explanation="An A record maps a domain name to an IPv4 address. AAAA is for IPv6, CNAME for aliases, and MX for mail."
+/>
+
+<Quiz
+  question="Which DNS server holds the final answer for a domain?"
+  options={[
+    "Root server",
+    "TLD server",
+    "Recursive resolver",
+    "Authoritative nameserver",
+  ]}
+  correct={3}
+  explanation="The authoritative nameserver is the source of truth for a domain's DNS records."
+/>
+
+<Quiz
+  question="What is the purpose of DNS caching?"
+  options={[
+    "Increase security",
+    "Speed up repeat lookups",
+    "Encrypt traffic",
+    "Block malicious sites",
+  ]}
+  correct={1}
+  explanation="DNS caching stores results temporarily so future queries for the same domain are faster."
+/>
+
+<Question
+  question="What public DNS servers can you use instead of your ISP's?"
+  answer="Common options: Google (8.8.8.8), Cloudflare (1.1.1.1), Quad9 (9.9.9.9)"
+  hint="Think about Google and Cloudflare"
+/>
+
+---
+
+## 📄 Summary
+
+<CardGrid>
+  <Card title="What is DNS?" icon="document">
+    The Internet's phonebook — converts domain names to IP addresses
+  </Card>
+  <Card title="Key Records" icon="list-format">
+    A (IPv4), AAAA (IPv6), CNAME (alias), MX (mail), TXT (verification)
+  </Card>
+  <Card title="Resolution Flow" icon="rocket">
+    Browser → Resolver → Root → TLD → Authoritative → Browser
+  </Card>
+  <Card title="Why it matters" icon="star">
+    Without DNS, you'd need to memorize IP addresses for every website!
+  </Card>
+</CardGrid>
+
+---
+
+## ✅ Progress Check
+
+<ProgressCheck
+  items={[
+    "Understand what DNS is and why it exists",
+    "Know the main DNS record types (A, AAAA, CNAME, MX, TXT)",
+    "Understand the DNS resolution flow",
+    "Know what root, TLD, and authoritative servers do",
+    "Understand the role of DNS caching",
+  ]}
+/>

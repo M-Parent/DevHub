@@ -1,0 +1,242 @@
+---
+title: "Working with PKCS#12 Files"
+description: "Convert between PEM and PKCS#12 (.p12/.pfx) formats for certificate portability."
+sidebar:
+  label: "PKCS#12 Conversion"
+  order: 13
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge } from "@astrojs/starlight/components";
+import Quiz from "../../../../../components/Quiz.astro";
+import Flashcard from "../../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
+
+PKCS#12 (`.p12` or `.pfx`) is a binary format that bundles a private key with its certificate and optional CA chain. It's commonly used for importing certificates into Windows, browsers, and various applications.
+
+<Aside type="note" title="Ubuntu/Debian">
+  Commands work on any system with OpenSSL installed.
+</Aside>
+
+---
+
+## What is PKCS#12?
+
+| Feature        | Description                          |
+| -------------- | ------------------------------------ |
+| **Format**     | Binary (not human-readable)          |
+| **Extensions** | `.p12`, `.pfx` (same format)         |
+| **Contains**   | Private key + Certificate + CA chain |
+| **Protection** | Password-encrypted                   |
+
+### Common Use Cases
+
+- **Windows IIS** - Requires .pfx for SSL certificates
+- **Web Browsers** - Client certificate import
+- **Java Keystores** - Can import PKCS#12 directly
+- **Email (S/MIME)** - Email encryption certificates
+- **VPN Clients** - Client authentication
+
+---
+
+## Convert PEM to PKCS#12
+
+Bundle your certificate, private key, and CA chain into a single .p12 file:
+
+```bash
+openssl pkcs12 -export \
+  -out devhub-app.p12 \
+  -inkey devhub-app.key \
+  -in devhub-app.crt \
+  -certfile devhub-ca/cacert.pem
+```
+
+| Option      | Description                  |
+| ----------- | ---------------------------- |
+| `-export`   | Create a new PKCS#12 file    |
+| `-out`      | Output .p12 filename         |
+| `-inkey`    | Private key file             |
+| `-in`       | Certificate file             |
+| `-certfile` | CA certificate(s) to include |
+
+You'll be prompted to set an export password. This password protects the .p12 file.
+
+<Aside type="tip" title="Password Required for Import">
+  Remember this password! You'll need it when importing the .p12 file into
+  Windows or other applications.
+</Aside>
+
+### Without CA Chain
+
+If you only need the certificate and key:
+
+```bash
+openssl pkcs12 -export \
+  -out devhub-app.p12 \
+  -inkey devhub-app.key \
+  -in devhub-app.crt
+```
+
+---
+
+## Extract from PKCS#12
+
+### Extract Private Key
+
+```bash
+openssl pkcs12 -in devhub-app.p12 -nocerts -out extracted-key.pem -nodes
+```
+
+| Option     | Description                     |
+| ---------- | ------------------------------- |
+| `-in`      | Input .p12 file                 |
+| `-nocerts` | Don't output certificates       |
+| `-out`     | Output key file                 |
+| `-nodes`   | Don't encrypt the extracted key |
+
+<Aside type="caution">
+  Using `-nodes` saves the key unencrypted. Only use this for immediate use or
+  secure environments.
+</Aside>
+
+### Extract Certificate
+
+```bash
+openssl pkcs12 -in devhub-app.p12 -clcerts -nokeys -out extracted-cert.pem
+```
+
+| Option     | Description                     |
+| ---------- | ------------------------------- |
+| `-clcerts` | Only output client certificates |
+| `-nokeys`  | Don't output private keys       |
+
+### Extract CA Certificates
+
+```bash
+openssl pkcs12 -in devhub-app.p12 -cacerts -nokeys -out extracted-ca.pem
+```
+
+| Option     | Description                 |
+| ---------- | --------------------------- |
+| `-cacerts` | Only output CA certificates |
+
+### Extract Everything
+
+Get all contents in one PEM file:
+
+```bash
+openssl pkcs12 -in devhub-app.p12 -out all-contents.pem -nodes
+```
+
+---
+
+## Verify PKCS#12 Contents
+
+View what's inside a .p12 file:
+
+```bash
+openssl pkcs12 -in devhub-app.p12 -info -noout
+```
+
+This shows the structure without extracting the actual keys/certificates.
+
+---
+
+## Common Scenarios
+
+### For Windows IIS
+
+```bash
+# Create .pfx (same as .p12)
+openssl pkcs12 -export \
+  -out website.pfx \
+  -inkey website.key \
+  -in website.crt \
+  -certfile intermediate-ca.crt
+```
+
+Then import via IIS Manager > Server Certificates > Import.
+
+### For Browser Client Certificate
+
+```bash
+# Bundle client cert for browser import
+openssl pkcs12 -export \
+  -out client-cert.p12 \
+  -inkey client.key \
+  -in client.crt \
+  -certfile ca.crt \
+  -name "DevHub Client Certificate"
+```
+
+The `-name` option sets a friendly name shown in the browser.
+
+### For Java Keystore
+
+Java can import PKCS#12 directly:
+
+```bash
+keytool -importkeystore \
+  -srckeystore devhub-app.p12 \
+  -srcstoretype PKCS12 \
+  -destkeystore devhub-app.jks \
+  -deststoretype JKS
+```
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="PKCS#12 Concepts"
+  cards={[
+    {
+      front: "What does PKCS#12 bundle together?",
+      back: "Private key + Certificate + CA chain (optionally)",
+    },
+    {
+      front: "What's the difference between .p12 and .pfx?",
+      back: "Nothing - they're the same format",
+    },
+    {
+      front: "What does -nodes do when extracting?",
+      back: "Saves the private key without encryption",
+    },
+    {
+      front: "Why is PKCS#12 commonly used?",
+      back: "Portability - single file for key + cert, password protected",
+    },
+  ]}
+/>
+
+<Quiz
+  question="When extracting a private key from a .p12, what option prevents encryption of the output?"
+  options={["-nokeys", "-nocerts", "-nodes", "-export"]}
+  correct={2}
+  explanation="-nodes (no DES encryption) outputs the private key in plain text without password protection."
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Create PKCS#12 from PEM files",
+    "Extract private key from PKCS#12",
+    "Extract certificates from PKCS#12",
+    "Understand when to use PKCS#12 format",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)
+- [OpenSSL PKCS12 Documentation](https://www.openssl.org/docs/man1.1.1/man1/pkcs12.html)

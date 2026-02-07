@@ -1,0 +1,255 @@
+---
+title: "Server Learning Path"
+description: "Complete learning path for server administration - from basics to production deployments."
+sidebar:
+  label: "Server Path"
+  order: 6
+tableOfContents: true
+---
+
+import {
+  Badge,
+  CardGrid,
+  LinkCard,
+  Aside,
+} from "@astrojs/starlight/components";
+import ProgressCheck from "../../../components/ProgressCheck.astro";
+
+<Badge text="Server" class="server" />
+
+Master server administration across Linux and Windows platforms.
+
+<Aside type="tip" title="How to Use This Path">
+  Follow the guides in order. Each one builds on the previous. Check off items
+  as you complete them.
+</Aside>
+
+---
+
+## Overview
+
+|               |                                            |
+| ------------- | ------------------------------------------ |
+| 📚 **Guides** | 7 available (more coming)                  |
+| 🎯 **Goal**   | Become proficient in server administration |
+
+---
+
+## Linux
+
+Server administration essentials for Linux systems.
+
+### General Linux
+
+#### 1. SSH Fundamentals <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Secure shell access is the foundation of server administration.
+
+<CardGrid>
+  <LinkCard
+    title="SSH Fundamentals"
+    description="SSH key generation, configuration, and secure connections"
+    href="/guides/linux/ssh-fundamentals/"
+  />
+  <LinkCard
+    title="SSH Cheatsheet"
+    description="Quick reference for SSH commands"
+    href="/cheatsheets/linux/ssh-cheatsheet/"
+  />
+</CardGrid>
+
+---
+
+#### 2. User & Permission Management <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Manage users, groups, and file permissions on Linux servers.
+
+<CardGrid>
+  <LinkCard
+    title="Linux User Management"
+    description="Create users, groups, and manage permissions"
+    href="/guides/linux/linux-user-management/"
+  />
+  <LinkCard
+    title="Linux File Permissions"
+    description="chmod, chown, and permission management"
+    href="/guides/linux/linux-file-permissions/"
+  />
+</CardGrid>
+
+---
+
+### Ubuntu / Debian
+
+#### 3. OpenVPN Server <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Set up a VPN server for secure remote access.
+
+<CardGrid>
+  <LinkCard
+    title="OpenVPN Server Setup"
+    description="Configure OpenVPN server and client with certificates"
+    href="/guides/linux/openvpn-setup/"
+  />
+  <LinkCard
+    title="OpenVPN Cheatsheet"
+    description="Quick reference for OpenVPN commands"
+    href="/cheatsheets/linux/openvpn-cheatsheet/"
+  />
+</CardGrid>
+
+---
+
+#### 4. SSL/TLS Certificate Management <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Create and manage SSL certificates for secure server communication.
+
+<CardGrid>
+  <LinkCard
+    title="Create a Certificate Authority"
+    description="Set up your own CA for internal certificates"
+    href="/guides/linux/ubuntu/create-certificate-authority/"
+  />
+  <LinkCard
+    title="Create CSR & Certificates"
+    description="Generate CSRs with SAN support"
+    href="/guides/linux/ubuntu/create-csr-certificate/"
+  />
+  <LinkCard
+    title="PKCS#12 Conversion"
+    description="Convert between PEM and .p12/.pfx formats"
+    href="/guides/linux/ubuntu/pkcs12-conversion/"
+  />
+  <LinkCard
+    title="Verify SSL Certificates"
+    description="Validate certs, check expiration, match keys"
+    href="/guides/linux/ubuntu/verify-ssl-certificates/"
+  />
+</CardGrid>
+
+---
+
+#### 5. NGINX Web Server <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Install and configure NGINX to host web applications.
+
+<LinkCard
+  title="Install NGINX Web Server"
+  description="Set up NGINX with virtual hosts on Ubuntu"
+  href="/guides/linux/ubuntu/nginx-setup/"
+/>
+
+---
+
+### RHEL / Fedora / Rocky
+
+<Aside type="note" title="Coming Soon">
+  RHEL/Fedora/Rocky Linux server guides are in development.
+</Aside>
+
+---
+
+## Windows
+
+Server administration for Windows environments.
+
+### 1. Windows Server Basics <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
+
+Introduction to Windows Server roles and features.
+
+---
+
+### 2. Active Directory <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Set up and manage Active Directory Domain Services.
+
+---
+
+### 3. Group Policy <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Configure and deploy Group Policy Objects.
+
+---
+
+### 4. IIS Web Server <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Configure Internet Information Services for web hosting.
+
+---
+
+### 5. Windows Server Hardening <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Security best practices for Windows servers.
+
+---
+
+## Cross-Platform
+
+Topics applicable to both Linux and Windows servers.
+
+### Database Servers <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Set up MySQL, PostgreSQL, or SQL Server.
+
+---
+
+### Backup & Recovery <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Implement backup strategies and disaster recovery.
+
+---
+
+### Monitoring & Logging <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Set up monitoring with Prometheus, Grafana, and log management.
+
+---
+
+### High Availability <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Load balancing, clustering, and failover configurations.
+
+---
+
+## 🛠️ Projects
+
+Hands-on projects to practice your server administration skills.
+
+### Scribbler Game <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Build and deploy a multiplayer drawing game from source.
+
+<LinkCard
+  title="Build Scribbler Game"
+  description="Compile Go apps, configure ports, create systemd services"
+  href="/projects/linux/scribbler-game/"
+/>
+
+---
+
+## Track Your Progress
+
+<ProgressCheck
+  id="server-learning-path"
+  title="Server Checklist"
+  items={[
+    "SSH Fundamentals",
+    "User & Permission Management",
+    "OpenVPN Server",
+    "Certificate Authority Setup",
+    "CSR & Certificate Creation",
+    "PKCS#12 Conversion",
+    "Certificate Verification",
+  ]}
+/>
+
+---
+
+## What's Next?
+
+After completing this path, you'll be able to:
+
+- Securely access and manage servers
+- Configure web and database servers
+- Implement backup and monitoring solutions
+- Design high-availability infrastructure

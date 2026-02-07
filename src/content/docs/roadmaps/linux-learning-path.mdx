@@ -1,0 +1,305 @@
+---
+title: "Linux Learning Path"
+description: "Complete learning path for Linux - from basic commands to server administration, organized by distribution."
+sidebar:
+  label: "Linux Path"
+  order: 3
+tableOfContents: true
+---
+
+import {
+  Badge,
+  CardGrid,
+  LinkCard,
+  Aside,
+  Tabs,
+  TabItem,
+} from "@astrojs/starlight/components";
+import ProgressCheck from "../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" />
+
+Master Linux from the ground up. This learning path takes you from basic commands to server administration and automation.
+
+<Aside type="tip" title="How to Use This Path">
+  Start with **General Linux** for concepts that apply everywhere, then dive
+  into your specific distribution section.
+</Aside>
+
+---
+
+## Overview
+
+|               |                                           |
+| ------------- | ----------------------------------------- |
+| 📚 **Guides** | 11 available (more coming)                |
+| 🎯 **Goal**   | Become proficient in Linux administration |
+
+---
+
+## General Linux
+
+These guides apply to all Linux distributions.
+
+### 1. Linux Distributions <Badge text="Available" variant="tip" /> <Badge text="Theory" variant="note" />
+
+Understand the major distribution families and choose the right one for your needs.
+
+<LinkCard
+  title="Linux Distributions Explained"
+  description="Debian, Red Hat, Arch - understand the differences"
+  href="/guides/linux/linux-distributions/"
+/>
+
+---
+
+### 2. SSH Fundamentals <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Set up SSH key-based authentication for secure, passwordless server access.
+
+<CardGrid>
+  <LinkCard
+    title="SSH Fundamentals"
+    description="SSH key generation, configuration, and secure connections"
+    href="/guides/linux/ssh-fundamentals/"
+  />
+  <LinkCard
+    title="SSH Cheatsheet"
+    description="Quick reference for SSH commands"
+    href="/cheatsheets/linux/ssh-cheatsheet/"
+  />
+</CardGrid>
+
+---
+
+### 3. User Management <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Create users, manage groups, and configure permissions.
+
+<LinkCard
+  title="Linux User Management"
+  description="Create users, groups, and manage permissions"
+  href="/guides/linux/linux-user-management/"
+/>
+
+---
+
+### 4. File Permissions <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Understand the Linux file system permissions and ownership.
+
+<LinkCard
+  title="Linux File Permissions"
+  description="chmod, chown, and permission management"
+  href="/guides/linux/linux-file-permissions/"
+/>
+
+---
+
+## Ubuntu / Debian
+
+<Badge text="APT Package Manager" variant="tip" />
+
+Guides specific to Debian-based distributions (Ubuntu, Debian, Linux Mint, Pop!\_OS).
+
+### 1. Custom Ubuntu ISO <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Create automated Ubuntu Server installations with autoinstall.
+
+<LinkCard
+  title="Automated Ubuntu Server ISO"
+  description="Build custom ISOs for unattended installations"
+  href="/guides/linux/ubuntu/custom-ubuntu-iso/"
+/>
+
+---
+
+### 2. Sudoers Configuration <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Configure sudo privileges for users and groups.
+
+<LinkCard
+  title="Sudoers File Configuration"
+  description="Safely configure sudo with visudo"
+  href="/guides/linux/ubuntu/sudoers-configuration/"
+/>
+
+---
+
+### 3. OpenVPN Setup <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Set up an OpenVPN server and client for secure network access.
+
+<CardGrid>
+  <LinkCard
+    title="OpenVPN Server Setup"
+    description="Configure OpenVPN server and client with certificates"
+    href="/guides/linux/openvpn-setup/"
+  />
+  <LinkCard
+    title="OpenVPN Cheatsheet"
+    description="Quick reference for OpenVPN commands"
+    href="/cheatsheets/linux/openvpn-cheatsheet/"
+  />
+</CardGrid>
+
+---
+
+### 4. SSL/TLS Certificate Management <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Complete certificate management with OpenSSL.
+
+<CardGrid>
+  <LinkCard
+    title="Create a Certificate Authority"
+    description="Set up your own CA for internal certificates"
+    href="/guides/linux/ubuntu/create-certificate-authority/"
+  />
+  <LinkCard
+    title="Create CSR & Certificates"
+    description="Generate CSRs with SAN support"
+    href="/guides/linux/ubuntu/create-csr-certificate/"
+  />
+  <LinkCard
+    title="PKCS#12 Conversion"
+    description="Convert between PEM and .p12/.pfx formats"
+    href="/guides/linux/ubuntu/pkcs12-conversion/"
+  />
+  <LinkCard
+    title="Verify SSL Certificates"
+    description="Validate certs, check expiration, match keys"
+    href="/guides/linux/ubuntu/verify-ssl-certificates/"
+  />
+</CardGrid>
+
+---
+
+### 5. NGINX Web Server <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Install and configure NGINX to host websites.
+
+<LinkCard
+  title="Install NGINX Web Server"
+  description="Set up NGINX with virtual hosts"
+  href="/guides/linux/ubuntu/nginx-setup/"
+/>
+
+---
+
+### 6. APT Package Management <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
+
+Install, update, and manage software with apt.
+
+---
+
+## RHEL / Fedora / Rocky
+
+<Badge text="DNF Package Manager" variant="caution" />
+
+Guides specific to Red Hat-based distributions (RHEL, Fedora, Rocky Linux, AlmaLinux).
+
+### 1. DNF Package Management <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
+
+Install, update, and manage software with dnf.
+
+---
+
+### 2. SELinux Basics <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Understand and configure SELinux security.
+
+---
+
+### 3. Firewalld Configuration <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Manage firewall rules with firewalld.
+
+---
+
+## Coming Soon (All Distros)
+
+### Linux Command Line Basics <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
+
+Essential commands every Linux user should know.
+
+---
+
+### Systemd & Services <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Manage services, create unit files, and understand systemd.
+
+---
+
+### Shell Scripting <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Automate tasks with bash scripting.
+
+---
+
+### Server Hardening <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Secure your Linux server with best practices.
+
+---
+
+## 🛠️ Projects
+
+Hands-on projects to practice your Linux skills.
+
+### Scribbler Game <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Build and deploy a multiplayer drawing game from source using Go.
+
+<LinkCard
+  title="Build Scribbler Game"
+  description="Compile Go apps, configure ports, create systemd services"
+  href="/projects/linux/scribbler-game/"
+/>
+
+---
+
+## Track Your Progress
+
+<ProgressCheck
+  id="linux-learning-path"
+  title="Linux Checklist"
+  items={[
+    "Linux Distributions (Theory)",
+    "SSH Fundamentals",
+    "User Management",
+    "File Permissions",
+    "OpenVPN Setup",
+    "Custom Ubuntu ISO",
+    "Sudoers Configuration",
+    "Certificate Authority Setup",
+    "CSR & Certificate Creation",
+    "PKCS#12 Conversion",
+    "Certificate Verification",
+  ]}
+/>
+
+---
+
+## What's Next?
+
+After completing this path, you'll be able to:
+
+- Navigate and manage Linux systems confidently
+- Administer Linux servers
+- Manage SSL/TLS certificates
+- Secure your Linux installations
+
+### Related
+
+<CardGrid>
+  <LinkCard
+    title="Docker Learning Path"
+    description="Containers run great on Linux"
+    href="/roadmaps/docker-learning-path/"
+  />
+  <LinkCard
+    title="Server Learning Path"
+    description="Server administration skills"
+    href="/roadmaps/server-learning-path/"
+  />
+</CardGrid>

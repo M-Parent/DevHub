@@ -1,0 +1,290 @@
+---
+title: "Sudoers File Configuration"
+description: "Configure sudo privileges for users and groups with the sudoers file."
+sidebar:
+  label: "Sudoers Configuration"
+  order: 10
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../../components/Quiz.astro";
+import Flashcard from "../../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" />
+
+The sudoers file controls which users and groups can execute commands with elevated privileges using `sudo`. Proper configuration is critical for security.
+
+<Aside type="caution" title="Ubuntu/Debian Specific">
+  This guide uses Ubuntu/Debian syntax. RHEL-based systems are similar but may
+  have different default paths.
+</Aside>
+
+---
+
+## What is the Sudoers File?
+
+The sudoers file (`/etc/sudoers`) defines:
+
+- **Who** can use sudo (users or groups)
+- **Where** they can use it (which hosts)
+- **As whom** they can run commands (which users)
+- **What** commands they can run
+
+<Aside type="danger" title="Never Edit Directly">
+  Never edit `/etc/sudoers` directly with a text editor. Always use `visudo`
+  which validates syntax before saving.
+</Aside>
+
+---
+
+## Using visudo
+
+The `visudo` command safely edits the sudoers file by:
+
+1. Locking the file to prevent concurrent edits
+2. Validating syntax before saving
+3. Preventing you from breaking sudo access
+
+### Edit the Main Sudoers File
+
+```bash
+sudo visudo
+```
+
+<Aside type="tip">
+  On Ubuntu, visudo uses nano by default. Press `Ctrl+X` then `Y` to save
+  changes.
+</Aside>
+
+### Edit a Specific Sudoers File
+
+For better organization, create separate files in `/etc/sudoers.d/`:
+
+```bash
+sudo visudo -f /etc/sudoers.d/devhub-admins
+```
+
+---
+
+## Sudoers File Syntax
+
+The basic format is:
+
+```
+WHO WHERE=(AS_WHOM) WHAT
+```
+
+### Example Entry
+
+```ini
+%devadmin  ALL=(ALL) NOPASSWD: /usr/bin/apt-get
+```
+
+| Component          | Meaning                         |
+| ------------------ | ------------------------------- |
+| `%devadmin`        | The group (% indicates a group) |
+| `ALL`              | Applies to all hosts            |
+| `(ALL)`            | Can run as any user             |
+| `NOPASSWD:`        | No password prompt required     |
+| `/usr/bin/apt-get` | The allowed command             |
+
+---
+
+## Common Configurations
+
+### Grant Full Sudo Access
+
+Allow a user to run any command as root:
+
+```ini
+devuser  ALL=(ALL) ALL
+```
+
+### Grant Full Sudo Without Password
+
+```ini
+devuser  ALL=(ALL) NOPASSWD: ALL
+```
+
+<Aside type="danger">
+  Use `NOPASSWD` sparingly. It's mainly for automation (like Ansible) where
+  password prompts aren't possible.
+</Aside>
+
+### Grant Access to Specific Commands
+
+Allow a group to only run package management:
+
+```ini
+%developers  ALL=(ALL) /usr/bin/apt-get, /usr/bin/apt
+```
+
+### Grant Access to Multiple Commands
+
+```ini
+%dbadmins  ALL=(ALL) /usr/bin/systemctl restart postgresql, /usr/bin/systemctl status postgresql
+```
+
+---
+
+## Best Practices
+
+<Steps>
+
+1. **Use Groups Instead of Users**
+
+   Easier to manage permissions for multiple users:
+
+   ```ini
+   %devadmin  ALL=(ALL) ALL
+   ```
+
+2. **Create Separate Files**
+
+   Don't clutter the main sudoers file:
+
+   ```bash
+   sudo visudo -f /etc/sudoers.d/developers
+   sudo visudo -f /etc/sudoers.d/dbadmins
+   ```
+
+3. **Be Specific with Commands**
+
+   Avoid `ALL` when possible. Limit to needed commands:
+
+   ```ini
+   %webadmins  ALL=(ALL) /usr/bin/systemctl restart nginx
+   ```
+
+4. **Use Full Paths**
+
+   Always use absolute paths for commands:
+
+   ```ini
+   # Good
+   /usr/bin/apt-get
+
+   # Bad (security risk)
+   apt-get
+   ```
+
+</Steps>
+
+---
+
+## Example: Ansible Automation User
+
+For automation tools like Ansible that need passwordless sudo:
+
+<Steps>
+
+1. **Create the user**
+
+   ```bash
+   sudo adduser ansibleuser
+   ```
+
+2. **Create sudoers file**
+
+   ```bash
+   sudo visudo -f /etc/sudoers.d/ansible
+   ```
+
+3. **Add the configuration**
+
+   ```ini
+   ansibleuser  ALL=(ALL) NOPASSWD: ALL
+   ```
+
+</Steps>
+
+---
+
+## Troubleshooting
+
+### Syntax Error Locked Me Out
+
+If you made a syntax error and can't use sudo:
+
+1. Reboot into recovery mode
+2. Mount filesystem as read-write: `mount -o remount,rw /`
+3. Fix the sudoers file: `visudo`
+
+### Test Sudoers Syntax
+
+Before saving, visudo checks syntax. You can also manually check:
+
+```bash
+sudo visudo -c
+```
+
+### View Effective Sudo Permissions
+
+Check what a user can do with sudo:
+
+```bash
+sudo -l -U devuser
+```
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="Sudoers Concepts"
+  cards={[
+    {
+      front: "What command should you use to edit sudoers?",
+      back: "visudo (never edit directly)",
+    },
+    {
+      front: "What does % mean in sudoers?",
+      back: "It indicates a group (e.g., %devadmin)",
+    },
+    {
+      front: "What does NOPASSWD do?",
+      back: "Allows sudo without password prompt",
+    },
+    {
+      front: "Where should custom sudoers rules go?",
+      back: "/etc/sudoers.d/ directory",
+    },
+  ]}
+/>
+
+<Quiz
+  question="What happens if you edit /etc/sudoers directly and make a syntax error?"
+  options={[
+    "Sudo automatically corrects it",
+    "You may be locked out of sudo completely",
+    "The system ignores the error",
+    "It creates a backup automatically",
+  ]}
+  correct={1}
+  explanation="A syntax error in sudoers can completely break sudo access, which is why you should always use visudo."
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Understand sudoers file format",
+    "Use visudo to safely edit",
+    "Create separate sudoers files",
+    "Configure specific command permissions",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)
+- [Ubuntu Sudoers Documentation](https://help.ubuntu.com/community/Sudoers)

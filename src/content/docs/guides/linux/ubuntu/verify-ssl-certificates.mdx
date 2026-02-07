@@ -1,0 +1,278 @@
+---
+title: "Verifying SSL Certificates"
+description: "Validate certificates, check expiration, verify CA trust, and match certificates with private keys."
+sidebar:
+  label: "Verify Certificates"
+  order: 14
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge } from "@astrojs/starlight/components";
+import Quiz from "../../../../../components/Quiz.astro";
+import Flashcard from "../../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
+
+Properly verifying certificates is essential for troubleshooting SSL/TLS issues. This guide covers viewing certificate details, validating trust chains, and matching certificates with private keys.
+
+---
+
+## View Certificate Information
+
+Display all certificate details in human-readable format:
+
+```bash
+openssl x509 -in certificate.crt -text -noout
+```
+
+| Option   | Description                      |
+| -------- | -------------------------------- |
+| `-in`    | Input certificate file           |
+| `-text`  | Human-readable output            |
+| `-noout` | Don't print raw certificate data |
+
+### Key Information to Check
+
+| Field                        | Description                        |
+| ---------------------------- | ---------------------------------- |
+| **Subject**                  | Who the certificate is issued to   |
+| **Issuer**                   | The CA that signed the certificate |
+| **Validity**                 | Not Before / Not After dates       |
+| **Subject Alternative Name** | Additional hostnames covered       |
+| **Public Key**               | Key algorithm and size             |
+
+### View Specific Fields
+
+```bash
+# Just the subject
+openssl x509 -in certificate.crt -subject -noout
+
+# Just the issuer
+openssl x509 -in certificate.crt -issuer -noout
+
+# Just the dates
+openssl x509 -in certificate.crt -dates -noout
+
+# Just the serial number
+openssl x509 -in certificate.crt -serial -noout
+```
+
+---
+
+## Check Certificate Expiration
+
+### View Expiration Date
+
+```bash
+openssl x509 -in certificate.crt -enddate -noout
+```
+
+Output:
+
+```
+notAfter=Dec 31 23:59:59 2026 GMT
+```
+
+### Check If Certificate Is Still Valid
+
+```bash
+openssl x509 -in certificate.crt -checkend 0
+```
+
+- Returns exit code `0` if valid
+- Returns exit code `1` if expired
+
+### Check If Certificate Expires Within N Seconds
+
+Check if it expires within 30 days (2592000 seconds):
+
+```bash
+openssl x509 -in certificate.crt -checkend 2592000
+```
+
+Useful for monitoring scripts!
+
+---
+
+## Verify Against Certificate Authority
+
+Confirm a certificate was signed by a specific CA:
+
+```bash
+openssl verify -CAfile ca-cert.pem certificate.crt
+```
+
+### Expected Output
+
+```
+certificate.crt: OK
+```
+
+### With Intermediate Certificates
+
+If you have an intermediate CA:
+
+```bash
+openssl verify -CAfile root-ca.pem -untrusted intermediate-ca.pem certificate.crt
+```
+
+### Common Errors
+
+| Error                                    | Meaning                        |
+| ---------------------------------------- | ------------------------------ |
+| `unable to get local issuer certificate` | CA certificate not found       |
+| `certificate signature failure`          | Wrong CA or corrupted cert     |
+| `certificate has expired`                | Certificate past validity date |
+
+---
+
+## Match Certificate with Private Key
+
+A certificate and private key must be paired. Verify by comparing their modulus values.
+
+### Get Certificate Modulus (MD5)
+
+```bash
+openssl x509 -noout -modulus -in certificate.crt | openssl md5
+```
+
+### Get Private Key Modulus (MD5)
+
+```bash
+openssl rsa -noout -modulus -in private.key | openssl md5
+```
+
+### Compare Results
+
+If the MD5 hashes match, the certificate and key are paired:
+
+```bash
+# Example output - these should be identical
+(stdin)= d41d8cd98f00b204e9800998ecf8427e
+(stdin)= d41d8cd98f00b204e9800998ecf8427e  ✓ Match!
+```
+
+### One-Liner Comparison
+
+```bash
+diff <(openssl x509 -noout -modulus -in cert.crt | openssl md5) \
+     <(openssl rsa -noout -modulus -in key.key | openssl md5)
+```
+
+No output = they match. Any output = mismatch.
+
+---
+
+## Convert Between Formats
+
+### PEM to DER
+
+DER is binary format, used by some Java applications:
+
+```bash
+openssl x509 -in certificate.pem -outform der -out certificate.der
+```
+
+### DER to PEM
+
+```bash
+openssl x509 -in certificate.der -inform der -outform pem -out certificate.pem
+```
+
+### View DER Certificate
+
+```bash
+openssl x509 -in certificate.der -inform der -text -noout
+```
+
+---
+
+## Check Remote Server Certificate
+
+Fetch and examine a certificate from a running server:
+
+```bash
+openssl s_client -connect devhub.local:443 -servername devhub.local </dev/null 2>/dev/null | openssl x509 -text -noout
+```
+
+### Just Check Expiration
+
+```bash
+echo | openssl s_client -connect devhub.local:443 -servername devhub.local 2>/dev/null | openssl x509 -noout -dates
+```
+
+### Show Certificate Chain
+
+```bash
+openssl s_client -connect devhub.local:443 -servername devhub.local -showcerts </dev/null
+```
+
+---
+
+## Troubleshooting Checklist
+
+| Issue                | Command to Check                         |
+| -------------------- | ---------------------------------------- |
+| Certificate expired? | `openssl x509 -in cert.crt -checkend 0`  |
+| Wrong CA?            | `openssl verify -CAfile ca.pem cert.crt` |
+| Key mismatch?        | Compare MD5 of modulus                   |
+| Wrong hostname?      | Check SAN in `-text` output              |
+| Chain incomplete?    | Use `-showcerts` on remote server        |
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="Certificate Verification"
+  cards={[
+    {
+      front: "How do you check if a cert expires within 30 days?",
+      back: "openssl x509 -in cert.crt -checkend 2592000",
+    },
+    {
+      front: "How do you verify cert was signed by specific CA?",
+      back: "openssl verify -CAfile ca.pem cert.crt",
+    },
+    {
+      front: "How do you check if cert and key match?",
+      back: "Compare MD5 hash of their modulus values",
+    },
+    {
+      front: "What's the difference between PEM and DER?",
+      back: "PEM is Base64-encoded text, DER is binary format",
+    },
+  ]}
+/>
+
+<Quiz
+  question="What does 'openssl verify' return if the certificate is valid?"
+  options={["VALID", "TRUE", "OK", "VERIFIED"]}
+  correct={2}
+  explanation="OpenSSL verify returns 'filename: OK' when the certificate is valid and properly signed by the specified CA."
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "View certificate details with openssl x509",
+    "Check certificate expiration",
+    "Verify certificate against CA",
+    "Match certificate with private key",
+    "Convert between PEM and DER formats",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)
+- [OpenSSL x509 Documentation](https://www.openssl.org/docs/man1.1.1/man1/x509.html)

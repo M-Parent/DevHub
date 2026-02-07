@@ -1,0 +1,146 @@
+---
+title: "Docker Learning Path"
+description: "Complete learning path for Docker - from containers basics to orchestration and production deployment."
+sidebar:
+  label: "Docker Path"
+  order: 1
+tableOfContents: true
+---
+
+import {
+  Badge,
+  CardGrid,
+  LinkCard,
+  Aside,
+} from "@astrojs/starlight/components";
+import ProgressCheck from "../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+
+Master Docker from the ground up. This learning path takes you from container basics to production-ready deployments.
+
+<Aside type="tip" title="How to Use This Path">
+  Follow the guides in order. Each one builds on the previous. Check off items
+  as you complete them.
+</Aside>
+
+---
+
+## Overview
+
+|               |                                             |
+| ------------- | ------------------------------------------- |
+| 📚 **Guides** | 3 available (more coming)                   |
+| 🎯 **Goal**   | Build and deploy containerized applications |
+
+---
+
+## Learning Path
+
+### 1. Docker Fundamentals <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Learn what Docker is, understand core concepts (Dockerfile, Image, Container), and install Docker on your machine.
+
+<LinkCard
+  title="Getting Started with Docker"
+  description="Containers, images, Dockerfiles, and essential commands"
+  href="/guides/docker/docker-fundamentals/"
+/>
+
+---
+
+### 2. Install Docker on Linux <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Step-by-step installation guide for Ubuntu Linux.
+
+<LinkCard
+  title="Installing Docker on Ubuntu Linux"
+  description="Complete setup with all required commands"
+  href="/guides/docker/docker-install-linux/"
+/>
+
+---
+
+### 3. Install Docker on Windows <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Install Docker Desktop with WSL 2 integration on Windows.
+
+<LinkCard
+  title="Installing Docker Desktop on Windows"
+  description="Docker Desktop setup with WSL 2"
+  href="/guides/windows/docker-install-windows/"
+/>
+
+---
+
+### 4. Docker Commands & Workflow <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
+
+Master essential Docker CLI commands for building, running, and managing containers.
+
+---
+
+### 5. Docker Compose <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Define and run multi-container applications with Docker Compose.
+
+---
+
+### 6. Docker Networking <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Understand container networking, ports, and connecting multiple containers.
+
+---
+
+### 7. Docker Volumes & Persistence <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Persist data with volumes and understand container storage.
+
+---
+
+### 8. Production Best Practices <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Optimize images, security hardening, and deployment strategies.
+
+---
+
+## 🛠️ Projects
+
+Hands-on projects to practice your Docker skills.
+
+<Aside type="note" title="Coming Soon">
+  Docker projects will be added here as they become available.
+</Aside>
+
+---
+
+## Track Your Progress
+
+<ProgressCheck
+  id="docker-learning-path"
+  title="Docker Checklist"
+  items={[
+    "Docker Fundamentals",
+    "Docker Linux Install",
+    "Docker Windows Install",
+  ]}
+/>
+
+---
+
+## What's Next?
+
+After completing this path, you'll be able to:
+
+- Build and run Docker containers
+- Create multi-container applications with Compose
+- Deploy containerized apps to production
+
+### Related
+
+<CardGrid>
+  <LinkCard
+    title="ARR Stack Cheatsheet"
+    description="Docker-based media automation stack"
+    href="/cheatsheets/arr-stack/arr-stack/"
+  />
+</CardGrid>

@@ -1,0 +1,290 @@
+---
+title: "Install NGINX Web Server"
+description: "Set up NGINX web server on Ubuntu and host a simple website with virtual hosts."
+sidebar:
+  label: "NGINX Setup"
+  order: 20
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../../components/Quiz.astro";
+import Flashcard from "../../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
+
+NGINX is a powerful web server used by major hosting companies worldwide. It handles high volumes of requests simultaneously, offering faster loading times and better performance than most other web servers.
+
+<Aside type="tip" title="Why NGINX?">
+  NGINX uses fewer resources than Apache and is excellent for static content,
+  reverse proxying, and load balancing.
+</Aside>
+
+---
+
+## What is NGINX?
+
+| Feature         | Description                                |
+| --------------- | ------------------------------------------ |
+| **Type**        | Web server, reverse proxy, load balancer   |
+| **Performance** | High concurrency, low memory usage         |
+| **Config**      | Simple, declarative configuration files    |
+| **Use Cases**   | Static sites, API gateway, SSL termination |
+
+---
+
+## Install NGINX
+
+<Steps>
+
+1. **Update package repositories**
+
+   ```bash
+   sudo apt update
+   ```
+
+2. **Install NGINX**
+
+   ```bash
+   sudo apt install nginx
+   ```
+
+3. **Start and enable NGINX**
+
+   ```bash
+   # Start NGINX now
+   sudo systemctl start nginx
+
+   # Enable NGINX to start on boot
+   sudo systemctl enable nginx
+   ```
+
+4. **Verify installation**
+
+   ```bash
+   curl localhost
+   ```
+
+   You should see the default NGINX welcome page HTML.
+
+</Steps>
+
+---
+
+## Host Your Own Website
+
+### Create Application Directory
+
+```bash
+# Create directory for your site
+sudo mkdir -p /var/www/devhub-site
+
+# Create a simple index.html
+sudo tee /var/www/devhub-site/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DevHub - Hello World</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #070a12 0%, #1a1a2e 100%);
+            color: #f9fafb;
+        }
+        .container {
+            text-align: center;
+            padding: 2em;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        h1 { color: #60a5fa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 DevHub</h1>
+        <p>Your NGINX server is working!</p>
+    </div>
+</body>
+</html>
+EOF
+```
+
+### Configure Virtual Host
+
+<Steps>
+
+1. **Create site configuration**
+
+   ```bash
+   sudo tee /etc/nginx/sites-available/devhub-site.conf << 'EOF'
+   server {
+       listen 80;
+       listen [::]:80;
+
+       server_name devhub.local;
+
+       root /var/www/devhub-site;
+       index index.html;
+
+       location / {
+           try_files $uri $uri/ =404;
+       }
+   }
+   EOF
+   ```
+
+2. **Enable the site**
+
+   Create a symbolic link to enable the site:
+
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/devhub-site.conf /etc/nginx/sites-enabled/
+   ```
+
+3. **Test configuration**
+
+   Always test before restarting:
+
+   ```bash
+   sudo nginx -t
+   ```
+
+   Expected output:
+
+   ```
+   nginx: configuration file /etc/nginx/nginx.conf syntax is ok
+   nginx: configuration file /etc/nginx/nginx.conf test is successful
+   ```
+
+4. **Restart NGINX**
+
+   ```bash
+   sudo systemctl restart nginx
+   ```
+
+5. **Test your site**
+
+   ```bash
+   curl localhost
+   ```
+
+</Steps>
+
+---
+
+## Configuration Explained
+
+```nginx
+server {
+    listen 80;              # Listen on port 80 (HTTP)
+    listen [::]:80;         # Listen on IPv6 port 80
+
+    server_name devhub.local;  # Domain name
+
+    root /var/www/devhub-site; # Document root
+    index index.html;          # Default file
+
+    location / {
+        try_files $uri $uri/ =404;  # Try file, then dir, then 404
+    }
+}
+```
+
+| Directive     | Purpose                            |
+| ------------- | ---------------------------------- |
+| `listen`      | Port to listen on                  |
+| `server_name` | Domain/hostname for this site      |
+| `root`        | Directory containing website files |
+| `index`       | Default file to serve              |
+| `try_files`   | Order to try serving files         |
+
+---
+
+## Useful NGINX Commands
+
+```bash
+# Check status
+sudo systemctl status nginx
+
+# Test configuration syntax
+sudo nginx -t
+
+# Reload config (no downtime)
+sudo systemctl reload nginx
+
+# Restart completely
+sudo systemctl restart nginx
+
+# View error logs
+sudo tail -f /var/log/nginx/error.log
+
+# View access logs
+sudo tail -f /var/log/nginx/access.log
+```
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="NGINX Basics"
+  cards={[
+    {
+      front: "Where are NGINX site configs stored?",
+      back: "/etc/nginx/sites-available/ (available) and /etc/nginx/sites-enabled/ (active)",
+    },
+    {
+      front: "How do you enable a site?",
+      back: "Create a symlink from sites-available to sites-enabled",
+    },
+    { front: "How do you test config before restart?", back: "sudo nginx -t" },
+    {
+      front: "What does try_files do?",
+      back: "Tries to serve files in order, returns 404 if none found",
+    },
+  ]}
+/>
+
+<Quiz
+  question="What command reloads NGINX without downtime?"
+  options={[
+    "systemctl restart nginx",
+    "systemctl reload nginx",
+    "nginx -t",
+    "service nginx stop",
+  ]}
+  correct={1}
+  explanation="systemctl reload nginx reloads the configuration without stopping the service, ensuring zero downtime."
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Installed NGINX",
+    "Created website directory",
+    "Configured virtual host",
+    "Tested and reloaded NGINX",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)
+- [NGINX Documentation](https://nginx.org/en/docs/)

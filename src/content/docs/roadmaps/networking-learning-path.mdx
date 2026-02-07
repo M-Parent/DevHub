@@ -1,0 +1,157 @@
+---
+title: "Networking Learning Path"
+description: "Complete learning path for networking - from fundamentals to advanced network administration."
+sidebar:
+  label: "Networking Path"
+  order: 4
+tableOfContents: true
+---
+
+import {
+  Badge,
+  CardGrid,
+  LinkCard,
+  Aside,
+} from "@astrojs/starlight/components";
+import ProgressCheck from "../../../components/ProgressCheck.astro";
+
+<Badge text="Networking" class="networking" />
+
+Master networking from the ground up. This learning path covers protocols, DNS, firewalls, and network troubleshooting.
+
+<Aside type="tip" title="How to Use This Path">
+  Follow the guides in order. Each one builds on the previous. Check off items
+  as you complete them.
+</Aside>
+
+---
+
+## Overview
+
+|               |                                         |
+| ------------- | --------------------------------------- |
+| 📚 **Guides** | 3 available (more coming)               |
+| 🎯 **Goal**   | Understand and manage computer networks |
+
+---
+
+## Learning Path
+
+### 1. DNS Theory <Badge text="Available" variant="tip" /> <Badge text="Theory" variant="note" />
+
+Understand how DNS works - the Internet's phonebook.
+
+<LinkCard
+  title="Introduction to DNS"
+  description="DNS resolution, record types, and how queries work"
+  href="/guides/networking/dns-theory/"
+/>
+
+---
+
+### 2. SSH Fundamentals <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Secure shell connections and key-based authentication.
+
+<CardGrid>
+  <LinkCard
+    title="SSH Fundamentals"
+    description="SSH key generation, configuration, and secure connections"
+    href="/guides/linux/ssh-fundamentals/"
+  />
+  <LinkCard
+    title="SSH Cheatsheet"
+    description="Quick reference for SSH commands"
+    href="/cheatsheets/linux/ssh-cheatsheet/"
+  />
+</CardGrid>
+
+---
+
+### 3. OpenVPN Setup <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Set up a VPN server and client for secure network access.
+
+<CardGrid>
+  <LinkCard
+    title="OpenVPN Server Setup"
+    description="Configure OpenVPN server and client with certificates"
+    href="/guides/linux/openvpn-setup/"
+  />
+  <LinkCard
+    title="OpenVPN Cheatsheet"
+    description="Quick reference for OpenVPN commands"
+    href="/cheatsheets/linux/openvpn-cheatsheet/"
+  />
+</CardGrid>
+
+---
+
+### 4. TCP/IP Fundamentals <Badge text="Coming Soon" variant="note" /> <Badge text="Theory" variant="note" />
+
+Understand the TCP/IP model and how data travels across networks.
+
+---
+
+### 5. Subnetting & CIDR <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Calculate subnets and understand IP addressing schemes.
+
+---
+
+### 6. Firewalls & iptables <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Configure Linux firewalls and understand packet filtering.
+
+---
+
+### 7. Network Troubleshooting <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Debug network issues with ping, traceroute, netstat, and tcpdump.
+
+---
+
+### 8. Reverse Proxy Setup <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Configure Nginx or Traefik as a reverse proxy with SSL.
+
+---
+
+## 🛠️ Projects
+
+Hands-on projects to practice your networking skills.
+
+<Aside type="note" title="Coming Soon">
+  Networking projects will be added here as they become available.
+</Aside>
+
+---
+
+## Track Your Progress
+
+<ProgressCheck
+  id="networking-learning-path"
+  title="Networking Checklist"
+  items={["DNS Theory", "SSH Fundamentals", "OpenVPN Setup"]}
+/>
+
+---
+
+## What's Next?
+
+After completing this path, you'll be able to:
+
+- Understand how networks function
+- Configure DNS and firewalls
+- Troubleshoot network issues
+- Set up secure network services
+
+### Related
+
+<CardGrid>
+  <LinkCard
+    title="Linux Learning Path"
+    description="Networking runs on Linux servers"
+    href="/roadmaps/linux-learning-path/"
+  />
+</CardGrid>

@@ -1,0 +1,286 @@
+---
+title: "Creating CSRs and Certificates"
+description: "Generate certificate signing requests and get them signed by your CA with SAN support."
+sidebar:
+  label: "Create CSR & Certificates"
+  order: 12
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../../components/Quiz.astro";
+import Flashcard from "../../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
+
+To obtain a certificate from a CA, you first generate a private key and Certificate Signing Request (CSR). This guide covers CSR generation, Subject Alternative Names (SAN), and certificate signing.
+
+<Aside type="note" title="Ubuntu/Debian">
+  This guide follows the CA setup from the previous article. Commands are for
+  Ubuntu/Debian.
+</Aside>
+
+---
+
+## Generate a Private Key
+
+First, create a private key for your application:
+
+```bash
+openssl genpkey -algorithm RSA -out devhub-app.key -aes256
+```
+
+| Option           | Description                                         |
+| ---------------- | --------------------------------------------------- |
+| `-algorithm RSA` | RSA algorithm (2048-bit default)                    |
+| `-out`           | Output file for the private key                     |
+| `-aes256`        | Encrypt the key (optional, prompted for passphrase) |
+
+For automated systems that can't enter a passphrase:
+
+```bash
+openssl genpkey -algorithm RSA -out devhub-app.key
+```
+
+---
+
+## Generate a Certificate Signing Request (CSR)
+
+### Basic CSR
+
+```bash
+openssl req -new -key devhub-app.key -out devhub-app.csr \
+  -subj "/C=CA/ST=Ontario/L=Ottawa/O=DevHub/OU=IT/CN=app.devhub.local"
+```
+
+| Subject Field | Description             | Required     |
+| ------------- | ----------------------- | ------------ |
+| `C`           | Country (2-letter code) | Recommended  |
+| `ST`          | State or Province       | Optional     |
+| `L`           | Locality (City)         | Optional     |
+| `O`           | Organization            | Recommended  |
+| `OU`          | Organizational Unit     | Optional     |
+| `CN`          | Common Name (hostname)  | **Required** |
+
+---
+
+## Subject Alternative Names (SAN)
+
+Modern browsers require SAN for certificate validation. SAN allows one certificate to cover multiple hostnames.
+
+### Why Use SAN?
+
+- **Multiple Hostnames** - One cert for `app.devhub.local`, `www.app.devhub.local`, `api.devhub.local`
+- **Browser Compatibility** - Chrome and others prefer SAN over CN
+- **IP Addresses** - SAN can include IP addresses
+
+### Create SAN Configuration File
+
+Create `san.cnf`:
+
+```ini
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions = req_ext
+prompt = no
+
+[ req_distinguished_name ]
+C = CA
+ST = Ontario
+L = Ottawa
+O = DevHub
+OU = IT
+CN = app.devhub.local
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = app.devhub.local
+DNS.2 = www.app.devhub.local
+DNS.3 = api.devhub.local
+IP.1 = 192.168.1.100
+```
+
+### Generate CSR with SAN
+
+```bash
+openssl req -new -key devhub-app.key -out devhub-app.csr -config san.cnf
+```
+
+### Alternative: Command-Line SAN
+
+For quick CSRs without a config file:
+
+```bash
+openssl req -newkey rsa:4096 -sha256 -nodes \
+  -keyout devhub-app.key -out devhub-app.csr \
+  -subj "/CN=app.devhub.local" \
+  -addext "subjectAltName=DNS:app.devhub.local,DNS:www.app.devhub.local,IP:192.168.1.100"
+```
+
+---
+
+## Sign the CSR with Your CA
+
+### Configure OpenSSL for Your CA
+
+Edit `/usr/lib/ssl/openssl.cnf` to point to your CA:
+
+```bash
+sudo nano /usr/lib/ssl/openssl.cnf
+```
+
+Under `[ CA_default ]`:
+
+```ini
+[ CA_default ]
+dir             = /home/devuser/devhub-ca    # Your CA directory
+certs           = $dir/certs
+crl_dir         = $dir/crl
+database        = $dir/index.txt
+new_certs_dir   = $dir/newcerts
+certificate     = $dir/cacert.pem
+serial          = $dir/serial
+private_key     = $dir/private/cakey.pem
+```
+
+Also update these settings:
+
+```ini
+copy_extensions = copy          # Copy SAN from CSR to certificate
+policy          = policy_anything   # Less strict policy
+```
+
+### Sign the Certificate
+
+```bash
+openssl ca -in devhub-app.csr -out devhub-app.crt -days 365
+```
+
+You'll be prompted to:
+
+1. Enter the CA private key passphrase
+2. Confirm the certificate details
+3. Confirm signing
+
+---
+
+## Wildcard Certificates
+
+Wildcard certificates cover all subdomains at one level (e.g., `*.devhub.local`).
+
+### When to Use Wildcards
+
+| Use Case                   | Recommendation       |
+| -------------------------- | -------------------- |
+| Internal/Development       | ✅ Good choice       |
+| Changing subdomains        | ✅ Good choice       |
+| Public-facing production   | ❌ Use specific SANs |
+| High security requirements | ❌ Use specific SANs |
+
+### Generate Wildcard CSR
+
+```bash
+openssl req -new -key devhub-app.key -out devhub-wildcard.csr \
+  -subj "/CN=*.devhub.local" \
+  -addext "subjectAltName=DNS:*.devhub.local,DNS:devhub.local"
+```
+
+<Aside type="caution" title="Security Warning">
+  Wildcards only cover one level. `*.devhub.local` covers `app.devhub.local` but
+  NOT `api.app.devhub.local`.
+</Aside>
+
+---
+
+## Certificate Expiration Guidelines
+
+| Environment   | Validity  | Reasoning                         |
+| ------------- | --------- | --------------------------------- |
+| Public Web    | 90 days   | Industry standard (Let's Encrypt) |
+| Internal Apps | 1 year    | Balance security and maintenance  |
+| Development   | 1-2 years | Convenience for testing           |
+| Root CA       | 10+ years | Long-lived trust anchor           |
+
+Set validity when signing:
+
+```bash
+openssl ca -in devhub-app.csr -out devhub-app.crt -days 365
+```
+
+---
+
+## Verify the Certificate
+
+Check certificate details:
+
+```bash
+openssl x509 -in devhub-app.crt -text -noout
+```
+
+Verify against CA:
+
+```bash
+openssl verify -CAfile devhub-ca/cacert.pem devhub-app.crt
+```
+
+Expected output: `devhub-app.crt: OK`
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="CSR & Certificate Concepts"
+  cards={[
+    {
+      front: "What is a CSR?",
+      back: "Certificate Signing Request - contains public key and identity info, sent to CA for signing",
+    },
+    {
+      front: "Why use SAN instead of just CN?",
+      back: "SAN supports multiple hostnames/IPs and is required by modern browsers",
+    },
+    {
+      front: "Does *.example.com cover sub.app.example.com?",
+      back: "No, wildcards only cover one subdomain level",
+    },
+    {
+      front: "What does 'copy_extensions = copy' do?",
+      back: "Copies SAN and other extensions from CSR to the signed certificate",
+    },
+  ]}
+/>
+
+<Quiz
+  question="What's the recommended certificate validity for public-facing web servers?"
+  options={["10 years", "5 years", "1 year", "90 days"]}
+  correct={3}
+  explanation="90 days is the industry standard (e.g., Let's Encrypt) to encourage automation and reduce exposure from compromised certificates."
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Generate private key for application",
+    "Create CSR with proper subject fields",
+    "Add Subject Alternative Names",
+    "Sign certificate with your CA",
+    "Verify the certificate",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)
+- [OpenSSL req Documentation](https://www.openssl.org/docs/man1.1.1/man1/req.html)

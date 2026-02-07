@@ -1,0 +1,301 @@
+---
+title: "Linux Distributions Explained"
+description: "Understand the major Linux distribution families, their differences, and which one to choose for your use case."
+sidebar:
+  label: "Linux Distributions"
+  order: 1
+  badge:
+    text: "Theory"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Aside, Badge, Card, CardGrid } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" />
+
+Linux isn't a single operating system—it's a family of operating systems called **distributions** (or "distros"). Each distribution is built on the Linux kernel but comes with different package managers, default software, and philosophies.
+
+<Aside type="tip" title="Which Distro Should I Learn?">
+  If you're new to Linux, start with **Ubuntu** (Debian-based). It has the
+  largest community and most tutorials. For enterprise servers, **RHEL/Rocky
+  Linux** is common in corporate environments.
+</Aside>
+
+---
+
+## The Linux Distribution Families
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     LINUX KERNEL                            │
+└─────────────────────────────────────────────────────────────┘
+           │              │              │
+           ▼              ▼              ▼
+    ┌──────────┐   ┌──────────┐   ┌──────────┐
+    │  Debian  │   │  Red Hat │   │   Arch   │
+    └──────────┘   └──────────┘   └──────────┘
+         │              │              │
+         ▼              ▼              ▼
+    ┌──────────┐   ┌──────────┐   ┌──────────┐
+    │  Ubuntu  │   │   RHEL   │   │  Manjaro │
+    │  Mint    │   │  Fedora  │   │ EndeavourOS │
+    │  Pop!_OS │   │  Rocky   │   └──────────┘
+    └──────────┘   │  Alma    │
+                   └──────────┘
+```
+
+---
+
+## Debian Family
+
+<Badge text="Package Manager: APT" variant="tip" />
+
+Debian is one of the oldest and most stable Linux distributions. It prioritizes stability over cutting-edge software.
+
+### Key Characteristics
+
+| Feature             | Description                     |
+| ------------------- | ------------------------------- |
+| **Package Format**  | `.deb`                          |
+| **Package Manager** | `apt`, `dpkg`                   |
+| **Release Cycle**   | Stable releases every 2-3 years |
+| **Philosophy**      | Stability and free software     |
+
+### Popular Debian-Based Distros
+
+<CardGrid>
+  <Card title="Ubuntu" icon="rocket">
+    The most popular desktop Linux. Great for beginners and servers.
+  </Card>
+  <Card title="Linux Mint" icon="laptop">
+    User-friendly desktop focused on simplicity.
+  </Card>
+  <Card title="Debian" icon="server">
+    Rock-solid stability. Preferred for servers that need reliability.
+  </Card>
+</CardGrid>
+
+### Common APT Commands
+
+```bash
+# Update package list
+sudo apt update
+
+# Upgrade all packages
+sudo apt upgrade
+
+# Install a package
+sudo apt install nginx
+
+# Remove a package
+sudo apt remove nginx
+
+# Search for packages
+apt search nginx
+```
+
+---
+
+## Red Hat Family
+
+<Badge text="Package Manager: DNF/YUM" variant="caution" />
+
+Red Hat focuses on enterprise stability and long-term support. It's the dominant choice in corporate data centers.
+
+### Key Characteristics
+
+| Feature             | Description                      |
+| ------------------- | -------------------------------- |
+| **Package Format**  | `.rpm`                           |
+| **Package Manager** | `dnf` (formerly `yum`)           |
+| **Release Cycle**   | 10-year support cycles           |
+| **Philosophy**      | Enterprise stability and support |
+
+### Popular RHEL-Based Distros
+
+<CardGrid>
+  <Card title="RHEL" icon="seti:lock">
+    Red Hat Enterprise Linux. Paid enterprise support.
+  </Card>
+  <Card title="Rocky Linux" icon="seti:shell">
+    Free RHEL clone. Created after CentOS EOL.
+  </Card>
+  <Card title="Fedora" icon="rocket">
+    Cutting-edge. Testing ground for RHEL features.
+  </Card>
+  <Card title="AlmaLinux" icon="server">
+    Another free RHEL clone with community support.
+  </Card>
+</CardGrid>
+
+### Common DNF Commands
+
+```bash
+# Update package list and upgrade
+sudo dnf upgrade
+
+# Install a package
+sudo dnf install nginx
+
+# Remove a package
+sudo dnf remove nginx
+
+# Search for packages
+dnf search nginx
+
+# List installed packages
+dnf list installed
+```
+
+---
+
+## Arch Family
+
+<Badge text="Package Manager: Pacman" variant="danger" />
+
+Arch Linux follows a "rolling release" model with the latest software. It's designed for advanced users who want full control.
+
+### Key Characteristics
+
+| Feature             | Description                             |
+| ------------------- | --------------------------------------- |
+| **Package Format**  | `.pkg.tar.zst`                          |
+| **Package Manager** | `pacman`                                |
+| **Release Cycle**   | Rolling (continuous updates)            |
+| **Philosophy**      | Simplicity, user-centric, bleeding edge |
+
+### Popular Arch-Based Distros
+
+<CardGrid>
+  <Card title="Arch Linux" icon="seti:config">
+    DIY installation. You build everything from scratch.
+  </Card>
+  <Card title="Manjaro" icon="laptop">
+    User-friendly Arch with graphical installer.
+  </Card>
+  <Card title="EndeavourOS" icon="rocket">
+    Arch made accessible with easy installation.
+  </Card>
+</CardGrid>
+
+### Common Pacman Commands
+
+```bash
+# Update and upgrade
+sudo pacman -Syu
+
+# Install a package
+sudo pacman -S nginx
+
+# Remove a package
+sudo pacman -R nginx
+
+# Search for packages
+pacman -Ss nginx
+```
+
+---
+
+## Comparison Table
+
+| Feature             | Debian/Ubuntu       | RHEL/Rocky             | Arch        |
+| ------------------- | ------------------- | ---------------------- | ----------- |
+| **Difficulty**      | Beginner            | Intermediate           | Advanced    |
+| **Stability**       | High                | Very High              | Variable    |
+| **Software Age**    | Moderate            | Older (stable)         | Latest      |
+| **Package Manager** | apt                 | dnf                    | pacman      |
+| **Support Cycle**   | 5 years (LTS)       | 10 years               | Rolling     |
+| **Best For**        | Desktop, Dev, Cloud | Enterprise, Production | Power Users |
+
+---
+
+## Choosing the Right Distribution
+
+### For Beginners
+
+- **Ubuntu Desktop** - Best documentation, largest community
+- **Linux Mint** - Most Windows-like experience
+
+### For Servers
+
+- **Ubuntu Server** - Popular in cloud (AWS, Azure, GCP)
+- **Rocky/AlmaLinux** - Enterprise production environments
+- **Debian** - Maximum stability, minimal changes
+
+### For Development
+
+- **Fedora** - Latest development tools
+- **Ubuntu** - Wide compatibility with tutorials
+
+### For Learning
+
+- **Arch Linux** - Teaches you how Linux really works
+- **Debian** - Classic, well-documented
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="Distribution Facts"
+  cards={[
+    {
+      front: "What package manager does Ubuntu use?",
+      back: "APT (apt) with .deb packages",
+    },
+    {
+      front: "What is Rocky Linux?",
+      back: "A free, community-driven RHEL clone created after CentOS EOL",
+    },
+    {
+      front: "What does 'rolling release' mean?",
+      back: "Continuous updates instead of major version releases",
+    },
+    {
+      front: "Which distro family is dominant in enterprise?",
+      back: "Red Hat (RHEL, Rocky, AlmaLinux)",
+    },
+  ]}
+/>
+
+<MatchPairs
+  instruction="Match the distribution to its package manager"
+  pairs={[
+    { left: "Ubuntu", right: "apt" },
+    { left: "Fedora", right: "dnf" },
+    { left: "Arch", right: "pacman" },
+    { left: "Debian", right: "dpkg" },
+  ]}
+/>
+
+<Quiz
+  question="Which distribution family would you choose for a production enterprise server?"
+  options={["Arch Linux", "Ubuntu Desktop", "Rocky/AlmaLinux", "Linux Mint"]}
+  correct={2}
+  explanation="RHEL-based distributions like Rocky or AlmaLinux are designed for enterprise with 10-year support cycles."
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Understand the three main distribution families",
+    "Know the difference between apt, dnf, and pacman",
+    "Choose the right distro for your use case",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [DistroWatch](https://distrowatch.com/)
+- [Ubuntu Official](https://ubuntu.com/)
+- [Red Hat Documentation](https://access.redhat.com/documentation/)

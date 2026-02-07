@@ -1,0 +1,261 @@
+---
+title: "Linux File Permissions"
+description: "Understand Linux file and folder permissions, ownership, and how to use chmod and chown."
+sidebar:
+  label: "File Permissions"
+  order: 6
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge } from "@astrojs/starlight/components";
+import Question from "../../../../components/Question.astro";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" />
+
+File permissions control who can read, write, and execute files in Linux. Understanding permissions is essential for security and proper system administration.
+
+---
+
+## Viewing Permissions
+
+Use `ls -l` to view file permissions:
+
+```bash
+ls -l
+```
+
+```
+-rw-r--r--  1 devuser devgroup  4096 Nov  8 20:58 testfile
+drwxr-xr-x  2 devuser devgroup  4096 Nov  8 19:21 testdir
+lrwxrwxrwx  1 devuser devgroup    10 Nov  8 21:05 symlink -> ./testfile
+```
+
+### Permission Breakdown
+
+| Character | Meaning            |
+| --------- | ------------------ |
+| `-`       | Regular file       |
+| `d`       | Directory          |
+| `l`       | Symbolic link      |
+| `r`       | Read permission    |
+| `w`       | Write permission   |
+| `x`       | Execute permission |
+
+The 10 characters break down as:
+
+```
+-rwxr-xr--
+│└┬┘└┬┘└┬┘
+│ │  │  └── Others: r-- (read only)
+│ │  └───── Group:  r-x (read + execute)
+│ └──────── User:   rwx (read + write + execute)
+└────────── Type:   - (regular file)
+```
+
+---
+
+## Octal (Numeric) Notation
+
+Permissions can be represented as numbers:
+
+| Permission  | Value |
+| ----------- | ----- |
+| Read (r)    | 4     |
+| Write (w)   | 2     |
+| Execute (x) | 1     |
+
+Add them together for combined permissions:
+
+| Octal | Permissions | Meaning                |
+| ----- | ----------- | ---------------------- |
+| 7     | rwx         | Read + Write + Execute |
+| 6     | rw-         | Read + Write           |
+| 5     | r-x         | Read + Execute         |
+| 4     | r--         | Read only              |
+| 3     | -wx         | Write + Execute        |
+| 2     | -w-         | Write only             |
+| 1     | --x         | Execute only           |
+| 0     | ---         | No permissions         |
+
+### Common Permission Sets
+
+| Octal | Symbolic  | Use Case                      |
+| ----- | --------- | ----------------------------- |
+| 755   | rwxr-xr-x | Executable files, directories |
+| 644   | rw-r--r-- | Regular files                 |
+| 600   | rw------- | Private files (SSH keys)      |
+| 700   | rwx------ | Private directories           |
+| 777   | rwxrwxrwx | Full access (avoid!)          |
+
+---
+
+## Changing Permissions with chmod
+
+### Octal Method
+
+```bash
+chmod 755 script.sh
+chmod 644 document.txt
+chmod 600 ~/.ssh/id_ed25519
+```
+
+### Symbolic Method
+
+```bash
+chmod u+x script.sh      # Add execute for user
+chmod g-w file.txt       # Remove write for group
+chmod o=r file.txt       # Set others to read only
+chmod a+r file.txt       # Add read for all
+```
+
+| Symbol | Meaning              |
+| ------ | -------------------- |
+| u      | User (owner)         |
+| g      | Group                |
+| o      | Others               |
+| a      | All (u+g+o)          |
+| +      | Add permission       |
+| -      | Remove permission    |
+| =      | Set exact permission |
+
+### Examples
+
+These are equivalent:
+
+```bash
+chmod 777 testfile
+chmod u=rwx,g=rwx,o=rwx testfile
+chmod a=rwx testfile
+```
+
+---
+
+## Changing Ownership with chown
+
+The `chown` command changes file ownership.
+
+```bash
+chown user:group file
+```
+
+### Change User Owner
+
+```bash
+sudo chown devuser testfile
+```
+
+### Change Group Owner
+
+```bash
+sudo chown :devgroup testfile
+```
+
+### Change Both
+
+```bash
+sudo chown devuser:devgroup testfile
+```
+
+### Recursive Change
+
+```bash
+sudo chown -R devuser:devgroup /path/to/directory
+```
+
+---
+
+## Directory Permissions
+
+For directories, permissions have slightly different meanings:
+
+| Permission  | File            | Directory            |
+| ----------- | --------------- | -------------------- |
+| Read (r)    | View contents   | List files           |
+| Write (w)   | Modify contents | Create/delete files  |
+| Execute (x) | Run as program  | Enter directory (cd) |
+
+<Aside type="note">
+  To access files in a directory, you need **execute** permission on the
+  directory, even if you have read permission on the files inside.
+</Aside>
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="Permission Commands"
+  cards={[
+    { front: "Make file executable by owner", back: "chmod u+x filename" },
+    { front: "Set permissions to 755", back: "chmod 755 filename" },
+    { front: "Change owner to devuser", back: "chown devuser filename" },
+    { front: "View file permissions", back: "ls -l filename" },
+    {
+      front: "What does 644 mean?",
+      back: "rw-r--r-- (owner read/write, group/others read)",
+    },
+  ]}
+/>
+
+<MatchPairs
+  instruction="Match the octal value with its permission"
+  pairs={[
+    { left: "7", right: "rwx" },
+    { left: "6", right: "rw-" },
+    { left: "5", right: "r-x" },
+    { left: "4", right: "r--" },
+    { left: "0", right: "---" },
+  ]}
+/>
+
+<Quiz
+  question="What permission value should SSH private keys have?"
+  options={["777", "755", "644", "600"]}
+  correct={3}
+  explanation="SSH private keys should have 600 (rw-------) so only the owner can read/write them."
+/>
+
+<Quiz
+  question="What does the 'x' permission mean for a directory?"
+  options={[
+    "Run the directory as a program",
+    "List files in the directory",
+    "Enter (cd into) the directory",
+    "Delete the directory",
+  ]}
+  correct={2}
+  explanation="For directories, execute (x) permission allows you to enter (cd into) the directory."
+/>
+
+<Question
+  question="What's the difference between chmod and chown?"
+  answer="chmod changes the permissions (read/write/execute) of a file. chown changes the ownership (user and group) of a file."
+  hint="One changes WHO owns it, one changes WHAT they can do"
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Read and understand ls -l output",
+    "Convert between octal and symbolic notation",
+    "Use chmod to change permissions",
+    "Use chown to change ownership",
+    "Understand directory permission differences",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)

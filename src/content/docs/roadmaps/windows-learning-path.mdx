@@ -1,0 +1,122 @@
+---
+title: "Windows Learning Path"
+description: "Complete learning path for Windows - from basics to server administration."
+sidebar:
+  label: "Windows Path"
+  order: 5
+tableOfContents: true
+---
+
+import {
+  Badge,
+  CardGrid,
+  LinkCard,
+  Aside,
+} from "@astrojs/starlight/components";
+import ProgressCheck from "../../../components/ProgressCheck.astro";
+
+<Badge text="Windows" class="windows" />
+
+Master Windows administration from basics to advanced server management.
+
+<Aside type="tip" title="How to Use This Path">
+  Follow the guides in order. Each one builds on the previous. Check off items
+  as you complete them.
+</Aside>
+
+---
+
+## Overview
+
+|               |                                             |
+| ------------- | ------------------------------------------- |
+| 📚 **Guides** | 2 available (more coming)                   |
+| 🎯 **Goal**   | Become proficient in Windows administration |
+
+---
+
+## Learning Path
+
+### 1. SSH Fundamentals <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+SSH key-based authentication works on Windows too via OpenSSH.
+
+<CardGrid>
+  <LinkCard
+    title="SSH Fundamentals"
+    description="SSH key generation, configuration, and secure connections"
+    href="/guides/linux/ssh-fundamentals/"
+  />
+  <LinkCard
+    title="SSH Cheatsheet"
+    description="Quick reference for SSH commands"
+    href="/cheatsheets/linux/ssh-cheatsheet/"
+  />
+</CardGrid>
+
+---
+
+### 2. Docker on Windows <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Install Docker Desktop on Windows with WSL2.
+
+<LinkCard
+  title="Docker Installation on Windows"
+  description="Install Docker Desktop with WSL2 backend"
+  href="/guides/windows/docker-install-windows/"
+/>
+
+---
+
+### 3. PowerShell Basics <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
+
+Learn the fundamentals of PowerShell scripting.
+
+---
+
+### 4. Windows Server Administration <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Active Directory, Group Policy, and server roles.
+
+---
+
+### 5. Windows Networking <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Configure networking, DNS, and DHCP on Windows.
+
+---
+
+### 6. Windows Security Hardening <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Secure Windows servers and workstations.
+
+---
+
+## 🛠️ Projects
+
+Hands-on projects to practice your Windows skills.
+
+<Aside type="note" title="Coming Soon">
+  Windows projects will be added here as they become available.
+</Aside>
+
+---
+
+## Track Your Progress
+
+<ProgressCheck
+  id="windows-learning-path"
+  title="Windows Checklist"
+  items={["SSH Fundamentals", "Docker on Windows"]}
+/>
+
+---
+
+## What's Next?
+
+After completing this path, you'll be able to:
+
+- Administer Windows servers
+- Use PowerShell for automation
+- Secure Windows environments
+- Integrate Windows with Linux infrastructure

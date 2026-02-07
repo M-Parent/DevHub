@@ -1,0 +1,212 @@
+---
+title: "Getting Started with Docker"
+description: "Learn Docker fundamentals - containers, images, Dockerfiles, and essential commands to package and run applications anywhere."
+sidebar:
+  label: "Docker Fundamentals"
+  order: 1
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import {
+  Aside,
+  Badge,
+  Card,
+  CardGrid,
+  LinkCard,
+} from "@astrojs/starlight/components";
+import Question from "../../../../components/Question.astro";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+
+If you've ever wanted to run applications reliably across different computers, Docker is a tool you need to know. At its core, Docker lets you package an app with all its dependencies into a lightweight container that can run anywhere—your laptop, a server, or the cloud.
+
+Think of it like a portable, self-contained mini-computer for your app. No more "it works on my machine" problems!
+
+---
+
+## Video Introduction
+
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/Gjnup-PuquQ"
+  title="Docker in 100 Seconds"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+> **Source**: Fireship - Docker in 100 Seconds
+
+---
+
+## Core Docker Concepts
+
+Docker has three fundamental elements:
+
+<Flashcard
+  title="Docker Core Components"
+  cards={[
+    {
+      front: "Dockerfile",
+      back: "A text file with instructions to build a Docker image - like DNA for your container",
+    },
+    {
+      front: "Docker Image",
+      back: "An immutable snapshot of your software with all dependencies - can be stored locally or on Docker Hub",
+    },
+    {
+      front: "Docker Container",
+      back: "A running instance of an image - isolated but lightweight, runs on any machine with Docker",
+    },
+  ]}
+/>
+
+---
+
+### Dockerfile
+
+Think of it as DNA for your container. It contains instructions to build a Docker image.
+
+```dockerfile
+FROM ubuntu:22.04                              # Base image
+RUN apt-get update && apt-get install -y python3 python3-pip  # Install dependencies
+ENV APP_ENV=production                         # Set environment variables
+COPY . /app                                    # Copy your app files
+WORKDIR /app                                   # Set working directory
+CMD ["python3", "app.py"]                      # Default command when container starts
+```
+
+<Question
+  question="What does the FROM instruction do in a Dockerfile?"
+  answer="FROM specifies the base image to use as the starting point for your container. All subsequent instructions build on top of this base."
+  hint="Think about the foundation of your container"
+/>
+
+---
+
+### Docker Image
+
+- Snapshot of your software with all dependencies
+- Immutable: once built, it doesn't change
+- Can be stored locally or uploaded to Docker Hub or other registries
+
+---
+
+### Docker Container
+
+- The running instance of an image
+- Can run on any machine that has Docker installed
+- Containers are isolated, but lightweight
+
+<MatchPairs
+  title="Match Docker Concepts"
+  pairs={[
+    { left: "Dockerfile", right: "Build instructions" },
+    { left: "Image", right: "Immutable snapshot" },
+    { left: "Container", right: "Running instance" },
+    { left: "Docker Hub", right: "Image registry" },
+  ]}
+/>
+
+---
+
+## Installation
+
+To get hands-on with Docker, you'll need to install it on your machine first.
+
+<CardGrid>
+  <LinkCard
+    title="Windows"
+    description="Install Docker Desktop for Windows"
+    href="https://docs.docker.com/desktop/install/windows-install/"
+  />
+  <LinkCard
+    title="Linux"
+    description="Install Docker Engine on Linux"
+    href="https://docs.docker.com/engine/install/"
+  />
+  <LinkCard
+    title="macOS"
+    description="Install Docker Desktop for Mac"
+    href="https://docs.docker.com/desktop/install/mac-install/"
+  />
+</CardGrid>
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="What is the difference between a Docker image and a container?"
+  options={[
+    "No difference, they are the same thing",
+    "Image is the blueprint, container is the running instance",
+    "Container is stored on disk, image runs in memory",
+    "Image is for Linux, container is for Windows",
+  ]}
+  correct={1}
+  explanation="A Docker image is an immutable template (blueprint) containing your app and dependencies. A container is a running instance of that image."
+/>
+
+<Quiz
+  question="Which Dockerfile instruction sets the command to run when the container starts?"
+  options={["RUN", "COPY", "CMD", "FROM"]}
+  correct={2}
+  explanation="CMD specifies the default command to execute when a container starts. RUN executes commands during the image build process."
+/>
+
+<Question
+  question="Why would you use Docker instead of running apps directly on your machine?"
+  answer="Docker ensures consistency across environments (dev, staging, production), isolates dependencies to avoid conflicts, and makes deployment portable and reproducible."
+/>
+
+---
+
+## Progress Tracker
+
+<ProgressCheck
+  id="docker-fundamentals"
+  title="Docker Fundamentals Checklist"
+  items={[
+    "Understand what Docker is and why it's useful",
+    "Know the three core components: Dockerfile, Image, Container",
+    "Understand basic Dockerfile instructions",
+    "Install Docker on your machine",
+  ]}
+/>
+
+---
+
+## Learn More
+
+<Aside type="tip" title="Recommended Course">
+  For a deeper dive into Docker, check out **Docker Mastery** by Bret Fisher on
+  Udemy. It covers containers, images, Docker Compose, and best practices. Often
+  on sale for around $20.
+</Aside>
+
+---
+
+## Sources & References
+
+<Aside type="note" title="Learn More">
+  Resources for learning Docker:
+</Aside>
+
+### Official Documentation
+
+- [Docker Official Docs](https://docs.docker.com/) — Complete Docker documentation
+- [Docker Hub](https://hub.docker.com/) — Official image registry
+
+### Video Resources
+
+- [Fireship - Docker in 100 Seconds](https://www.youtube.com/watch?v=Gjnup-PuquQ) — Quick introduction
+- [Docker Mastery on Udemy](https://www.udemy.com/course/docker-mastery/) — Comprehensive paid course

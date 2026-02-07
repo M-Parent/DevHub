@@ -1,0 +1,252 @@
+---
+title: "SSH Without a Password"
+description: "Learn how to set up SSH key-based authentication for secure, passwordless server access."
+sidebar:
+  label: "SSH Fundamentals"
+  order: 4
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Question from "../../../../components/Question.astro";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" /> <Badge text="Windows" class="windows" />
+<Badge text="Server" class="server" /> <Badge text="SSH" class="ssh" />
+
+SSH using a password works well but isn't as secure. Your password is sent to the server over the network. The more secure option is SSH with a private key. The private key never leaves your workstation even when connecting to a host.
+
+<Aside type="tip" title="Why SSH Keys?">
+  SSH keys provide multi-factor authentication: something you **have** (the key)
+  and optionally something you **know** (the passphrase). This is more secure
+  than passwords alone.
+</Aside>
+
+---
+
+## What is SSH?
+
+SSH (Secure Shell) is a network protocol that gives users a secure way to access a computer over an unsecured network. It provides:
+
+- **Strong encryption** for all traffic
+- **Public key authentication** for secure login
+- **Remote command execution** and file transfer
+- Runs on **TCP port 22** by default
+
+---
+
+## Generate SSH Key Pair
+
+<Steps>
+
+1. **Run the key generation command**
+
+   ```bash
+   ssh-keygen
+   ```
+
+2. **Enter the file location** (or press Enter for default)
+
+   ```bash
+   /home/devuser/.ssh/id_ed25519
+   ```
+
+3. **Enter a passphrase** (optional but recommended)
+
+   ```bash
+   Enter passphrase (empty for no passphrase):
+   ```
+
+4. **Verify the keys were created**
+
+   ```bash
+   ls -la ~/.ssh/
+   ```
+
+   You should see:
+   - `id_ed25519` - Your **private key** (never share this!)
+   - `id_ed25519.pub` - Your **public key** (this gets shared)
+
+</Steps>
+
+<Aside type="caution" title="Protect Your Private Key">
+  The private key (`id_ed25519`) should NEVER leave your workstation or be
+  shared with anyone.
+</Aside>
+
+---
+
+## Copy Public Key to Remote Host
+
+The public key needs to be added to the remote server's `~/.ssh/authorized_keys` file.
+
+### Using ssh-copy-id (Recommended)
+
+```bash
+ssh-copy-id devuser@192.168.1.100
+```
+
+Enter your password when prompted. The command automatically:
+
+- Creates the `.ssh` directory if needed
+- Adds your public key to `authorized_keys`
+- Sets correct permissions (600)
+
+### Manual Method
+
+If `ssh-copy-id` isn't available:
+
+```bash
+cat ~/.ssh/id_ed25519.pub | ssh devuser@192.168.1.100 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+```
+
+---
+
+## Login Without Password
+
+Now you can connect without entering a password:
+
+```bash
+ssh devuser@192.168.1.100
+```
+
+Verify the authorized_keys file on the remote host:
+
+```bash
+ls -l ~/.ssh/authorized_keys
+cat ~/.ssh/authorized_keys
+```
+
+---
+
+## Disable Password Authentication
+
+For maximum security, disable password login entirely.
+
+Edit the SSH daemon config:
+
+```bash
+sudo nano /etc/ssh/sshd_config
+```
+
+Find and set:
+
+```ini
+PasswordAuthentication no
+```
+
+Restart SSH:
+
+```bash
+sudo systemctl restart sshd
+```
+
+<Aside type="danger" title="Warning">
+  Make sure your SSH key works BEFORE disabling password authentication, or you
+  may lock yourself out!
+</Aside>
+
+---
+
+## SSH Through a Jumpbox
+
+When you need to access servers in a private network through a bastion/jumpbox.
+
+### Configure SSH Config File
+
+Edit `~/.ssh/config`:
+
+```bash
+# Jumpbox (public-facing)
+Host jumpbox
+    HostName 203.0.113.10
+    User devuser
+
+# Private server (accessed through jumpbox)
+Host private-server
+    HostName 10.0.1.50
+    User devuser
+    ProxyJump jumpbox
+```
+
+Now connect directly:
+
+```bash
+ssh private-server
+```
+
+SSH automatically tunnels through the jumpbox!
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="SSH Concepts"
+  cards={[
+    { front: "What port does SSH use by default?", back: "Port 22 (TCP)" },
+    {
+      front: "What file stores authorized public keys?",
+      back: "~/.ssh/authorized_keys",
+    },
+    {
+      front: "What permissions should authorized_keys have?",
+      back: "600 (read/write for owner only)",
+    },
+    {
+      front: "What is a jumpbox/bastion?",
+      back: "A server that acts as a gateway to access private network servers",
+    },
+  ]}
+/>
+
+<Quiz
+  question="Which file should NEVER be shared?"
+  options={["id_ed25519.pub", "id_ed25519", "authorized_keys", "known_hosts"]}
+  correct={1}
+  explanation="id_ed25519 is your private key and should never leave your workstation or be shared."
+/>
+
+<Quiz
+  question="What does ssh-copy-id do?"
+  options={[
+    "Generates a new SSH key pair",
+    "Copies your public key to the remote server's authorized_keys",
+    "Copies files between servers",
+    "Disables password authentication",
+  ]}
+  correct={1}
+  explanation="ssh-copy-id copies your public key to the remote server and sets correct permissions."
+/>
+
+<Question
+  question="Why is SSH key authentication more secure than passwords?"
+  answer="The private key never leaves your machine (something you have), and can be protected with a passphrase (something you know). Passwords are transmitted over the network."
+  hint="Think about what gets sent over the network"
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Generated SSH key pair",
+    "Copied public key to remote server",
+    "Connected without password",
+    "Understand SSH config file",
+    "Know how to use ProxyJump for bastion access",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)
+- [OpenSSH Documentation](https://www.openssh.com/manual.html)

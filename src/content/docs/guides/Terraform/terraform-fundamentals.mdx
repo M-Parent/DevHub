@@ -1,0 +1,398 @@
+---
+title: "Getting Started with Terraform"
+description: "Learn how to install Terraform and set up your first Infrastructure as Code project on Ubuntu Linux."
+sidebar:
+  label: "Terraform Fundamentals"
+  order: 1
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Terraform" class="terraform" />
+<Badge text="Linux" class="linux" />
+
+Terraform is an open-source Infrastructure as Code (IaC) tool by HashiCorp. It allows you to define and provision infrastructure using a declarative configuration language called HCL (HashiCorp Configuration Language).
+
+<Aside type="tip" title="Why Terraform?">
+  Terraform lets you manage infrastructure across multiple cloud providers (AWS,
+  Azure, GCP) and on-premises environments using a single, consistent workflow.
+</Aside>
+
+---
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- Ubuntu Linux (20.04 or later)
+- `sudo` privileges
+- Git installed
+- An AWS account (for cloud examples)
+
+---
+
+## Installing Terraform on Ubuntu
+
+<Steps>
+
+1. **Install required packages**
+
+   ```bash
+   sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
+   ```
+
+2. **Add HashiCorp GPG key**
+
+   ```bash
+   wget -O- https://apt.releases.hashicorp.com/gpg | \
+   gpg --dearmor | \
+   sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+   ```
+
+3. **Verify the key fingerprint**
+
+   ```bash
+   gpg --no-default-keyring \
+   --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+   --fingerprint
+   ```
+
+4. **Add HashiCorp repository**
+
+   ```bash
+   echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+   ```
+
+5. **Install Terraform**
+
+   ```bash
+   sudo apt update
+   sudo apt-get install terraform
+   ```
+
+6. **Verify installation**
+
+   ```bash
+   terraform version
+   ```
+
+</Steps>
+
+---
+
+## Setting Up Your Terraform Project
+
+### Create a Git Repository
+
+It's best practice to version control your Terraform code. This ensures you can track changes and recover from mistakes.
+
+<Steps>
+
+1. **Create a project directory**
+
+   ```bash
+   mkdir terraform-project
+   cd terraform-project
+   ```
+
+2. **Initialize Git**
+
+   ```bash
+   git init
+   ```
+
+3. **Create a .gitignore file**
+
+   ```bash
+   cat > .gitignore << 'EOF'
+   # Terraform
+   .terraform/
+   *.tfstate
+   *.tfstate.*
+   *.tfvars
+   !example.tfvars
+   crash.log
+   override.tf
+   override.tf.json
+   *_override.tf
+   *_override.tf.json
+   .terraformrc
+   terraform.rc
+   EOF
+   ```
+
+4. **Connect to remote repository**
+
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin <your-repository-url>
+   git push -u origin main
+   ```
+
+</Steps>
+
+<Aside type="caution" title="Never Commit Sensitive Data">
+  Your `.tfvars` files often contain sensitive data like passwords and API keys.
+  Always add them to `.gitignore` and use environment variables or secret
+  management tools in production.
+</Aside>
+
+---
+
+## Basic Terraform Commands
+
+| Command              | Description                                      |
+| -------------------- | ------------------------------------------------ |
+| `terraform init`     | Initialize working directory, download providers |
+| `terraform plan`     | Preview changes before applying                  |
+| `terraform apply`    | Create or update infrastructure                  |
+| `terraform destroy`  | Remove all managed infrastructure                |
+| `terraform fmt`      | Format configuration files                       |
+| `terraform validate` | Validate configuration syntax                    |
+
+---
+
+## Providers
+
+Providers are plugins that let Terraform interact with cloud platforms, SaaS providers, and other APIs. You configure them in a `terraform {}` block.
+
+### AWS Provider
+
+The most common cloud provider. Great for EC2, S3, VPC, and hundreds of other services.
+
+```hcl
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "ca-central-1"
+
+  # Optional: Use a specific profile from ~/.aws/credentials
+  # profile = "my-profile"
+
+  # Optional: Default tags applied to all resources
+  default_tags {
+    tags = {
+      Environment = "dev"
+      ManagedBy   = "Terraform"
+    }
+  }
+}
+```
+
+**Authentication Options:**
+
+```bash
+# Option 1: Environment variables (recommended)
+export AWS_ACCESS_KEY_ID="your-access-key"
+export AWS_SECRET_ACCESS_KEY="your-secret-key"
+export AWS_REGION="ca-central-1"
+
+# Option 2: AWS CLI profile
+aws configure --profile my-profile
+```
+
+### Proxmox BPG Provider
+
+For managing Proxmox VE virtual machines and containers. Uses the community BPG provider.
+
+```hcl
+terraform {
+  required_providers {
+    proxmox = {
+      source  = "bpg/proxmox"
+      version = "~> 0.50"
+    }
+  }
+}
+
+provider "proxmox" {
+  endpoint = "https://proxmox.example.com:8006"
+  username = "root@pam"
+  password = var.proxmox_password  # Use variable, not hardcoded!
+
+  # Skip TLS verification (dev only)
+  insecure = true
+
+  # SSH connection for file uploads
+  ssh {
+    agent = true
+  }
+}
+```
+
+**Example: Create a Proxmox VM**
+
+```hcl
+resource "proxmox_virtual_environment_vm" "ubuntu_server" {
+  name      = "ubuntu-server"
+  node_name = "pve"
+
+  clone {
+    vm_id = 9000  # Template ID
+  }
+
+  cpu {
+    cores = 2
+    type  = "host"
+  }
+
+  memory {
+    dedicated = 4096
+  }
+
+  disk {
+    datastore_id = "local-lvm"
+    size         = 32
+    interface    = "scsi0"
+  }
+
+  network_device {
+    bridge = "vmbr0"
+  }
+
+  initialization {
+    ip_config {
+      ipv4 {
+        address = "dhcp"
+      }
+    }
+
+    user_account {
+      username = "ubuntu"
+      keys     = [file("~/.ssh/id_rsa.pub")]
+    }
+  }
+}
+```
+
+<Aside type="tip" title="Provider Documentation">
+  Always check the official provider documentation for the latest features and
+  options: - [AWS
+  Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs) -
+  [Proxmox BPG
+  Provider](https://registry.terraform.io/providers/bpg/proxmox/latest/docs)
+</Aside>
+
+---
+
+## Your First Configuration
+
+Create a simple `main.tf` file:
+
+```hcl
+# Configure the AWS Provider
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "ca-central-1"
+}
+
+# Create a VPC
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+
+  tags = {
+    Name = "devhub-vpc"
+  }
+}
+```
+
+Run the workflow:
+
+```bash
+# Initialize providers
+terraform init
+
+# Preview changes
+terraform plan
+
+# Apply changes
+terraform apply
+```
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="What command downloads the required providers?"
+  options={[
+    "terraform plan",
+    "terraform init",
+    "terraform apply",
+    "terraform get",
+  ]}
+  correct={1}
+  explanation="terraform init initializes the working directory and downloads provider plugins."
+/>
+
+<Quiz
+  question="What language does Terraform use for configuration?"
+  options={["YAML", "JSON", "HCL", "XML"]}
+  correct={2}
+  explanation="Terraform uses HCL (HashiCorp Configuration Language), though JSON is also supported."
+/>
+
+<Quiz
+  question="Which command previews changes without applying them?"
+  options={[
+    "terraform preview",
+    "terraform plan",
+    "terraform check",
+    "terraform diff",
+  ]}
+  correct={1}
+  explanation="terraform plan shows what changes will be made without actually making them."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="terraform-fundamentals"
+  title="Terraform Fundamentals Checklist"
+  items={[
+    "Install Terraform on Ubuntu",
+    "Create a Git repository for your project",
+    "Write your first main.tf configuration",
+    "Run terraform init, plan, and apply",
+  ]}
+/>
+
+---
+
+## What's Next?
+
+Now that you have Terraform installed, continue with:
+
+- **Terraform State** - Understanding how Terraform tracks your infrastructure
+- **Terraform Variables** - Making your configurations reusable
+- **Terraform Modules** - Organizing complex infrastructure
+
+---
+
+## Source
+
+Based on [HashiCorp Terraform Documentation](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) and DevHub examples.

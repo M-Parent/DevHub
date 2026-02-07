@@ -1,0 +1,203 @@
+---
+title: "Introduction to the ARR Stack"
+description: "Learn what the ARR Stack is - a coordinated ecosystem of automated services for managing your media library."
+sidebar:
+  label: "ARR Stack Theory"
+  order: 1
+  badge:
+    text: "Theory"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Aside, Badge, Card, CardGrid } from "@astrojs/starlight/components";
+import Question from "../../../../components/Question.astro";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="ARR-Stack" class="arr-stack" />
+<Badge text="Homelab" class="homelab" />
+
+An **ARR Stack** is a **collection of automated applications** that work together to manage, download, and organize your media content.
+
+---
+
+## Why is it Called ARR?
+
+Each letter represents a key type of tool in the ecosystem:
+
+| Letter | Meaning               | Examples                  |
+| ------ | --------------------- | ------------------------- |
+| **A**  | Automation / Apps     | Sonarr, Radarr, Bazarr    |
+| **R**  | Requests              | Prowlarr, Overseerr       |
+| **R**  | Retrieval / Downloads | qBittorrent, Transmission |
+
+<Aside type="tip" title="In Short">
+  An ARR Stack is a **coordinated ecosystem of automated services** that manage
+  your media from discovery to playback.
+</Aside>
+
+---
+
+## Docker and the ARR Stack
+
+Most ARR services run inside **Docker containers** because it makes installation and management super easy.
+
+With Docker, each service runs in its own isolated environment, so you don't have to worry about messy dependencies, system conflicts, or complex setups.
+
+<Aside type="note">
+  For more information about Docker, check out the [Docker
+  Fundamentals](/guides/docker-fundamentals/) guide.
+</Aside>
+
+---
+
+## Plex vs Jellyfin
+
+Both are powerful media server solutions that let you organize, stream, and watch your movies, TV shows, and music on almost any device.
+
+<CardGrid>
+  <Card title="Plex" icon="star">
+    - Polished, user-friendly interface - Works on every platform -
+    Cloud-connected for easy remote access - Plex Pass unlocks premium features
+  </Card>
+  <Card title="Jellyfin" icon="heart">
+    - 100% free and open-source - Fully local, privacy-focused - Highly
+    customizable - Community-driven development
+  </Card>
+</CardGrid>
+
+### Quick Comparison
+
+| Feature           | Plex             | Jellyfin          |
+| ----------------- | ---------------- | ----------------- |
+| **Price**         | Free + Plex Pass | 100% Free         |
+| **Setup**         | Very easy        | Moderate (DIY)    |
+| **Remote Access** | Automatic        | Manual setup      |
+| **Privacy**       | Cloud-linked     | Fully local       |
+| **Customization** | Limited          | Extensive         |
+| **Best For**      | Convenience      | Privacy & control |
+
+---
+
+## Common ARR Tools
+
+<Flashcard
+  title="ARR Stack Tools"
+  cards={[
+    {
+      front: "Prowlarr",
+      back: "Manages indexers (search sources) for all your other ARR apps",
+    },
+    {
+      front: "Sonarr",
+      back: "Automates finding and downloading new TV show episodes",
+    },
+    { front: "Radarr", back: "Automates finding and downloading movies" },
+    { front: "Bazarr", back: "Automatically finds and downloads subtitles" },
+    {
+      front: "qBittorrent",
+      back: "Torrent client used to handle the actual downloads",
+    },
+    {
+      front: "Gluetun",
+      back: "VPN container that routes download traffic securely",
+    },
+  ]}
+/>
+
+<MatchPairs
+  instruction="Match each ARR tool with its function"
+  pairs={[
+    { left: "Prowlarr", right: "Indexer Manager" },
+    { left: "Sonarr", right: "TV Shows" },
+    { left: "Radarr", right: "Movies" },
+    { left: "Bazarr", right: "Subtitles" },
+    { left: "qBittorrent", right: "Torrent Downloads" },
+  ]}
+/>
+
+---
+
+## How the ARR Stack Works Together
+
+```
+Prowlarr (Indexers) ──▶ Sonarr (TV Shows) ─┐
+                                           │
+                                           ├──▶ Gluetun (VPN) ─▶ qBittorrent ─▶ Plex/Jellyfin
+                                           │
+                                           └──▶ Bazarr (Subtitles)
+Prowlarr (Indexers) ──▶ Radarr (Movies) ───┘
+```
+
+### Workflow
+
+1. **Prowlarr** - Searches indexers for available TV shows or movies
+2. **Sonarr / Radarr** - Receive info and decide which content to download
+3. **Gluetun** - Routes all download traffic through a secure VPN
+4. **qBittorrent** - Handles the actual downloading
+5. **Bazarr** - Monitors downloads to automatically fetch subtitles
+6. **Plex / Jellyfin** - Makes your media available for streaming
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="What does the 'A' in ARR stand for?"
+  options={["Audio", "Automation/Apps", "Archive", "Access"]}
+  correct={1}
+  explanation="The A stands for Automation/Apps like Sonarr, Radarr, and Bazarr."
+/>
+
+<Quiz
+  question="Which tool manages indexers for all ARR apps?"
+  options={["Sonarr", "Radarr", "Prowlarr", "Bazarr"]}
+  correct={2}
+  explanation="Prowlarr is the indexer manager that provides search sources to Sonarr, Radarr, and other ARR apps."
+/>
+
+<Quiz
+  question="What is the main difference between Plex and Jellyfin?"
+  options={[
+    "Plex is for movies, Jellyfin is for TV",
+    "Plex uses cloud, Jellyfin is fully local",
+    "Jellyfin is paid, Plex is free",
+    "They are exactly the same",
+  ]}
+  correct={1}
+  explanation="Plex connects to cloud for features, while Jellyfin is 100% local and privacy-focused."
+/>
+
+<Question
+  question="Why does the ARR Stack use Docker?"
+  answer="Docker makes installation easy by running each service in isolated containers, avoiding dependency conflicts."
+  hint="Think about isolation and ease of management"
+/>
+
+---
+
+## Why Try an ARR Stack?
+
+Building an ARR Stack is an awesome way to:
+
+- Learn **Docker** in a practical way
+- Understand **automation** and **networking**
+- Create your own **personal media hub**
+- Explore **self-hosting** concepts
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Understand what ARR stands for",
+    "Know the main ARR tools (Prowlarr, Sonarr, Radarr, Bazarr)",
+    "Understand Plex vs Jellyfin differences",
+    "Know how the ARR workflow works",
+    "Understand why Docker is used",
+  ]}
+/>

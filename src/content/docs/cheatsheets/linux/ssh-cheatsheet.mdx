@@ -1,0 +1,190 @@
+---
+title: "SSH Commands Cheatsheet"
+description: "Quick reference for SSH key generation, configuration, and secure connections."
+sidebar:
+  label: "SSH Cheatsheet"
+  order: 4
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Badge } from "@astrojs/starlight/components";
+
+<Badge text="Linux" class="linux" /> <Badge text="Windows" class="windows" />
+<Badge text="Server" class="server" /> <Badge text="SSH" class="ssh" />
+
+## Key Generation
+
+```bash
+# Generate ED25519 key (recommended)
+ssh-keygen -t ed25519
+
+# Generate RSA key (4096 bits)
+ssh-keygen -t rsa -b 4096
+
+# Generate key with custom name
+ssh-keygen -t ed25519 -f ~/.ssh/mykey
+
+# Generate key with comment
+ssh-keygen -t ed25519 -C "devuser@devhub"
+```
+
+---
+
+## Copy Public Key to Server
+
+```bash
+# Automatic method (recommended)
+ssh-copy-id devuser@192.168.1.100
+
+# With specific key
+ssh-copy-id -i ~/.ssh/mykey.pub devuser@192.168.1.100
+
+# Manual method
+cat ~/.ssh/id_ed25519.pub | ssh devuser@server "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+```
+
+---
+
+## Connection
+
+```bash
+# Basic connection
+ssh devuser@192.168.1.100
+
+# With specific port
+ssh -p 2222 devuser@192.168.1.100
+
+# With specific key
+ssh -i ~/.ssh/mykey devuser@192.168.1.100
+
+# Verbose mode (debugging)
+ssh -v devuser@192.168.1.100
+```
+
+---
+
+## SSH Config File
+
+Location: `~/.ssh/config`
+
+```ini
+# Simple host
+Host myserver
+    HostName 192.168.1.100
+    User devuser
+    Port 22
+
+# With specific key
+Host prodserver
+    HostName prod.devhub.local
+    User admin
+    IdentityFile ~/.ssh/prod_key
+
+# Through jumpbox
+Host private
+    HostName 10.0.1.50
+    User devuser
+    ProxyJump jumpbox
+
+# Jumpbox definition
+Host jumpbox
+    HostName 203.0.113.10
+    User devuser
+```
+
+---
+
+## File Transfer (SCP)
+
+```bash
+# Copy file to server
+scp file.txt devuser@server:/path/to/destination/
+
+# Copy file from server
+scp devuser@server:/path/to/file.txt ./
+
+# Copy directory (recursive)
+scp -r directory/ devuser@server:/path/
+
+# With specific port
+scp -P 2222 file.txt devuser@server:/path/
+```
+
+---
+
+## SSH Tunneling
+
+```bash
+# Local port forwarding
+# Access remote:8080 via localhost:8080
+ssh -L 8080:localhost:8080 devuser@server
+
+# Remote port forwarding
+# Expose local:3000 on remote:3000
+ssh -R 3000:localhost:3000 devuser@server
+
+# Dynamic SOCKS proxy
+ssh -D 1080 devuser@server
+```
+
+---
+
+## Key Permissions
+
+```bash
+# Private key (REQUIRED)
+chmod 600 ~/.ssh/id_ed25519
+
+# Public key
+chmod 644 ~/.ssh/id_ed25519.pub
+
+# SSH directory
+chmod 700 ~/.ssh
+
+# authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+```
+
+---
+
+## Disable Password Auth
+
+Edit `/etc/ssh/sshd_config`:
+
+```ini
+PasswordAuthentication no
+PubkeyAuthentication yes
+```
+
+Restart SSH:
+
+```bash
+sudo systemctl restart sshd
+```
+
+---
+
+## Troubleshooting
+
+```bash
+# Check SSH service status
+sudo systemctl status sshd
+
+# View auth logs
+sudo tail -f /var/log/auth.log
+
+# Test config syntax
+sudo sshd -t
+
+# Debug connection
+ssh -vvv devuser@server
+```
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)

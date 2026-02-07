@@ -1,0 +1,247 @@
+---
+title: "Creating a Certificate Authority"
+description: "Set up your own Certificate Authority (CA) using OpenSSL for internal certificate management."
+sidebar:
+  label: "Create a CA"
+  order: 11
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../../components/Quiz.astro";
+import Flashcard from "../../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
+
+A Certificate Authority (CA) is a trusted entity that issues digital certificates. Creating your own CA allows you to manage certificates for internal applications, development environments, and client authentication.
+
+<Aside type="note" title="Ubuntu/Debian">
+  This guide is written for Ubuntu/Debian systems. Commands may vary slightly on
+  RHEL-based systems.
+</Aside>
+
+---
+
+## What is a Certificate Authority?
+
+A CA signs certificates for servers, users, or applications, enabling:
+
+- **Secure Communication** - SSL/TLS encryption
+- **Identity Verification** - Prove who you're connecting to
+- **Trust Chain** - Establish trust hierarchies
+
+### Use Cases for Internal CAs
+
+| Use Case                  | Description                                     |
+| ------------------------- | ----------------------------------------------- |
+| **Internal Networks**     | Sign certificates for internal applications     |
+| **Development/Testing**   | Generate test certificates without external CAs |
+| **Client Authentication** | Mutual TLS (mTLS) authentication                |
+| **VPN Certificates**      | OpenVPN client/server certificates              |
+
+---
+
+## Create the CA Directory Structure
+
+<Steps>
+
+1. **Create the directory structure**
+
+   ```bash
+   mkdir -p devhub-ca/{certs,crl,newcerts,private}
+   chmod 700 devhub-ca/private
+   touch devhub-ca/index.txt
+   echo 1000 > devhub-ca/serial
+   ```
+
+2. **Understand the structure**
+
+   | Directory/File | Purpose                             |
+   | -------------- | ----------------------------------- |
+   | `certs/`       | Store issued certificates           |
+   | `crl/`         | Certificate Revocation Lists        |
+   | `newcerts/`    | Newly issued certificates           |
+   | `private/`     | CA private key (restricted access!) |
+   | `index.txt`    | Database of issued certificates     |
+   | `serial`       | Next serial number to use           |
+
+</Steps>
+
+---
+
+## Generate the CA Private Key
+
+The CA's private key is the most critical file. It signs all certificates and must be protected.
+
+```bash
+openssl genpkey -algorithm RSA -out devhub-ca/private/cakey.pem -aes256
+```
+
+| Option           | Description                  |
+| ---------------- | ---------------------------- |
+| `-algorithm RSA` | Use RSA algorithm            |
+| `-out`           | Output file path             |
+| `-aes256`        | Encrypt the key with AES-256 |
+
+You'll be prompted to create a passphrase. **Store this securely!**
+
+<Aside type="danger" title="Protect Your CA Key">
+  Anyone with access to the CA private key can issue valid certificates. Store
+  the passphrase in a password manager and limit access to the `private/`
+  directory.
+</Aside>
+
+---
+
+## Generate the CA Certificate
+
+Create a self-signed certificate for the CA:
+
+```bash
+openssl req -new -x509 -key devhub-ca/private/cakey.pem -out devhub-ca/cacert.pem -days 3650
+```
+
+| Option       | Description                    |
+| ------------ | ------------------------------ |
+| `-new`       | Create new certificate request |
+| `-x509`      | Create self-signed certificate |
+| `-key`       | Private key to sign with       |
+| `-out`       | Output certificate file        |
+| `-days 3650` | Valid for 10 years             |
+
+You'll be prompted for certificate details:
+
+```
+Country Name: CA
+State or Province: Ontario
+Locality Name: Ottawa
+Organization Name: DevHub
+Organizational Unit: IT
+Common Name: DevHub Root CA
+Email Address: admin@devhub.local
+```
+
+---
+
+## Install the CA Certificate
+
+For systems to trust your CA, you must install the CA certificate.
+
+### Ubuntu/Debian
+
+```bash
+sudo cp devhub-ca/cacert.pem /usr/local/share/ca-certificates/devhub-ca.crt
+sudo update-ca-certificates
+```
+
+<Aside type="note">
+  The file **must** have a `.crt` extension and be in PEM format.
+</Aside>
+
+### RHEL/Fedora/Rocky
+
+```bash
+sudo cp devhub-ca/cacert.pem /etc/pki/ca-trust/source/anchors/devhub-ca.pem
+sudo update-ca-trust
+```
+
+### Windows
+
+1. Open `certmgr.msc`
+2. Navigate to **Trusted Root Certification Authorities > Certificates**
+3. Right-click → **All Tasks > Import**
+4. Select your `cacert.pem` file
+5. Complete the wizard
+
+### macOS
+
+1. Open **Keychain Access** (Applications > Utilities)
+2. Select **File > Import Items**
+3. Choose your `cacert.pem` file
+4. Double-click the imported certificate
+5. Expand **Trust** and set to **Always Trust**
+
+---
+
+## Verify the CA
+
+Check that the CA certificate was installed correctly:
+
+```bash
+openssl x509 -in devhub-ca/cacert.pem -text -noout
+```
+
+This displays the certificate details including:
+
+- Subject (your CA identity)
+- Validity period
+- Public key information
+
+---
+
+## Next Steps
+
+After creating your CA, you can:
+
+1. **Create CSRs** - Generate certificate signing requests
+2. **Sign Certificates** - Issue certificates for servers/clients
+3. **Manage Revocation** - Handle compromised certificates
+
+---
+
+## Knowledge Check
+
+<Flashcard
+  title="CA Concepts"
+  cards={[
+    {
+      front: "What does a CA do?",
+      back: "Signs digital certificates to establish trust",
+    },
+    {
+      front: "What file must be protected most?",
+      back: "The CA private key (cakey.pem)",
+    },
+    {
+      front: "Why use -aes256 when generating the key?",
+      back: "To encrypt the private key with a passphrase",
+    },
+    { front: "What tracks issued certificates?", back: "The index.txt file" },
+  ]}
+/>
+
+<Quiz
+  question="What is the purpose of the serial file in a CA?"
+  options={[
+    "Store the CA password",
+    "Track the next serial number for certificates",
+    "List revoked certificates",
+    "Store the private key",
+  ]}
+  correct={1}
+  explanation="The serial file contains the next serial number to be used when issuing a new certificate."
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Created CA directory structure",
+    "Generated CA private key with encryption",
+    "Created self-signed CA certificate",
+    "Installed CA on target systems",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)
+- [OpenSSL CA Documentation](https://www.openssl.org/docs/)

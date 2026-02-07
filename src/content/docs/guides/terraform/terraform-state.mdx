@@ -1,0 +1,350 @@
+---
+title: "Understanding Terraform State"
+description: "Learn how Terraform state files work, how to manage changes, and best practices for protecting your infrastructure state."
+sidebar:
+  label: "Terraform State"
+  order: 2
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Terraform" class="terraform" />
+<Badge text="Linux" class="linux" />
+
+Terraform state files are the backbone of how Terraform manages your infrastructure. They store a snapshot of everything deployed by Terraform—the last known checkpoint of your configurations and resources.
+
+<Aside type="caution" title="Critical: Protect Your State">
+  State files often contain **sensitive information** like passwords, API keys,
+  and resource IDs. If you lose the state file, you lose Terraform's ability to
+  manage your existing infrastructure.
+</Aside>
+
+---
+
+## What is Terraform State?
+
+The state file (`terraform.tfstate`) is a JSON file that:
+
+- Maps your configuration to real-world resources
+- Stores resource metadata and attributes
+- Tracks dependencies between resources
+- Enables Terraform to determine what changes are needed
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Your .tf Files                        │
+│              (Desired State)                             │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│                  terraform.tfstate                       │
+│              (Last Known State)                          │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│               Real Cloud Resources                       │
+│              (Actual State)                              │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Reading Data from Cloud
+
+Terraform can query existing resources using `data` blocks instead of creating new ones with `resource` blocks.
+
+| Block Type | Purpose                       |
+| ---------- | ----------------------------- |
+| `resource` | Creates new infrastructure    |
+| `data`     | Reads existing infrastructure |
+
+### Example: Finding an Ubuntu AMI
+
+```hcl
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/*/ubuntu-*-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"]  # Canonical's AWS account ID
+}
+
+resource "aws_instance" "vm" {
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t2.micro"
+  key_name                    = aws_key_pair.key.key_name
+  vpc_security_group_ids      = [aws_security_group.sg.id]
+  subnet_id                   = aws_subnet.public.id
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "devhub-server"
+  }
+}
+```
+
+<Flashcard
+  title="Data vs Resource"
+  cards={[
+    {
+      front: "What's the difference between data and resource blocks?",
+      back: "data blocks query existing resources in your cloud environment. resource blocks create new resources. Use data to reference things that already exist, like AMIs or existing VPCs.",
+    },
+  ]}
+/>
+
+---
+
+## Making Changes to Infrastructure
+
+When you modify your `.tf` files, Terraform compares:
+
+1. Your configuration (desired state)
+2. The state file (last known state)
+3. The actual cloud resources (current state)
+
+### Simple In-Place Update
+
+Changing a tag is a non-destructive update:
+
+```hcl
+resource "aws_instance" "vm" {
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t2.micro"
+  # ... other config ...
+
+  tags = {
+    Name = "devhub-server-updated"  # Changed name
+  }
+}
+```
+
+```bash
+terraform apply
+```
+
+Terraform shows: `~ update in-place`
+
+### Destructive Changes
+
+Some changes require destroying and recreating resources:
+
+```hcl
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/*/ubuntu-*-24.04-amd64-server-*"]  # Changed from 22.04
+  }
+  # ...
+}
+```
+
+<Aside type="danger" title="Warning: Data Loss">
+  When you see `-/+ destroy and then create replacement`, Terraform will
+  **delete the resource and create a new one**. Any data stored on that resource
+  (like a VM's disk) will be **permanently lost**.
+</Aside>
+
+---
+
+## Destroying Resources
+
+To remove all infrastructure managed by Terraform:
+
+```bash
+terraform destroy
+```
+
+This command:
+
+- Reads the state file to find managed resources
+- Destroys each resource in the correct order (respecting dependencies)
+- Updates the state file to reflect the empty state
+
+<Aside type="note" title="What Gets Destroyed?">
+  Terraform destroys based on **what's in the state file**, not what's in your
+  configuration. If a resource is in the state, it gets destroyed.
+</Aside>
+
+---
+
+## Output Values
+
+Export important values from your infrastructure:
+
+```hcl
+output "public_ip" {
+  value       = aws_instance.vm.public_ip
+  description = "The public IP address of the server"
+}
+
+output "instance_id" {
+  value       = aws_instance.vm.id
+  description = "The EC2 instance ID"
+}
+```
+
+After `terraform apply`, these values are displayed:
+
+```
+Outputs:
+
+instance_id = "i-0abc123def456789"
+public_ip = "54.123.45.67"
+```
+
+View outputs anytime with:
+
+```bash
+terraform output
+terraform output public_ip
+```
+
+---
+
+## Workspaces
+
+Workspaces let you maintain multiple state files for the same configuration (e.g., dev, staging, production).
+
+### Workspace Commands
+
+| Command                             | Description            |
+| ----------------------------------- | ---------------------- |
+| `terraform workspace list`          | List all workspaces    |
+| `terraform workspace new <name>`    | Create a new workspace |
+| `terraform workspace select <name>` | Switch to a workspace  |
+| `terraform workspace show`          | Show current workspace |
+| `terraform workspace delete <name>` | Delete a workspace     |
+
+### Example: Creating Dev and Prod Environments
+
+```bash
+# Create development workspace
+terraform workspace new dev
+terraform apply
+
+# Create production workspace
+terraform workspace new prod
+terraform apply
+
+# Switch between environments
+terraform workspace select dev
+
+# Clean up
+terraform destroy
+terraform workspace select default
+terraform workspace delete dev
+```
+
+<Aside type="tip" title="Use Case">
+  Workspaces are perfect when you want to deploy the same infrastructure
+  multiple times with minor variations (like different naming or sizing).
+</Aside>
+
+---
+
+## State File Best Practices
+
+1. **Never edit state files manually** - Use `terraform state` commands
+2. **Store state remotely** - Use S3, Azure Blob, or Terraform Cloud
+3. **Enable state locking** - Prevent concurrent modifications
+4. **Encrypt state at rest** - State contains sensitive data
+5. **Backup your state** - Loss of state = loss of management
+
+---
+
+## Knowledge Check
+
+<Quiz
+  id="terraform-state-quiz"
+  title="Terraform State Quiz"
+  questions={[
+    {
+      question: "What does the terraform state file contain?",
+      options: [
+        "Only your .tf configurations",
+        "A mapping between config and real resources",
+        "AWS credentials",
+        "Terraform binary",
+      ],
+      correctAnswer: 1,
+      explanation:
+        "The state file maps your configuration to actual cloud resources and stores their current attributes.",
+    },
+    {
+      question: "What happens if you lose your state file?",
+      options: [
+        "Nothing, Terraform recreates it",
+        "Terraform can't manage existing resources",
+        "Resources are automatically deleted",
+        "Terraform downloads it from the cloud",
+      ],
+      correctAnswer: 1,
+      explanation:
+        "Without the state file, Terraform loses the connection between your config and existing resources.",
+    },
+    {
+      question: "What are workspaces used for?",
+      options: [
+        "Organizing .tf files",
+        "Maintaining multiple state files for the same config",
+        "Storing credentials",
+        "Running parallel applies",
+      ],
+      correctAnswer: 1,
+      explanation:
+        "Workspaces let you maintain separate state files, useful for dev/staging/prod environments.",
+    },
+  ]}
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="terraform-state"
+  title="Terraform State Checklist"
+  items={[
+    "Understand what the state file contains",
+    "Use data blocks to query existing resources",
+    "Make in-place and destructive changes",
+    "Use terraform destroy safely",
+    "Create and use workspaces",
+  ]}
+/>
+
+---
+
+## Save Your Progress
+
+```bash
+git add .
+git commit -m "Terraform state management"
+git push
+```
+
+---
+
+## Source
+
+Based on HashiCorp Terraform documentation and DevHub examples.

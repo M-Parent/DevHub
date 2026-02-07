@@ -24,15 +24,21 @@ export default defineConfig({
         {
           label: "Roadmaps",
           autogenerate: { directory: "roadmaps" },
+        },
+        {
+          label: "Projects",
+          autogenerate: { directory: "projects" },
           collapsed: true,
         },
         {
           label: "Guides",
           autogenerate: { directory: "guides" },
+          collapsed: true,
         },
         {
           label: "Cheat Sheets",
           autogenerate: { directory: "cheatsheets" },
+          collapsed: true,
         },
       ],
     }),

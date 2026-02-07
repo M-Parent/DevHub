@@ -5,19 +5,27 @@ sidebar:
   label: "Custom Ubuntu ISO"
   order: 10
   badge:
-    text: "Linux"
-    variant: "note"
+    text: "Mid"
+    variant: "caution"
 tableOfContents: true
 ---
 
-import { Steps, Aside, Card, CardGrid } from "@astrojs/starlight/components";
-import Question from "../../../components/Question.astro";
-import Quiz from "../../../components/Quiz.astro";
-import Flashcard from "../../../components/Flashcard.astro";
-import Terminal from "../../../components/Terminal.astro";
-import FillBlank from "../../../components/FillBlank.astro";
-import ProgressCheck from "../../../components/ProgressCheck.astro";
-import FileTree from "../../../components/FileTree.astro";
+import {
+  Steps,
+  Aside,
+  Badge,
+  Card,
+  CardGrid,
+} from "@astrojs/starlight/components";
+import Question from "../../../../../components/Question.astro";
+import Quiz from "../../../../../components/Quiz.astro";
+import Flashcard from "../../../../../components/Flashcard.astro";
+import Terminal from "../../../../../components/Terminal.astro";
+import FillBlank from "../../../../../components/FillBlank.astro";
+import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+import FileTree from "../../../../../components/FileTree.astro";
+
+<Badge text="Linux" class="linux" />
 
 ## Overview
 
@@ -29,7 +37,7 @@ Creating automated Ubuntu Server installations is essential for DevOps workflows
   Ansible and Terraform.
 </Aside>
 
-![Automated Ubuntu Server ISO creation workflow](../../../assets/img/content/ubuntu-autoinstall-diagram.png)
+![Automated Ubuntu Server ISO creation workflow](../../../../../assets/img/content/ubuntu-autoinstall-diagram.png)
 
 ### Prerequisites
 

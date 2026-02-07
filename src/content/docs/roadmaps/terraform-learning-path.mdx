@@ -1,0 +1,153 @@
+---
+title: "Terraform Learning Path"
+description: "Complete learning path for Terraform - from Infrastructure as Code basics to multi-cloud deployments."
+sidebar:
+  label: "Terraform Path"
+  order: 8
+tableOfContents: true
+---
+
+import {
+  Badge,
+  CardGrid,
+  LinkCard,
+  Aside,
+} from "@astrojs/starlight/components";
+import ProgressCheck from "../../../components/ProgressCheck.astro";
+
+<Badge text="Terraform" class="terraform" />
+
+Master Terraform from the ground up. This learning path takes you from IaC basics to managing multi-cloud infrastructure.
+
+<Aside type="tip" title="How to Use This Path">
+  Follow the guides in order. Each one builds on the previous. Check off items
+  as you complete them.
+</Aside>
+
+---
+
+## Overview
+
+|               |                                      |
+| ------------- | ------------------------------------ |
+| 📚 **Guides** | 4 available (more coming)            |
+| 🎯 **Goal**   | Manage infrastructure with Terraform |
+
+---
+
+## Learning Path
+
+### 1. Terraform Fundamentals <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Install Terraform and write your first configuration.
+
+<LinkCard
+  title="Getting Started with Terraform"
+  description="Install Terraform, set up your project, and create your first resources"
+  href="/guides/terraform/terraform-fundamentals/"
+/>
+
+---
+
+### 2. Terraform State <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Understand how Terraform tracks your infrastructure.
+
+<LinkCard
+  title="Understanding Terraform State"
+  description="State files, data blocks, making changes, and workspaces"
+  href="/guides/terraform/terraform-state/"
+/>
+
+---
+
+### 3. Terraform Variables <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Make your configurations reusable with variables.
+
+<LinkCard
+  title="Terraform Variables"
+  description="Variable types, interpolation, count, and .tfvars files"
+  href="/guides/terraform/terraform-variables/"
+/>
+
+---
+
+### 4. Terraform Modules <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Create reusable infrastructure components.
+
+<LinkCard
+  title="Terraform Modules"
+  description="Use registry modules and create your own"
+  href="/guides/terraform/terraform-modules/"
+/>
+
+---
+
+### 5. Remote State & Backends <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Store state remotely with S3, Azure Blob, or Terraform Cloud.
+
+---
+
+### 6. Workspaces & Environments <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Manage dev, staging, and production with workspaces.
+
+---
+
+### 7. CI/CD Integration <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+
+Automate Terraform in your deployment pipeline.
+
+---
+
+## 🛠️ Projects
+
+Hands-on projects to practice your Terraform skills.
+
+<Aside type="note" title="Coming Soon">
+  Terraform projects will be added here as they become available.
+</Aside>
+
+---
+
+## Track Your Progress
+
+<ProgressCheck
+  id="terraform-learning-path"
+  title="Terraform Checklist"
+  items={[
+    "Terraform Fundamentals",
+    "Terraform State",
+    "Terraform Variables",
+    "Terraform Modules",
+  ]}
+/>
+
+---
+
+## What's Next?
+
+After completing this path, you'll be able to:
+
+- Define infrastructure as code
+- Provision cloud resources
+- Manage multi-environment deployments
+- Integrate Terraform into CI/CD
+
+### Related
+
+<CardGrid>
+  <LinkCard
+    title="Ansible Learning Path"
+    description="Configuration management after provisioning"
+    href="/roadmaps/ansible-learning-path/"
+  />
+  <LinkCard
+    title="Kubernetes Learning Path"
+    description="Deploy K8s with Terraform"
+    href="/roadmaps/kubernetes-learning-path/"
+  />
+</CardGrid>

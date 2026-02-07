@@ -1,0 +1,269 @@
+---
+title: "OpenVPN Server Setup"
+description: "Set up an OpenVPN server and client on Linux with certificate-based authentication."
+sidebar:
+  label: "OpenVPN Setup"
+  order: 8
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Question from "../../../../components/Question.astro";
+import Quiz from "../../../../components/Quiz.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Linux" class="linux" />
+<Badge text="Networking" class="networking" />
+
+OpenVPN is a robust open-source VPN solution. This guide covers setting up both server and client, plus configuring a Linux gateway for VPN traffic.
+
+<Aside type="note" title="Prerequisites">
+  You need basic Linux knowledge and access to a Certificate Authority (CA) for
+  signing certificates.
+</Aside>
+
+---
+
+## Part 1: OpenVPN Client Setup
+
+<Steps>
+
+1. **Install OpenVPN**
+
+   ```bash
+   sudo apt update
+   sudo apt install openvpn
+   ```
+
+2. **Copy sample client config**
+
+   ```bash
+   sudo cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf /etc/openvpn/client/
+   ```
+
+3. **Download certificates**
+
+   Get the CA certificate and client certificate/key from your CA:
+
+   ```bash
+   cd /etc/openvpn/client
+   sudo wget https://your-ca-server.com/certs/ca.crt
+   sudo wget https://your-ca-server.com/certs/client.crt
+   sudo wget https://your-ca-server.com/certs/client.key
+   ```
+
+</Steps>
+
+<Aside type="caution">
+  In production, never download private keys over the network. Generate them
+  locally and only share the CSR.
+</Aside>
+
+<Steps>
+
+4. **Configure client**
+
+   Edit `/etc/openvpn/client/client.conf`:
+
+   ```ini
+   # Server address and port
+   remote vpn.devhub.local 1194
+
+   # Certificate files
+   ca ca.crt
+   cert client.crt
+   key client.key
+   ```
+
+5. **Start the VPN**
+
+   ```bash
+   sudo openvpn /etc/openvpn/client/client.conf
+   ```
+
+</Steps>
+
+---
+
+## Part 2: OpenVPN Server Setup
+
+<Steps>
+
+1. **Install OpenVPN**
+
+   ```bash
+   sudo apt update
+   sudo apt install openvpn
+   ```
+
+2. **Generate server CSR**
+
+   ```bash
+   openssl req -newkey rsa:4096 -sha256 -nodes \
+     -keyout "ovpnserver.key" \
+     -out "ovpnserver.csr" \
+     -subj "/CN=OpenVPN Server" \
+     -addext "extendedKeyUsage = serverAuth" \
+     -addext "keyUsage = digitalSignature, keyEncipherment"
+   ```
+
+3. **Get certificate signed by CA**
+
+   On your CA server:
+
+   ```bash
+   openssl ca -in ovpnserver.csr -out ovpnserver.crt -days 365
+   ```
+
+4. **Generate Diffie-Hellman parameters**
+
+   ```bash
+   openssl dhparam -out dh.pem 2048
+   ```
+
+   <Aside type="note">
+     The DH params file doesn't need to be secret - it's used during the key
+     exchange handshake.
+   </Aside>
+
+5. **Copy config and move certificates**
+
+   ```bash
+   sudo cp /usr/share/doc/openvpn/examples/sample-config-files/server.conf /etc/openvpn/server/
+   sudo mv ovpnserver.key ovpnserver.crt dh.pem /etc/openvpn/server/
+   ```
+
+6. **Configure server**
+
+   Edit `/etc/openvpn/server/server.conf`:
+
+   ```ini
+   ca ca.crt
+   cert ovpnserver.crt
+   key ovpnserver.key
+
+   # Diffie-Hellman parameters
+   dh dh.pem
+
+   # VPN subnet
+   server 10.8.0.0 255.255.255.0
+   ```
+
+7. **Start the server**
+
+   ```bash
+   sudo openvpn /etc/openvpn/server/server.conf
+   ```
+
+</Steps>
+
+---
+
+## Part 3: Linux VPN Gateway
+
+Turn your VPN server into a gateway to route traffic between networks.
+
+### Enable IP Forwarding
+
+Check current status:
+
+```bash
+cat /proc/sys/net/ipv4/ip_forward
+```
+
+Enable forwarding:
+
+```bash
+sudo sysctl -w net.ipv4.ip_forward=1
+```
+
+To make permanent, edit `/etc/sysctl.conf`:
+
+```ini
+net.ipv4.ip_forward=1
+```
+
+### Configure iptables
+
+**Allow forwarding from VPN to local network:**
+
+```bash
+sudo iptables -A FORWARD -i tun0 -s 10.8.0.0/24 -d 192.168.1.0/24 -j ACCEPT
+```
+
+**Enable NAT (masquerading):**
+
+```bash
+sudo iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -d 192.168.1.0/24 -j MASQUERADE
+```
+
+**Allow return traffic:**
+
+```bash
+sudo iptables -A FORWARD -i eth0 -s 192.168.1.0/24 -d 10.8.0.0/24 -j ACCEPT
+```
+
+### Verify Configuration
+
+```bash
+sudo iptables -L
+sudo iptables -t nat -L
+```
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="What does the Diffie-Hellman file (dh.pem) do?"
+  options={[
+    "Encrypts the VPN traffic",
+    "Authenticates the server",
+    "Used for key exchange during connection setup",
+    "Stores client passwords",
+  ]}
+  correct={2}
+  explanation="The DH parameters are used during the initial key exchange to establish a shared secret securely."
+/>
+
+<Quiz
+  question="What does MASQUERADE do in iptables?"
+  options={[
+    "Hides the VPN from network scans",
+    "Translates private IPs to the gateway's IP (NAT)",
+    "Encrypts traffic",
+    "Blocks unauthorized connections",
+  ]}
+  correct={1}
+  explanation="MASQUERADE performs NAT, translating private VPN client IPs to the gateway's IP for outbound traffic."
+/>
+
+<Question
+  question="Why do we need to enable IP forwarding?"
+  answer="IP forwarding allows the Linux server to route packets between different network interfaces (e.g., from VPN tunnel to local network), acting as a gateway/router."
+  hint="Think about what a router does"
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Install and configure OpenVPN client",
+    "Generate server certificates with OpenSSL",
+    "Configure OpenVPN server",
+    "Enable IP forwarding",
+    "Configure iptables for NAT and forwarding",
+  ]}
+/>
+
+---
+
+## Sources
+
+- [PureLogicIT Training Repository](https://github.com/PureLogicIT)
+- [OpenVPN Documentation](https://openvpn.net/community-resources/)

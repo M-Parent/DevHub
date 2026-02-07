@@ -1,0 +1,105 @@
+---
+title: "Radio Communications Learning Path"
+description: "Complete learning path for radio communications - from electromagnetic spectrum basics to advanced propagation techniques."
+sidebar:
+  label: "Radio Path"
+  order: 1
+tableOfContents: true
+---
+
+import {
+  Badge,
+  CardGrid,
+  LinkCard,
+  Aside,
+} from "@astrojs/starlight/components";
+import ProgressCheck from "../../../components/ProgressCheck.astro";
+
+<Badge text="Radio" class="radio" />
+
+Master radio communications from the ground up. This learning path takes you through electromagnetic theory, frequency bands, propagation, and practical radio skills.
+
+<Aside type="tip" title="How to Use This Path">
+  Follow the guides in order. Each one builds on the previous. Check off items
+  as you complete them.
+</Aside>
+
+---
+
+## Overview
+
+|               |                                         |
+| ------------- | --------------------------------------- |
+| 📚 **Guides** | 1 (more coming)                         |
+| 🎯 **Goal**   | Understand radio theory and propagation |
+
+---
+
+## Learning Path
+
+### 1. Radio Theory Fundamentals <Badge text="Available" variant="tip" /> <Badge text="Theory" variant="note" />
+
+Learn the electromagnetic spectrum, frequency bands (HF, VHF, UHF), and how radio waves propagate.
+
+<LinkCard
+  title="Radio Theory Fundamentals"
+  description="Electromagnetic spectrum, frequency bands, LOS vs BLOS, and modulation types"
+  href="/guides/radio/radio-fundamentals/"
+/>
+
+---
+
+### 2. Antenna Basics <Badge text="Coming Soon" variant="note" /> <Badge text="Theory" variant="note" />
+
+Understand antenna types, radiation patterns, and how to choose the right antenna.
+
+---
+
+### 3. SDR Getting Started <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
+
+Set up Software Defined Radio and start receiving signals.
+
+---
+
+### 4. Amateur Radio License <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+
+Prepare for your amateur radio license exam.
+
+---
+
+## 🛠️ Projects
+
+Hands-on projects to practice your radio skills.
+
+<Aside type="note" title="Coming Soon">
+  Radio projects will be added here as they become available.
+</Aside>
+
+---
+
+## Track Your Progress
+
+<ProgressCheck
+  id="radio-learning-path"
+  title="Radio Learning Checklist"
+  items={["Radio Theory Fundamentals"]}
+/>
+
+---
+
+## What's Next?
+
+After completing this path, you'll be able to:
+
+- Understand how radio waves propagate
+- Choose the right frequency band for your application
+
+### Related
+
+<CardGrid>
+  <LinkCard
+    title="Radio Cheatsheet"
+    description="Quick reference for frequency bands and formulas"
+    href="/cheatsheets/radio/radio-theory/"
+  />
+</CardGrid>

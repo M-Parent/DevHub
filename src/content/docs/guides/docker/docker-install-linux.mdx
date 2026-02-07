@@ -1,0 +1,147 @@
+---
+title: "Installing Docker on Ubuntu Linux"
+description: "Step-by-step guide to install Docker Engine on Ubuntu Linux with all required commands."
+sidebar:
+  label: "Docker Linux Install"
+  order: 2
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Question from "../../../../components/Question.astro";
+import Quiz from "../../../../components/Quiz.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" /> <Badge text="Linux" class="linux" />
+
+Installing Docker on Linux is straightforward, but it requires a few terminal commands.
+
+You can follow the **official installation guide** from Docker here:  
+👉 [Docker Engine Installation Docs](https://docs.docker.com/engine/install)
+
+<Aside type="tip" title="Quick Tip">
+  You can skip the video if you want and go straight to the checklist below.
+</Aside>
+
+---
+
+## Video Tutorial
+
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/YeF7ObTnDwc"
+  title="Docker Installation Tutorial"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+_Source: Bret Fisher, Agentic DevOps_
+
+---
+
+## Ubuntu Linux Docker Setup
+
+<Steps>
+
+1. **Uninstall any old Docker versions**
+
+   ```bash
+   sudo apt remove docker docker-engine docker.io containerd runc
+   ```
+
+2. **Update your system and install required packages**
+
+   ```bash
+   sudo apt update && sudo apt install ca-certificates curl gnupg lsb-release
+   ```
+
+3. **Add Docker's official GPG key**
+
+   ```bash
+   sudo mkdir -p /etc/apt/keyrings
+   ```
+
+   ```bash
+   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+   ```
+
+4. **Add the Docker repository**
+
+   ```bash
+   echo \
+     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+     https://download.docker.com/linux/ubuntu \
+     $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   ```
+
+5. **Install Docker Engine, CLI, and Compose**
+
+   ```bash
+   sudo apt update && sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+   ```
+
+6. **Enable non-root access (optional but recommended)**
+
+   ```bash
+   sudo usermod -aG docker $USER
+   ```
+
+   ```bash
+   newgrp docker
+   ```
+
+7. **Verify the installation**
+
+   ```bash
+   docker version
+   ```
+
+   <Aside type="tip">
+     If you see a Docker version number in the terminal output, Docker is
+     successfully installed!
+   </Aside>
+
+</Steps>
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="What command installs Docker Engine on Ubuntu?"
+  options={[
+    "apt install docker",
+    "sudo apt install docker-ce docker-ce-cli containerd.io",
+    "docker install",
+    "snap install docker",
+  ]}
+  correct={1}
+  explanation="The official way is to use apt with docker-ce, docker-ce-cli, and containerd.io packages."
+/>
+
+<Question
+  question="Why should you add your user to the docker group?"
+  answer="To run Docker commands without sudo (non-root access)."
+  hint="Think about permissions"
+/>
+
+---
+
+## Progress Check
+
+<ProgressCheck
+  items={[
+    "Removed old Docker versions",
+    "Installed required packages",
+    "Added Docker GPG key",
+    "Added Docker repository",
+    "Installed Docker Engine",
+    "Configured non-root access",
+    "Verified installation with docker version",
+  ]}
+/>
