@@ -14,6 +14,9 @@ import { Aside, Badge } from "@astrojs/starlight/components";
 import Quiz from "../../../../../components/Quiz.astro";
 import Flashcard from "../../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../../components/MatchPairs.astro";
+import Terminal from "../../../../../components/Terminal.astro";
+import FillBlank from "../../../../../components/FillBlank.astro";
 
 <Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
 
@@ -212,6 +215,31 @@ keytool -importkeystore \
       back: "Portability - single file for key + cert, password protected",
     },
   ]}
+/>
+
+<MatchPairs
+  instruction="Match the openssl pkcs12 flag with its purpose"
+  pairs={[
+    { left: "-export", right: "Create PKCS#12 file" },
+    { left: "-in", right: "Input certificate" },
+    { left: "-inkey", right: "Input private key" },
+    { left: "-nodes", right: "No key encryption" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input:
+        "openssl pkcs12 -export -in cert.pem -inkey key.pem -out bundle.p12",
+      output: "Enter Export Password:",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the extraction command:"
+  sentence="To extract only the certificate from a .p12 file, use: openssl pkcs12 -in bundle.p12 -[BLANK:clcerts] -nokeys"
 />
 
 <Quiz

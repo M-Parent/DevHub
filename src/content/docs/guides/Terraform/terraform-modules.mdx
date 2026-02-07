@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Terraform" class="terraform" />
 
@@ -338,6 +341,53 @@ Browse more at [registry.terraform.io](https://registry.terraform.io/)
 ---
 
 ## Knowledge Check
+
+<Flashcard
+  title="Terraform Modules"
+  cards={[
+    {
+      front: "What is a Terraform module?",
+      back: "A container for multiple resources that are used together, making infrastructure reusable and maintainable.",
+    },
+    {
+      front: "What are the key files in a module?",
+      back: "main.tf (resources), variables.tf (inputs), outputs.tf (outputs), and README.md (documentation).",
+    },
+    {
+      front: "Why should you always pin module versions?",
+      back: "To avoid unexpected breaking changes when running terraform init, ensuring consistent deployments.",
+    },
+    {
+      front: "What command upgrades modules to newer versions?",
+      back: "terraform init -upgrade downloads the latest versions within version constraints.",
+    },
+  ]}
+/>
+
+<MatchPairs
+  instruction="Match the module source type with its example"
+  pairs={[
+    { left: "Terraform Registry", right: "terraform-aws-modules/vpc/aws" },
+    { left: "Local Path", right: "./modules/vpc" },
+    { left: "GitHub", right: "github.com/org/repo" },
+    { left: "S3 Bucket", right: "s3::https://bucket.s3.amazonaws.com/vpc.zip" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "terraform init -upgrade",
+      output:
+        "Upgrading modules...\nDownloading terraform-aws-modules/vpc/aws 5.1.0...\n\nTerraform has been successfully initialized!",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Always pin this to avoid breaking changes"
+  sentence="In a Terraform module block, what attribute pins the module version? [BLANK:version]"
+/>
 
 <Quiz
   question="What is a Terraform module?"

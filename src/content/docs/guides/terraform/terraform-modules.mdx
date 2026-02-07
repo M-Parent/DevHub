@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Terraform" class="terraform" />
 
@@ -339,47 +342,65 @@ Browse more at [registry.terraform.io](https://registry.terraform.io/)
 
 ## Knowledge Check
 
-<Quiz
-  id="terraform-modules-quiz"
-  title="Terraform Modules Quiz"
-  questions={[
+<MatchPairs
+  instruction="Match the module source type with its example"
+  pairs={[
+    { left: "Terraform Registry", right: "terraform-aws-modules/vpc/aws" },
+    { left: "Local Path", right: "./modules/vpc" },
+    { left: "GitHub", right: "github.com/org/repo" },
+    { left: "S3 Bucket", right: "s3::https://bucket.s3.amazonaws.com/vpc.zip" },
+  ]}
+/>
+
+<Terminal
+  commands={[
     {
-      question: "What is a Terraform module?",
-      options: [
-        "A single .tf file",
-        "A container for multiple related resources",
-        "A Terraform plugin",
-        "A state file",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "A module is a container for multiple resources that are used together, allowing for reusable infrastructure components.",
-    },
-    {
-      question: "Where can modules be sourced from?",
-      options: [
-        "Only Terraform Registry",
-        "Only local paths",
-        "Only GitHub",
-        "Registry, local, GitHub, S3, and more",
-      ],
-      correctAnswer: 3,
-      explanation:
-        "Modules can come from the Terraform Registry, local paths, Git repositories, S3 buckets, and other sources.",
-    },
-    {
-      question: "What command updates module versions?",
-      options: [
-        "terraform get",
-        "terraform init -upgrade",
-        "terraform update",
-        "terraform refresh",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "terraform init -upgrade downloads the latest versions of modules within version constraints.",
+      input: "terraform init -upgrade",
+      output:
+        "Upgrading modules...\nDownloading terraform-aws-modules/vpc/aws 5.1.0...\n\nTerraform has been successfully initialized!",
     },
   ]}
+/>
+
+<FillBlank
+  instruction="The name you gave to the module block"
+  sentence="To access a module's output value, use: module.[BLANK:module_name].output_name"
+/>
+
+<Quiz
+  question="What is a Terraform module?"
+  options={[
+    "A single .tf file",
+    "A container for multiple related resources",
+    "A Terraform plugin",
+    "A state file",
+  ]}
+  correct={1}
+  explanation="A module is a container for multiple resources that are used together, allowing for reusable infrastructure components."
+/>
+
+<Quiz
+  question="Where can modules be sourced from?"
+  options={[
+    "Only Terraform Registry",
+    "Only local paths",
+    "Only GitHub",
+    "Registry, local, GitHub, S3, and more",
+  ]}
+  correct={3}
+  explanation="Modules can come from the Terraform Registry, local paths, Git repositories, S3 buckets, and other sources."
+/>
+
+<Quiz
+  question="What command updates module versions?"
+  options={[
+    "terraform get",
+    "terraform init -upgrade",
+    "terraform update",
+    "terraform refresh",
+  ]}
+  correct={1}
+  explanation="terraform init -upgrade downloads the latest versions of modules within version constraints."
 />
 
 ---

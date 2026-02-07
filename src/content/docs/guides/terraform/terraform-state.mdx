@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Terraform" class="terraform" />
 <Badge text="Linux" class="linux" />
@@ -274,47 +277,71 @@ terraform workspace delete dev
 
 ## Knowledge Check
 
-<Quiz
-  id="terraform-state-quiz"
-  title="Terraform State Quiz"
-  questions={[
+<MatchPairs
+  instruction="Match the Terraform concept with its description"
+  pairs={[
     {
-      question: "What does the terraform state file contain?",
-      options: [
-        "Only your .tf configurations",
-        "A mapping between config and real resources",
-        "AWS credentials",
-        "Terraform binary",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "The state file maps your configuration to actual cloud resources and stores their current attributes.",
+      left: "terraform.tfstate",
+      right: "Stores mapping between config and real resources",
     },
+    { left: "data block", right: "Reads existing infrastructure" },
+    { left: "resource block", right: "Creates new infrastructure" },
     {
-      question: "What happens if you lose your state file?",
-      options: [
-        "Nothing, Terraform recreates it",
-        "Terraform can't manage existing resources",
-        "Resources are automatically deleted",
-        "Terraform downloads it from the cloud",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "Without the state file, Terraform loses the connection between your config and existing resources.",
-    },
-    {
-      question: "What are workspaces used for?",
-      options: [
-        "Organizing .tf files",
-        "Maintaining multiple state files for the same config",
-        "Storing credentials",
-        "Running parallel applies",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "Workspaces let you maintain separate state files, useful for dev/staging/prod environments.",
+      left: "workspace",
+      right: "Maintains separate state files for same config",
     },
   ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "terraform workspace new dev",
+      output:
+        'Created and switched to workspace "dev"!\n\nYou\'re now on a new, empty workspace.',
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Command to display exported values"
+  sentence="To view all outputs from your current state: terraform [BLANK:output]"
+/>
+
+<Quiz
+  question="What does the terraform state file contain?"
+  options={[
+    "Only your .tf configurations",
+    "A mapping between config and real resources",
+    "AWS credentials",
+    "Terraform binary",
+  ]}
+  correct={1}
+  explanation="The state file maps your configuration to actual cloud resources and stores their current attributes."
+/>
+
+<Quiz
+  question="What happens if you lose your state file?"
+  options={[
+    "Nothing, Terraform recreates it",
+    "Terraform can't manage existing resources",
+    "Resources are automatically deleted",
+    "Terraform downloads it from the cloud",
+  ]}
+  correct={1}
+  explanation="Without the state file, Terraform loses the connection between your config and existing resources."
+/>
+
+<Quiz
+  question="What are workspaces used for?"
+  options={[
+    "Organizing .tf files",
+    "Maintaining multiple state files for the same config",
+    "Storing credentials",
+    "Running parallel applies",
+  ]}
+  correct={1}
+  explanation="Workspaces let you maintain separate state files, useful for dev/staging/prod environments."
 />
 
 ---

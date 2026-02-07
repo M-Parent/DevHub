@@ -1,0 +1,500 @@
+---
+title: "Docker Compose"
+description: "Define and run multi-container applications with Docker Compose using simple YAML configuration."
+sidebar:
+  label: "Docker Compose"
+  order: 8
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import FileTree from "../../../../components/FileTree.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+
+Docker Compose lets you define multi-container applications in a single YAML file. Instead of long `docker run` commands, you declaratively define your entire stack.
+
+<Aside type="tip" title="Why Docker Compose?">
+  - Save complex container configurations in version-controlled files -
+  One-command startup for entire environments - Easy networking between
+  containers - Perfect for development and testing
+</Aside>
+
+---
+
+## Compose File Basics
+
+### Simple Web Server
+
+Create `docker-compose.yml`:
+
+```yaml
+version: "3.9"
+services:
+  web:
+    image: nginx:alpine
+    container_name: my-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+```
+
+### Start the Stack
+
+```bash
+# Start in foreground
+docker compose up
+
+# Start in background (detached)
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop and remove
+docker compose down
+```
+
+---
+
+## Compose Commands
+
+| Command                           | Description                 |
+| --------------------------------- | --------------------------- |
+| `docker compose up`               | Create and start containers |
+| `docker compose up -d`            | Start in background         |
+| `docker compose down`             | Stop and remove containers  |
+| `docker compose ps`               | List running services       |
+| `docker compose logs`             | View output from containers |
+| `docker compose logs -f`          | Follow log output           |
+| `docker compose exec service cmd` | Execute command in service  |
+| `docker compose build`            | Build or rebuild services   |
+| `docker compose pull`             | Pull service images         |
+| `docker compose restart`          | Restart services            |
+
+---
+
+## Multi-Container Application
+
+A typical web application with database:
+
+```yaml
+version: "3.9"
+services:
+  db:
+    image: mariadb:10.6
+    container_name: wordpress-db
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wppassword
+    expose:
+      - 3306
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress-app
+    depends_on:
+      - db
+    volumes:
+      - wp_data:/var/www/html
+    ports:
+      - "80:80"
+    restart: always
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wppassword
+      - WORDPRESS_DB_NAME=wordpress
+
+volumes:
+  db_data:
+  wp_data:
+```
+
+<Flashcard
+  title="Compose Service Communication"
+  cards={[
+    {
+      front: "How do containers in Docker Compose communicate with each other?",
+      back: "Compose creates a network and containers use service names as hostnames. For example, wordpress connects to 'db' not 'localhost'.",
+    },
+  ]}
+/>
+
+---
+
+## Key Compose Options
+
+### depends_on
+
+Control startup order:
+
+```yaml
+services:
+  web:
+    depends_on:
+      - db
+      - redis
+  db:
+    image: postgres
+  redis:
+    image: redis
+```
+
+<Aside type="caution" title="depends_on Limitation">
+  `depends_on` only waits for container start, not application readiness. Use
+  healthchecks for proper sequencing.
+</Aside>
+
+### restart
+
+Restart policies:
+
+```yaml
+services:
+  web:
+    restart: always # or: no, on-failure, unless-stopped
+```
+
+### expose vs ports
+
+```yaml
+services:
+  # expose: internal only (other containers)
+  db:
+    expose:
+      - 3306
+
+  # ports: external access (host)
+  web:
+    ports:
+      - "8080:80"
+```
+
+### healthcheck
+
+```yaml
+services:
+  db:
+    image: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+```
+
+---
+
+## Environment Variables
+
+### Inline
+
+```yaml
+services:
+  web:
+    environment:
+      - NODE_ENV=production
+      - DEBUG=false
+```
+
+### From File
+
+```yaml
+services:
+  web:
+    env_file:
+      - .env
+      - .env.local
+```
+
+### Variable Substitution
+
+Compose reads `.env` from the project directory:
+
+```yaml
+# docker-compose.yml
+services:
+  db:
+    image: mysql:${MYSQL_VERSION:-8.0}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+```
+
+```bash
+# .env
+MYSQL_VERSION=8.0
+DB_ROOT_PASSWORD=supersecret
+DB_PASSWORD=apppassword
+```
+
+---
+
+## Volumes
+
+### Named Volumes
+
+```yaml
+services:
+  db:
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+```
+
+### Bind Mounts
+
+```yaml
+services:
+  web:
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config:ro
+```
+
+---
+
+## Networks
+
+### Default Network
+
+Compose creates a default network. Services communicate by service name.
+
+### Custom Networks
+
+```yaml
+services:
+  frontend:
+    networks:
+      - frontend
+
+  backend:
+    networks:
+      - frontend
+      - backend
+
+  db:
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+```
+
+### External Network
+
+Connect to pre-existing network:
+
+```yaml
+networks:
+  existing:
+    external: true
+    name: my-existing-network
+```
+
+---
+
+## Building Images
+
+### Build from Dockerfile
+
+```yaml
+services:
+  web:
+    build: .
+    # or with options:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        - VERSION=1.0.0
+```
+
+### Build and Push
+
+```bash
+docker compose build
+docker compose push
+```
+
+---
+
+## Multiple Compose Files
+
+### Override Files
+
+```bash
+# Base + development overrides
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+# Base + production overrides
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up
+```
+
+### Development Override Example
+
+```yaml
+# docker-compose.yml (base)
+services:
+  web:
+    image: myapp
+    ports:
+      - '80:80'
+
+# docker-compose.dev.yml (override)
+services:
+  web:
+    build: .
+    volumes:
+      - ./src:/app/src
+    environment:
+      - DEBUG=true
+```
+
+---
+
+## Complete Example: WordPress Stack
+
+```yaml
+version: "3.9"
+
+services:
+  db:
+    image: mariadb:10.6
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: ${MYSQL_PW}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  wordpress:
+    depends_on:
+      db:
+        condition: service_healthy
+    image: wordpress:latest
+    volumes:
+      - wp_data:/var/www/html
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PW}
+      WORDPRESS_DB_NAME: wordpress
+
+volumes:
+  db_data:
+  wp_data:
+```
+
+```bash
+# .env
+MYSQL_PW=WpPassword123
+ROOT_PASSWORD=RootPassword456
+```
+
+---
+
+## Knowledge Check
+
+<FileTree
+  title="Compose Project Structure"
+  structure={[
+    { name: "docker-compose.yml", badge: "create" },
+    { name: ".env", badge: "create" },
+    {
+      name: "app/",
+      type: "folder",
+      children: [
+        { name: "Dockerfile", badge: "create" },
+        { name: "src/", type: "folder" },
+      ],
+    },
+    {
+      name: "nginx/",
+      type: "folder",
+      children: [{ name: "nginx.conf", badge: "create" }],
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Type the command to start all services in background:"
+  sentence="docker compose [BLANK:up] -d"
+/>
+
+<Quiz
+  question="How do services in Docker Compose communicate?"
+  options={[
+    "By IP address",
+    "By container ID",
+    "By service name as hostname",
+    "They can't communicate",
+  ]}
+  correct={2}
+  explanation="Compose creates a network where services use their service names as hostnames (e.g., 'db' not 'localhost')."
+/>
+
+<Quiz
+  question="What's the difference between 'expose' and 'ports'?"
+  options={[
+    "No difference",
+    "expose is for volumes",
+    "expose is internal only, ports maps to host",
+    "ports is deprecated",
+  ]}
+  correct={2}
+  explanation="'expose' makes ports available to other containers. 'ports' maps container ports to the host for external access."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="docker-compose"
+  title="Docker Compose Checklist"
+  items={[
+    "Write basic docker-compose.yml",
+    "Use docker compose up/down",
+    "Configure multi-container apps",
+    "Use environment variables and .env files",
+    "Configure volumes and networks",
+    "Use depends_on for startup order",
+    "Override with multiple compose files",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Docker Compose Documentation](https://docs.docker.com/compose/) and DevHub examples.

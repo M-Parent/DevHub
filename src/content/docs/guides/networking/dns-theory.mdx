@@ -16,6 +16,8 @@ import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import MatchPairs from "../../../../components/MatchPairs.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Networking" class="networking" />
 
@@ -149,6 +151,31 @@ Let's resolve `www.wikipedia.org`:
 ---
 
 ## 🎯 Knowledge Check
+
+<MatchPairs
+  instruction="Match the DNS component with its role"
+  pairs={[
+    { left: "Root Server", right: "Points to TLD servers" },
+    { left: "TLD Server", right: "Handles .com, .org, etc." },
+    { left: "Authoritative", right: "Holds actual domain records" },
+    { left: "Recursive Resolver", right: "Queries on your behalf" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "nslookup google.com",
+      output:
+        "Server:    8.8.8.8\nAddress:   8.8.8.8#53\n\nNon-authoritative answer:\nName:   google.com\nAddress: 142.250.80.46",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="The simplest DNS record type, just one letter"
+  sentence="An [BLANK:A] record maps a domain name to an IPv4 address"
+/>
 
 <Quiz
   question="What does an A record do?"

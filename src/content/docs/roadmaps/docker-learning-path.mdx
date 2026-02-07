@@ -17,7 +17,7 @@ import ProgressCheck from "../../../components/ProgressCheck.astro";
 
 <Badge text="Docker" class="docker" />
 
-Master Docker from the ground up. This learning path takes you from container basics to production-ready deployments.
+Master Docker from the ground up. This learning path takes you from container basics to production-ready deployments with Docker Swarm.
 
 <Aside type="tip" title="How to Use This Path">
   Follow the guides in order. Each one builds on the previous. Check off items
@@ -30,12 +30,12 @@ Master Docker from the ground up. This learning path takes you from container ba
 
 |               |                                             |
 | ------------- | ------------------------------------------- |
-| 📚 **Guides** | 3 available (more coming)                   |
+| 📚 **Guides** | 13 available                                |
 | 🎯 **Goal**   | Build and deploy containerized applications |
 
 ---
 
-## Learning Path
+## Phase 1: Getting Started
 
 ### 1. Docker Fundamentals <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
 
@@ -49,7 +49,19 @@ Learn what Docker is, understand core concepts (Dockerfile, Image, Container), a
 
 ---
 
-### 2. Install Docker on Linux <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+### 2. Docker vs VMs <Badge text="Available" variant="tip" /> <Badge text="Theory" variant="note" />
+
+Understand the key differences between Docker containers and Virtual Machines.
+
+<LinkCard
+  title="Docker vs Virtual Machines"
+  description="Compare containers and VMs - when to use each"
+  href="/guides/docker/docker-vs-vm/"
+/>
+
+---
+
+### 3. Install Docker on Linux <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
 
 Step-by-step installation guide for Ubuntu Linux.
 
@@ -61,7 +73,7 @@ Step-by-step installation guide for Ubuntu Linux.
 
 ---
 
-### 3. Install Docker on Windows <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+### 4. Install Docker on Windows <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
 
 Install Docker Desktop with WSL 2 integration on Windows.
 
@@ -73,33 +85,143 @@ Install Docker Desktop with WSL 2 integration on Windows.
 
 ---
 
-### 4. Docker Commands & Workflow <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
+## Phase 2: Working with Containers
 
-Master essential Docker CLI commands for building, running, and managing containers.
+### 5. Running Containers <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Master container lifecycle - run, stop, restart, remove, and inspect containers.
+
+<LinkCard
+  title="Running Docker Containers"
+  description="Container commands, logs, exec, and lifecycle management"
+  href="/guides/docker/docker-running-containers/"
+/>
 
 ---
 
-### 5. Docker Compose <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+### 6. Port Mapping <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
+
+Expose container services to the outside world with port mapping.
+
+<LinkCard
+  title="Docker Port Mapping"
+  description="Expose containers with -p flag and port configuration"
+  href="/guides/docker/docker-ports/"
+/>
+
+---
+
+### 7. Volumes & Persistence <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Persist data with volumes and bind mounts - essential for databases and stateful apps.
+
+<LinkCard
+  title="Docker Volumes"
+  description="Data persistence, volumes, and bind mounts"
+  href="/guides/docker/docker-volumes/"
+/>
+
+---
+
+### 8. Environment Variables <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Configure containers with environment variables, .env files, and secrets.
+
+<LinkCard
+  title="Docker Environment Variables"
+  description="Container configuration and secrets management"
+  href="/guides/docker/docker-environment/"
+/>
+
+---
+
+## Phase 3: Building Images
+
+### 9. Custom Images <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Build your own Docker images with Dockerfiles, layers, and multi-stage builds.
+
+<LinkCard
+  title="Building Custom Docker Images"
+  description="Dockerfile syntax, layers, and optimization"
+  href="/guides/docker/docker-custom-images/"
+/>
+
+---
+
+### 10. Docker Registries <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Push, pull, and manage images with Docker Hub and private registries.
+
+<LinkCard
+  title="Docker Registries"
+  description="Push, pull, and manage container images"
+  href="/guides/docker/docker-registries/"
+/>
+
+---
+
+## Phase 4: Multi-Container Apps
+
+### 11. Docker Compose <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
 
 Define and run multi-container applications with Docker Compose.
 
----
-
-### 6. Docker Networking <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
-
-Understand container networking, ports, and connecting multiple containers.
-
----
-
-### 7. Docker Volumes & Persistence <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
-
-Persist data with volumes and understand container storage.
+<LinkCard
+  title="Docker Compose"
+  description="Multi-service applications with compose files"
+  href="/guides/docker/docker-compose/"
+/>
 
 ---
 
-### 8. Production Best Practices <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+### 12. Docker Networking <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
 
-Optimize images, security hardening, and deployment strategies.
+Understand container networking, custom networks, and service discovery.
+
+<LinkCard
+  title="Docker Networking"
+  description="Network types, custom networks, and container communication"
+  href="/guides/docker/docker-networking/"
+/>
+
+---
+
+## Phase 5: Orchestration
+
+### 13. Docker Swarm Basics <Badge text="Available" variant="tip" /> <Badge text="Advanced" variant="danger" />
+
+Introduction to Docker Swarm clustering and orchestration.
+
+<LinkCard
+  title="Docker Swarm Basics"
+  description="Initialize and manage a Swarm cluster"
+  href="/guides/docker-swarm/docker-swarm-basics/"
+/>
+
+---
+
+### 14. Swarm Services & Stacks <Badge text="Available" variant="tip" /> <Badge text="Advanced" variant="danger" />
+
+Deploy, scale, and update services in Docker Swarm.
+
+<LinkCard
+  title="Swarm Services & Stacks"
+  description="Services, scaling, rolling updates, and stacks"
+  href="/guides/docker-swarm/docker-swarm-services/"
+/>
+
+---
+
+### 15. Swarm Networking <Badge text="Available" variant="tip" /> <Badge text="Advanced" variant="danger" />
+
+Master overlay networks and routing mesh in Docker Swarm.
+
+<LinkCard
+  title="Swarm Networking"
+  description="Overlay networks, routing mesh, and service discovery"
+  href="/guides/docker-swarm/docker-swarm-networking/"
+/>
 
 ---
 
@@ -107,9 +229,27 @@ Optimize images, security hardening, and deployment strategies.
 
 Hands-on projects to practice your Docker skills.
 
-<Aside type="note" title="Coming Soon">
-  Docker projects will be added here as they become available.
-</Aside>
+<CardGrid>
+  <LinkCard
+    title="Project: Super Mario"
+    description="Deploy a playable Mario game - perfect first project"
+    href="/projects/docker/project-mario/"
+  />
+</CardGrid>
+
+---
+
+## 📋 Cheatsheets
+
+Quick reference guides for Docker commands.
+
+<CardGrid>
+  <LinkCard
+    title="Docker Cheatsheet"
+    description="Essential commands and tips"
+    href="/cheatsheets/docker/docker-tools-tips"
+  />
+</CardGrid>
 
 ---
 
@@ -120,8 +260,19 @@ Hands-on projects to practice your Docker skills.
   title="Docker Checklist"
   items={[
     "Docker Fundamentals",
-    "Docker Linux Install",
-    "Docker Windows Install",
+    "Docker vs VMs",
+    "Docker Install (Linux or Windows)",
+    "Running Containers",
+    "Port Mapping",
+    "Volumes & Persistence",
+    "Environment Variables",
+    "Custom Images",
+    "Docker Registries",
+    "Docker Compose",
+    "Docker Networking",
+    "Docker Swarm Basics",
+    "Swarm Services",
+    "Swarm Networking",
   ]}
 />
 
@@ -132,8 +283,10 @@ Hands-on projects to practice your Docker skills.
 After completing this path, you'll be able to:
 
 - Build and run Docker containers
+- Create custom images with optimized Dockerfiles
 - Create multi-container applications with Compose
-- Deploy containerized apps to production
+- Deploy and scale applications with Docker Swarm
+- Manage container networking and registries
 
 ### Related
 
@@ -142,5 +295,10 @@ After completing this path, you'll be able to:
     title="ARR Stack Cheatsheet"
     description="Docker-based media automation stack"
     href="/cheatsheets/arr-stack/arr-stack/"
+  />
+  <LinkCard
+    title="Docker Cheatsheet"
+    description="Quick command reference"
+    href="/cheatsheets/docker-cheatsheet/"
   />
 </CardGrid>

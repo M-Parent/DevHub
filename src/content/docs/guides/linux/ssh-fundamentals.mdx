@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Question from "../../../../components/Question.astro";
 import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FileTree from "../../../../components/FileTree.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
 
 <Badge text="Linux" class="linux" /> <Badge text="Windows" class="windows" />
@@ -185,6 +188,42 @@ SSH automatically tunnels through the jumpbox!
 ---
 
 ## Knowledge Check
+
+<FileTree
+  title="SSH Directory Structure"
+  structure={[
+    {
+      name: "~/.ssh/",
+      type: "folder",
+      children: [
+        { name: "id_ed25519", badge: "create" },
+        { name: "id_ed25519.pub", badge: "create" },
+        { name: "authorized_keys", badge: "edit" },
+        { name: "config", badge: "create" },
+        { name: "known_hosts" },
+      ],
+    },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "ssh-keygen -t ed25519 -C 'my@email.com'",
+      output:
+        "Generating public/private ed25519 key pair.\nEnter file in which to save the key: ~/.ssh/id_ed25519",
+    },
+    {
+      input: "ssh-copy-id user@server",
+      output: "Number of key(s) added: 1\nNow try logging into the machine",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Type the command to generate an ED25519 SSH key:"
+  sentence="[BLANK:ssh-keygen] -t ed25519"
+/>
 
 <Flashcard
   title="SSH Concepts"

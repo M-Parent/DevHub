@@ -52,6 +52,9 @@ src/content/docs/
 ├── projects/
 │   └── linux/
 │       └── scribbler-game.mdx
+├── misc/                          # Orphan articles - NOT in any roadmap
+│   ├── ux-design-theory.mdx
+│   └── microservices-theory.mdx
 └── roadmaps/
     ├── linux-learning-path.mdx
     ├── server-learning-path.mdx
@@ -66,6 +69,19 @@ src/content/docs/
     ├── ansible-learning-path.mdx
     └── cyber-learning-path.mdx
 ```
+
+---
+
+## 🏝️ Orphan Articles (Misc Category)
+
+Articles in the `misc/` folder are standalone content that does NOT belong to any learning path or roadmap. These cover topics outside core DevOps/IT focus areas (e.g., UX design theory, business concepts).
+
+**Rules for Misc Articles:**
+
+- Use `<Badge text="Misc" class="misc" />` category badge
+- Do NOT add to any roadmap
+- No ProgressCheck component required
+- Quiz/Flashcard components optional
 
 ---
 
@@ -90,6 +106,8 @@ src/content/docs/
 | Windows      | `windows`      | Blue          |
 | ARR-Stack    | `arr-stack`    | Yellow Green  |
 | Coding       | `coding`       | Emerald       |
+| Misc         | `misc`         | Gray          |
+| DevOps       | `devops`       | Slate         |
 
 ### Programming Language Badges
 
@@ -142,8 +160,228 @@ Import paths depend on folder depth:
 | `guides/linux/*.mdx`        | `../../../../components/`    |
 | `guides/linux/ubuntu/*.mdx` | `../../../../../components/` |
 | `guides/terraform/*.mdx`    | `../../../../components/`    |
+| `guides/docker-swarm/*.mdx` | `../../../../components/`    |
+| `guides/kubernetes/*.mdx`   | `../../../../components/`    |
 | `cheatsheets/linux/*.mdx`   | `../../../../components/`    |
+| `cheatsheets/docker/*.mdx`  | `../../../../components/`    |
 | `projects/linux/*.mdx`      | `../../../../components/`    |
+| `misc/*.mdx`                | `../../../components/`       |
+
+---
+
+## 🎮 Interactive Components Reference
+
+### Quiz Component
+
+Single question with multiple choice answers.
+
+```mdx
+import Quiz from "../../../../components/Quiz.astro";
+
+<Quiz
+  question="What port does SSH use by default?"
+  options={["21", "22", "80", "443"]}
+  correct={1}
+  explanation="SSH uses port 22 by default. Port 21 is FTP, 80 is HTTP, 443 is HTTPS."
+/>
+```
+
+**Props:**
+
+- `question` (string) - The question text
+- `options` (string[]) - Array of 4 answer options
+- `correct` (number) - Index of correct answer (0-3)
+- `explanation` (string, optional) - Shown after answering
+
+**Usage:** Add 1-3 Quiz per article to test knowledge.
+
+---
+
+### Flashcard Component
+
+Flip cards for memorization. **Minimum 3 cards required.**
+
+```mdx
+import Flashcard from "../../../../components/Flashcard.astro";
+
+<Flashcard
+  title="Docker Concepts"
+  cards={[
+    {
+      front: "What is a container?",
+      back: "A lightweight, isolated process running from an image",
+    },
+    {
+      front: "What is an image?",
+      back: "A read-only template with instructions to create a container",
+    },
+    {
+      front: "What is a volume?",
+      back: "Persistent data storage that survives container restarts",
+    },
+  ]}
+/>
+```
+
+**Props:**
+
+- `title` (string) - Title displayed above cards
+- `cards` (array) - Array of objects with `front` and `back` strings
+
+**Usage:** Use for key concepts, terminology, or quick recall items.
+
+---
+
+### DragDrop Component
+
+Fill in blanks by dragging words.
+
+```mdx
+import DragDrop from "../../../../components/DragDrop.astro";
+
+<DragDrop
+  instruction="Complete the Docker command to run a container:"
+  template="docker {{blank1}} -d --name {{blank2}} -p 8080:80 {{blank3}}"
+  blanks={{ blank1: "run", blank2: "webserver", blank3: "nginx" }}
+/>
+```
+
+**Props:**
+
+- `instruction` (string) - Instructions for the user
+- `template` (string) - Text with `{{blankN}}` placeholders
+- `blanks` (object) - Key-value pairs mapping blank names to answers
+
+**Usage:** Great for command syntax, configuration patterns.
+
+---
+
+### FillBlank Component
+
+Type the missing word/command.
+
+```mdx
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<FillBlank
+  instruction="Type the command to list all running containers:"
+  answer="docker ps"
+  hint="Two words starting with 'docker'"
+/>
+```
+
+**Props:**
+
+- `instruction` (string) - What to type
+- `answer` (string) - Correct answer (case-insensitive)
+- `hint` (string, optional) - Hint text
+
+**Usage:** Use for commands that should be memorized.
+
+---
+
+### MatchPairs Component
+
+Connect matching items with lines.
+
+```mdx
+import MatchPairs from "../../../../components/MatchPairs.astro";
+
+<MatchPairs
+  title="Match Docker Commands"
+  pairs={[
+    { left: "docker run", right: "Create and start a container" },
+    { left: "docker build", right: "Create image from Dockerfile" },
+    { left: "docker push", right: "Upload image to registry" },
+    { left: "docker pull", right: "Download image from registry" },
+  ]}
+/>
+```
+
+**Props:**
+
+- `title` (string) - Title above the pairs
+- `pairs` (array) - Array of objects with `left` and `right` strings
+
+**Usage:** Use for concept-definition matching, command-purpose mapping.
+
+---
+
+### Terminal Component
+
+Simulated terminal with command/output display.
+
+```mdx
+import Terminal from "../../../../components/Terminal.astro";
+
+<Terminal
+  commands={[
+    { input: "docker ps", output: "CONTAINER ID   IMAGE   COMMAND   STATUS" },
+    { input: "docker images", output: "REPOSITORY   TAG   IMAGE ID   SIZE" },
+  ]}
+/>
+```
+
+**Props:**
+
+- `commands` (array) - Array of objects with `input` and `output` strings
+
+**Usage:** Show expected command outputs, demonstrate workflows.
+
+---
+
+### FileTree Component
+
+Display directory structure with badges.
+
+```mdx
+import FileTree from "../../../../components/FileTree.astro";
+
+<FileTree
+  title="Project Structure"
+  structure={[
+    { name: "Dockerfile", badge: "create" },
+    { name: "docker-compose.yml", badge: "create" },
+    {
+      name: "src/",
+      type: "folder",
+      children: [
+        { name: "app.py", badge: "edit" },
+        { name: "requirements.txt", badge: "create" },
+      ],
+    },
+  ]}
+/>
+```
+
+**Props:**
+
+- `title` (string) - Title above the tree
+- `structure` (array) - Nested array of file/folder objects
+  - `name` (string) - File or folder name
+  - `type` (string, optional) - "folder" for directories
+  - `badge` (string, optional) - "create", "edit", "delete"
+  - `children` (array, optional) - Nested items for folders
+
+**Usage:** Show project structure, files to create/modify.
+
+---
+
+## 📊 Component Usage Guidelines
+
+| Article Type          | Recommended Components                                 |
+| --------------------- | ------------------------------------------------------ |
+| **Tutorial/Guide**    | Quiz (1-3), Flashcard (1), DragDrop or FillBlank (1-2) |
+| **Theory**            | Flashcard (1-2), Quiz (1-2), MatchPairs (1)            |
+| **Install/Setup**     | Terminal (1-2), FileTree (1), Quiz (1)                 |
+| **Command Reference** | DragDrop (2-3), Terminal (1-2), FillBlank (1-2)        |
+
+**Rules:**
+
+- Every guide should have at least 2 interactive components
+- Flashcard must have minimum 3 cards
+- Place Quiz components in "Knowledge Check" section near end
+- Use DragDrop/FillBlank for command practice inline with content
 
 ---
 

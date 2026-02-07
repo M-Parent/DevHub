@@ -14,6 +14,10 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Question from "../../../../components/Question.astro";
 import Quiz from "../../../../components/Quiz.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Linux" class="linux" />
 <Badge text="Networking" class="networking" />
@@ -216,6 +220,40 @@ sudo iptables -t nat -L
 ---
 
 ## Knowledge Check
+
+<Flashcard
+  title="OpenVPN Concepts"
+  cards={[
+    { front: "What is the default OpenVPN port?", back: "UDP 1194" },
+    {
+      front: "What file contains the DH parameters?",
+      back: "dh.pem or dh2048.pem",
+    },
+    {
+      front: "What does TAP mode do vs TUN?",
+      back: "TAP bridges layer 2 (ethernet), TUN routes layer 3 (IP)",
+    },
+  ]}
+/>
+
+<MatchPairs
+  instruction="Match the OpenVPN file with its purpose"
+  pairs={[
+    { left: "ca.crt", right: "Certificate Authority" },
+    { left: "server.crt", right: "Server certificate" },
+    { left: "server.key", right: "Server private key" },
+    { left: "dh.pem", right: "Diffie-Hellman parameters" },
+  ]}
+/>
+
+<Terminal
+  commands={[{ input: "sudo systemctl start openvpn@server", output: "" }]}
+/>
+
+<FillBlank
+  instruction="Complete the path:"
+  sentence="To enable IP forwarding permanently, set net.ipv4.ip_forward=1 in [BLANK:/etc/sysctl.conf]"
+/>
 
 <Quiz
   question="What does the Diffie-Hellman file (dh.pem) do?"

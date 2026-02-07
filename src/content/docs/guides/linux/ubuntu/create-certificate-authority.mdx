@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../../components/Quiz.astro";
 import Flashcard from "../../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../../components/MatchPairs.astro";
+import Terminal from "../../../../../components/Terminal.astro";
+import FillBlank from "../../../../../components/FillBlank.astro";
 
 <Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
 
@@ -212,6 +215,30 @@ After creating your CA, you can:
     },
     { front: "What tracks issued certificates?", back: "The index.txt file" },
   ]}
+/>
+
+<MatchPairs
+  instruction="Match the CA file with its purpose"
+  pairs={[
+    { left: "cakey.pem", right: "CA private key" },
+    { left: "cacert.pem", right: "CA certificate" },
+    { left: "index.txt", right: "Certificate database" },
+    { left: "serial", right: "Next serial number" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "openssl genrsa -aes256 -out cakey.pem 4096",
+      output: "Generating RSA private key, 4096 bit long modulus",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the command:"
+  sentence="To create a self-signed CA certificate valid for 10 years, use: openssl req -x509 -new -key cakey.pem -days [BLANK:3650] -out cacert.pem"
 />
 
 <Quiz

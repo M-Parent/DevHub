@@ -1,0 +1,392 @@
+---
+title: "Running Docker Containers"
+description: "Learn how to run, manage, and inspect Docker containers with essential commands and options."
+sidebar:
+  label: "Running Containers"
+  order: 3
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+import DragDrop from "../../../../components/DragDrop.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+
+Now that Docker is installed, let's learn how to run and manage containers. This guide covers the essential commands you'll use daily.
+
+<Aside type="tip" title="Container Lifecycle">
+  Containers are ephemeral by default. When you stop a container, any changes
+  made inside are lost unless you use volumes (covered later).
+</Aside>
+
+---
+
+## Running Your First Container
+
+### Basic Run Command
+
+The `docker run` command creates and starts a container from an image:
+
+```bash
+docker run nginx
+```
+
+This command:
+
+1. Pulls the `nginx` image from Docker Hub (if not already local)
+2. Creates a new container from that image
+3. Starts the container
+4. Attaches your terminal to the container logs
+
+Press `Ctrl+C` to stop the container.
+
+---
+
+## Viewing Running Containers
+
+Open a new terminal to check container status:
+
+```bash
+docker ps
+```
+
+Output:
+
+```
+CONTAINER ID   IMAGE   COMMAND                  CREATED         STATUS         PORTS     NAMES
+73bccad23180   nginx   "/docker-entrypoint.…"   4 seconds ago   Up 3 seconds   80/tcp    cool_hellman
+```
+
+| Column         | Description                                      |
+| -------------- | ------------------------------------------------ |
+| `CONTAINER ID` | Unique identifier (can use first few chars)      |
+| `IMAGE`        | Base image used                                  |
+| `COMMAND`      | Startup command                                  |
+| `STATUS`       | Running, Exited, etc.                            |
+| `PORTS`        | Exposed ports                                    |
+| `NAMES`        | Container name (auto-generated if not specified) |
+
+### View All Containers (Including Stopped)
+
+```bash
+docker ps -a
+```
+
+---
+
+## Naming Containers
+
+Instead of random names like `cool_hellman`, specify a meaningful name:
+
+```bash
+docker run --name my_nginx nginx
+```
+
+```
+CONTAINER ID   IMAGE   COMMAND                  CREATED         STATUS         PORTS     NAMES
+1ccf73e80c7f   nginx   "/docker-entrypoint.…"   7 seconds ago   Up 5 seconds   80/tcp    my_nginx
+```
+
+<Aside type="tip" title="Naming Best Practices">
+  Use descriptive names like `web-frontend`, `api-server`, or `db-postgres` to
+  identify containers easily.
+</Aside>
+
+---
+
+## Running in Detached Mode
+
+By default, containers lock your terminal. Run in the background with `-d`:
+
+```bash
+docker run -d nginx
+```
+
+The container runs in the background and returns the container ID.
+
+### View Container Logs
+
+```bash
+# Follow logs in real-time
+docker logs -f my_nginx
+
+# Last 100 lines
+docker logs --tail 100 my_nginx
+
+# With timestamps
+docker logs -t my_nginx
+```
+
+---
+
+## Inspecting Containers
+
+Get detailed information about a container:
+
+```bash
+docker inspect my_nginx
+```
+
+This returns a JSON object with:
+
+- Network settings (IP address, gateway)
+- Volume mounts
+- Environment variables
+- State information
+- Configuration
+
+### Useful Inspect Filters
+
+```bash
+# Get container IP address
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' my_nginx
+
+# Get container state
+docker inspect -f '{{.State.Status}}' my_nginx
+```
+
+<Flashcard
+  title="Docker Inspect"
+  cards={[
+    {
+      front: "How do you get detailed information about a container?",
+      back: "Use 'docker inspect container_name' to get a JSON object with all container details including network, volumes, and state.",
+    },
+    {
+      front: "What does docker ps show?",
+      back: "Lists all running containers with their ID, image, command, status, ports, and names.",
+    },
+    {
+      front: "What is the difference between docker stop and docker rm?",
+      back: "docker stop halts the container (can restart later). docker rm deletes the container entirely.",
+    },
+  ]}
+/>
+
+<MatchPairs
+  title="Match Docker Run Flags"
+  pairs={[
+    { left: "-d", right: "Run in detached (background) mode" },
+    { left: "--name", right: "Assign a custom name to container" },
+    { left: "-it", right: "Interactive mode with terminal" },
+    { left: "--rm", right: "Remove container when it stops" },
+  ]}
+/>
+
+---
+
+## Container Lifecycle Commands
+
+### Stop a Container
+
+```bash
+docker stop my_nginx
+```
+
+Sends SIGTERM, waits 10 seconds, then SIGKILL.
+
+### Start a Stopped Container
+
+```bash
+docker start my_nginx
+```
+
+### Restart a Container
+
+```bash
+docker restart my_nginx
+```
+
+### Remove a Container
+
+```bash
+# Remove stopped container
+docker rm my_nginx
+
+# Force remove running container
+docker rm -f my_nginx
+```
+
+### Remove All Stopped Containers
+
+```bash
+docker container prune
+```
+
+---
+
+## Interactive Containers
+
+Run a container with an interactive terminal:
+
+```bash
+# Start new interactive container
+docker run -it ubuntu bash
+
+# Connect to running container
+docker exec -it my_nginx bash
+```
+
+| Flag | Description                      |
+| ---- | -------------------------------- |
+| `-i` | Keep STDIN open (interactive)    |
+| `-t` | Allocate a pseudo-TTY (terminal) |
+
+### Execute Commands in Running Container
+
+```bash
+# Run a single command
+docker exec my_nginx cat /etc/nginx/nginx.conf
+
+# Interactive shell
+docker exec -it my_nginx /bin/sh
+```
+
+---
+
+## Resource Limits
+
+Limit container resources to prevent runaway processes:
+
+```bash
+docker run -d \
+  --name limited_nginx \
+  --memory="256m" \
+  --cpus="0.5" \
+  nginx
+```
+
+| Flag            | Description                           |
+| --------------- | ------------------------------------- |
+| `--memory`      | Maximum memory (e.g., `256m`, `1g`)   |
+| `--cpus`        | CPU cores (e.g., `0.5` = half a core) |
+| `--memory-swap` | Total memory + swap                   |
+
+---
+
+## Restart Policies
+
+Automatically restart containers:
+
+```bash
+docker run -d --restart unless-stopped nginx
+```
+
+| Policy           | Description                            |
+| ---------------- | -------------------------------------- |
+| `no`             | Never restart (default)                |
+| `on-failure`     | Restart only if exit code is non-zero  |
+| `always`         | Always restart                         |
+| `unless-stopped` | Always restart unless manually stopped |
+
+---
+
+## Cleanup Commands
+
+Docker can consume disk space quickly. Clean up regularly:
+
+```bash
+# Remove unused containers
+docker container prune
+
+# Remove unused images
+docker image prune
+
+# Remove all unused images (not just dangling)
+docker image prune -a
+
+# Remove everything unused (containers, images, networks, volumes)
+docker system prune -a
+
+# Check disk usage
+docker system df
+```
+
+---
+
+## Quick Reference
+
+| Command                          | Description                |
+| -------------------------------- | -------------------------- |
+| `docker run image`               | Create and start container |
+| `docker run -d image`            | Run in background          |
+| `docker run --name x image`      | Run with custom name       |
+| `docker run -it image bash`      | Interactive with terminal  |
+| `docker ps`                      | List running containers    |
+| `docker ps -a`                   | List all containers        |
+| `docker logs container`          | View container logs        |
+| `docker inspect container`       | Detailed container info    |
+| `docker exec -it container bash` | Shell into container       |
+| `docker stop container`          | Stop container             |
+| `docker start container`         | Start stopped container    |
+| `docker rm container`            | Remove container           |
+| `docker container prune`         | Remove all stopped         |
+
+---
+
+## Knowledge Check
+
+<DragDrop
+  instruction="Complete the command to run nginx in the background with a custom name:"
+  sentence="docker [BLANK] [BLANK] --name [BLANK] nginx"
+  words={["run", "-d", "webserver", "start", "-it"]}
+  correctOrder={[0, 1, 2]}
+/>
+
+<FillBlank
+  instruction="Type the command to view logs:"
+  sentence="docker [BLANK:logs] myapp"
+/>
+
+<Quiz
+  question="What flag runs a container in the background?"
+  options={["-b", "-d", "--background", "-bg"]}
+  correct={1}
+  explanation="The -d flag (detached mode) runs the container in the background."
+/>
+
+<Quiz
+  question="How do you get an interactive shell in a running container?"
+  options={[
+    "docker shell container",
+    "docker exec -it container bash",
+    "docker run -it container",
+    "docker connect container",
+  ]}
+  correct={1}
+  explanation="Use 'docker exec -it container bash' to get an interactive shell in a running container."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="docker-running-containers"
+  title="Running Containers Checklist"
+  items={[
+    "Run a basic container",
+    "Run container in detached mode",
+    "Name your containers",
+    "View container logs",
+    "Inspect container details",
+    "Execute commands in running container",
+    "Stop and remove containers",
+    "Clean up unused resources",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Docker Run Reference](https://docs.docker.com/engine/reference/run/) and DevHub examples.

@@ -1,0 +1,303 @@
+---
+title: "Project: Super Mario Docker"
+description: "Deploy a classic Super Mario Bros game in a Docker container - a fun way to learn Docker basics."
+sidebar:
+  label: "Mario Game"
+  order: 1
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import {
+  Aside,
+  Badge,
+  Steps,
+  Card,
+  CardGrid,
+  LinkCard,
+} from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Project" class="devops" />
+<Badge text="Fun" class="purple" />
+
+Deploy a playable Super Mario Bros game using Docker. This fun project demonstrates Docker basics: pulling images, running containers, and port mapping.
+
+---
+
+## Project Overview
+
+| Aspect         | Details                        |
+| -------------- | ------------------------------ |
+| **Difficulty** | Beginner                       |
+| **Time**       | 10 minutes                     |
+| **Skills**     | Docker run, port mapping       |
+| **Result**     | Playable Mario game in browser |
+
+---
+
+## Prerequisites
+
+- Docker installed and running
+- Web browser
+- Port 8600 available (or choose another)
+
+```bash
+# Verify Docker is running
+docker --version
+docker ps
+```
+
+---
+
+## Quick Start
+
+### One Command Deployment
+
+```bash
+docker run -d -p 8600:8080 pengbai/docker-supermario
+```
+
+That's it! Open `http://localhost:8600` in your browser.
+
+---
+
+## Step-by-Step Deployment
+
+<Steps>
+
+1. **Pull the image**
+
+   ```bash
+   docker pull pengbai/docker-supermario
+   ```
+
+   This downloads the Super Mario game container image from Docker Hub.
+
+2. **Run the container**
+
+   ```bash
+   docker run -d \
+     --name mario \
+     -p 8600:8080 \
+     pengbai/docker-supermario
+   ```
+
+   | Flag           | Description                               |
+   | -------------- | ----------------------------------------- |
+   | `-d`           | Run in background (detached)              |
+   | `--name mario` | Give container a friendly name            |
+   | `-p 8600:8080` | Map host port 8600 to container port 8080 |
+
+3. **Verify it's running**
+
+   ```bash
+   docker ps
+   ```
+
+   ```
+   CONTAINER ID   IMAGE                      STATUS         PORTS
+   abc123         pengbai/docker-supermario  Up 5 seconds   0.0.0.0:8600->8080/tcp
+   ```
+
+4. **Play the game**
+
+   Open your browser to: `http://localhost:8600`
+
+</Steps>
+
+<Aside type="tip" title="Controls">
+  Use arrow keys to move, and spacebar or 'S' key to jump/run. Have fun!
+</Aside>
+
+---
+
+## Understanding the Commands
+
+<Flashcard
+  title="Docker Run Breakdown"
+  cards={[
+    {
+      front: "What does -p 8600:8080 mean?",
+      back: "Port mapping: Host port 8600 → Container port 8080. Traffic to localhost:8600 goes to the game running on port 8080 inside the container.",
+    },
+    {
+      front: "Why use -d (detached mode)?",
+      back: "Runs the container in the background so you get your terminal back. Without -d, the container output would occupy your terminal.",
+    },
+  ]}
+/>
+
+---
+
+## Managing the Container
+
+### View Logs
+
+```bash
+docker logs mario
+docker logs -f mario  # Follow live
+```
+
+### Stop the Game
+
+```bash
+docker stop mario
+```
+
+### Start Again
+
+```bash
+docker start mario
+```
+
+### Remove Container
+
+```bash
+docker rm -f mario
+```
+
+---
+
+## Customizing the Port
+
+If port 8600 is busy, use any available port:
+
+```bash
+# Use port 3000
+docker run -d --name mario -p 3000:8080 pengbai/docker-supermario
+
+# Access at http://localhost:3000
+```
+
+---
+
+## Troubleshooting
+
+### Port Already in Use
+
+```bash
+# Find what's using the port
+lsof -i :8600
+
+# Use a different port
+docker run -d -p 8787:8080 pengbai/docker-supermario
+```
+
+### Container Won't Start
+
+```bash
+# Check for existing container with same name
+docker ps -a | grep mario
+
+# Remove it
+docker rm mario
+
+# Try again
+docker run -d --name mario -p 8600:8080 pengbai/docker-supermario
+```
+
+### Can't Access in Browser
+
+```bash
+# Check container is running
+docker ps | grep mario
+
+# Check port mapping
+docker port mario
+
+# Check logs for errors
+docker logs mario
+```
+
+---
+
+## What You Learned
+
+This simple project demonstrated:
+
+1. **`docker pull`** - Download images from Docker Hub
+2. **`docker run`** - Create and start containers
+3. **`-p` flag** - Port mapping between host and container
+4. **`-d` flag** - Running containers in background
+5. **`--name`** - Naming containers for easy management
+6. **Container lifecycle** - start, stop, rm commands
+
+---
+
+## Next Steps
+
+Now that you've deployed your first application, try:
+
+<CardGrid>
+  <LinkCard
+    title="Docker Fundamentals"
+    href="/guides/docker/docker-fundamentals"
+    description="Deep dive into Docker concepts"
+  />
+  <LinkCard
+    title="Running Containers"
+    href="/guides/docker/docker-running-containers"
+    description="More container commands"
+  />
+  <LinkCard
+    title="Docker Compose"
+    href="/guides/docker/docker-compose"
+    description="Multi-container applications"
+  />
+</CardGrid>
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="What does the -p 8600:8080 flag do?"
+  options={[
+    "Sets container priority",
+    "Maps host port 8600 to container port 8080",
+    "Exposes port 8600 internally",
+    "Creates 8600 container replicas",
+  ]}
+  correct={1}
+  explanation="The -p flag maps ports. Format is host:container. Traffic to localhost:8600 is forwarded to port 8080 inside the container."
+/>
+
+<Quiz
+  question="Why would you use --name when running a container?"
+  options={[
+    "Required by Docker",
+    "Gives container a memorable name for easy management",
+    "Makes container faster",
+    "Required for port mapping",
+  ]}
+  correct={1}
+  explanation="Naming containers makes them easier to manage. You can use the name instead of container ID for commands like stop, start, logs, etc."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="project-mario"
+  title="Super Mario Project Checklist"
+  items={[
+    "Pulled Docker image from Docker Hub",
+    "Ran container with port mapping",
+    "Accessed application in browser",
+    "Practiced container management commands",
+    "Understood -d, -p, and --name flags",
+  ]}
+/>
+
+---
+
+## Source
+
+Using [pengbai/docker-supermario](https://hub.docker.com/r/pengbai/docker-supermario) image from Docker Hub.

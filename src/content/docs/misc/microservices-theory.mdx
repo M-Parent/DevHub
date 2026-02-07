@@ -1,0 +1,321 @@
+---
+title: "Microservices Architecture Theory"
+description: "Understanding microservices architecture patterns, principles, and best practices for building distributed systems."
+sidebar:
+  label: "Microservices"
+  order: 2
+  badge:
+    text: "Theory"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Aside, Badge } from "@astrojs/starlight/components";
+import Flashcard from "../../../components/Flashcard.astro";
+
+<Badge text="Misc" class="misc" />
+<Badge text="DevOps" class="devops" />
+<Badge text="Theory" variant="note" />
+
+Microservices architecture breaks applications into small, independently deployable services. This guide covers the theory, principles, and patterns behind microservices.
+
+---
+
+## What are Microservices?
+
+Microservices architecture structures an application as a collection of loosely coupled services that:
+
+- Are independently deployable
+- Organized around business capabilities
+- Owned by small teams
+- Communicate via APIs
+
+---
+
+## Core Characteristics
+
+| Principle                         | Description                                                              |
+| --------------------------------- | ------------------------------------------------------------------------ |
+| **Componentization via Services** | Each module is a service that can be independently deployed              |
+| **Organized Around Business**     | Services map to business functions (user management, payments)           |
+| **Products not Projects**         | Teams own services through development, testing, deployment, and support |
+| **Smart Endpoints, Dumb Pipes**   | Services carry the logic, not middleware like ESBs                       |
+| **Decentralized Governance**      | Teams choose their own technology stacks                                 |
+| **Infrastructure Automation**     | CI/CD pipelines for fast deployments                                     |
+| **Design for Failure**            | Continuous monitoring with automatic rollbacks                           |
+| **Evolutionary Design**           | Add or remove services as needed                                         |
+
+---
+
+## Benefits
+
+| Benefit                      | Description                                                |
+| ---------------------------- | ---------------------------------------------------------- |
+| **Technology Independence**  | Choose different technologies per service                  |
+| **Ease of Testing**          | Validate services without worrying about other modules     |
+| **Easy Deployment**          | Deploy/update services independently on their own schedule |
+| **Improved Scalability**     | Scale services independently for better cost efficiency    |
+| **Improved Availability**    | One failing module doesn't bring down the entire system    |
+| **Improved Reusability**     | Services can be reused by other services                   |
+| **Improved Maintainability** | Small services can be changed in weeks, not months         |
+
+<Flashcard
+  title="Microservices Benefits"
+  cards={[
+    {
+      front: "What's the main advantage of microservices over monoliths?",
+      back: "Independent deployment and scaling. Each service can be developed, deployed, and scaled independently, allowing teams to move faster and use resources more efficiently.",
+    },
+  ]}
+/>
+
+---
+
+## Core Principles
+
+### Single Responsibility
+
+Each service should focus on one responsibility and evolve independently.
+
+### High Cohesion
+
+All related behavior should sit together within a service.
+
+### Loose Coupling
+
+Changes in one service should not impact other services.
+
+**How to achieve loose coupling:**
+
+- Hide implementation details
+- Avoid shared libraries
+- Avoid over-exposure of entity data
+- **Never share databases**
+
+---
+
+## Data Management
+
+### One Service, One Database
+
+Each microservice should own its data and database. This ensures:
+
+- Services are truly independent
+- Database changes don't affect other services
+- Teams have full control over their data model
+
+<Aside type="caution" title="No Shared Databases">
+  Sharing databases between services creates tight coupling and defeats the
+  purpose of microservices.
+</Aside>
+
+---
+
+## API Integration Technologies
+
+| Technology  | Use Cases                             | Format         | Pros                               | Cons                          |
+| ----------- | ------------------------------------- | -------------- | ---------------------------------- | ----------------------------- |
+| **REST**    | Public APIs, Resource-driven APIs     | JSON, XML      | Easy to understand, Cache friendly | Schema-less, Heavier payloads |
+| **RPC**     | High-performance, Streaming, Internal | Protobuf, JSON | Easy to use, High performance      | Tight coupling                |
+| **GraphQL** | Mobile APIs, Data aggregation         | JSON           | Typed schema, Flexible queries     | No caching, Complex queries   |
+
+---
+
+## Communication Patterns
+
+### Synchronous Communication
+
+```
+Order Service → Request → Payment Service
+              ← Response ←
+```
+
+The calling service waits for a response. Payment is processed before returning.
+
+### Asynchronous Communication
+
+```
+Order Service → Request → Payment Service
+              ← Acknowledgement ←
+              ... Payment processed later ...
+              ← Notification when complete ←
+```
+
+The caller receives immediate acknowledgement. Processing happens asynchronously.
+
+---
+
+## Service Discovery
+
+Service discovery allows services to find and communicate with each other dynamically.
+
+**Components:**
+
+- **Service Registry** - Database of service instances
+- **Load Balancing** - Distribute requests across instances
+- **Health Checks** - Monitor service availability
+
+**Types:**
+
+- **Client-Side Discovery** - Client queries registry directly
+- **Server-Side Discovery** - Load balancer handles discovery (easier to manage)
+
+**Examples:** Netflix Eureka, Zookeeper, etcd, HashiCorp Consul
+
+---
+
+## Circuit Breaker Pattern
+
+The circuit breaker acts as a middleman between services to prevent cascading failures.
+
+**Responsibilities:**
+
+1. **Fault Registration** - Track failures
+2. **Switch Off** - Stop calling failing service
+3. **Restore** - Test and restore healthy service
+
+**States:**
+
+- **Closed** - Normal operation
+- **Open** - Stop all requests (service is down)
+- **Half-Open** - Test if service recovered
+
+**Examples:** Hystrix, Resilience4j, Sentinel
+
+<Flashcard
+  title="Circuit Breaker"
+  cards={[
+    {
+      front: "Why use a circuit breaker in microservices?",
+      back: "To prevent cascading failures. When a service fails, the circuit breaker 'opens' to stop requests, preventing one failing service from bringing down the entire system.",
+    },
+  ]}
+/>
+
+---
+
+## API Gateway
+
+The API Gateway is the single entry point for all client requests.
+
+**Responsibilities:**
+
+- Authentication & Authorization
+- Service Discovery
+- Circuit Breaker
+- Rate Limiting
+- Request/Response Transformation
+- API Management & Versioning
+- Monitoring & Billing
+
+**Examples:** Netflix Zuul, Kong, Apigee, Amazon API Gateway
+
+---
+
+## Service Mesh
+
+A service mesh handles service-to-service communication with a dedicated infrastructure layer.
+
+**Features:**
+
+- Security (mTLS)
+- Service Discovery
+- Circuit Breaker
+- Monitoring & Observability
+
+**Architecture:**
+
+- **Control Plane** - Central management (separate microservice)
+- **Sidecar Proxies** - Run alongside each service
+
+**Examples:** Istio, Linkerd, HashiCorp Consul
+
+---
+
+## Deployment Options
+
+| Option         | Description                  | Best For                    |
+| -------------- | ---------------------------- | --------------------------- |
+| **VMs**        | Traditional virtual machines | Legacy, full isolation      |
+| **Containers** | Docker/Kubernetes            | Microservices (recommended) |
+| **Serverless** | FaaS (Lambda, Functions)     | Event-driven, variable load |
+| **Cloud PaaS** | Managed platforms            | Rapid deployment            |
+
+<Aside type="tip" title="Containers are Ideal">
+  Containers are the best choice for microservices due to their lightweight
+  nature, fast startup, and easy orchestration with Kubernetes.
+</Aside>
+
+---
+
+## Monitoring & Alerting
+
+### Metrics
+
+Data points that help identify issues:
+
+- CPU usage
+- Memory consumption
+- Uptime
+- Latency
+- Request rates
+
+### Alerts
+
+Notify teams when metrics exceed thresholds via:
+
+- Email
+- Slack/Teams
+- PagerDuty
+
+### Technology Stack
+
+1. **Metric Scraping** - Prometheus
+2. **Storage** - InfluxDB, Prometheus
+3. **Visualization** - Grafana, Kibana
+
+### Log Aggregation
+
+Centralize logs from all services for debugging:
+
+- ELK Stack (Elasticsearch, Logstash, Kibana)
+- Grafana Loki
+
+---
+
+## Supporting Services
+
+### Caching
+
+Improve response times and reduce API Gateway load:
+
+- **Example:** Redis, Memcached
+
+### Message Broker
+
+Enable asynchronous communication between services:
+
+- Queue requests for processing
+- Decouple services
+- Handle traffic spikes
+
+**Examples:** RabbitMQ, Apache Kafka
+
+---
+
+## Summary
+
+| Concept               | Description                              |
+| --------------------- | ---------------------------------------- |
+| **Microservice**      | Small, independently deployable service  |
+| **API Gateway**       | Single entry point for clients           |
+| **Service Discovery** | Dynamic service registration and lookup  |
+| **Circuit Breaker**   | Prevent cascading failures               |
+| **Service Mesh**      | Infrastructure for service communication |
+| **Message Broker**    | Async communication between services     |
+
+---
+
+## Source
+
+Based on microservices architecture patterns and industry best practices.

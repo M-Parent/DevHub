@@ -1,0 +1,382 @@
+---
+title: "Ansible Vault - Encrypting Secrets"
+description: "Learn how to secure sensitive data like passwords and API keys using Ansible Vault encryption."
+sidebar:
+  label: "Ansible Vault"
+  order: 4
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Ansible" class="ansible" />
+<Badge text="Linux" class="linux" />
+
+Ansible Vault encrypts variables and files, allowing you to protect sensitive data like passwords, API keys, and certificates instead of storing them in plain text.
+
+<Aside type="caution" title="Never Commit Secrets in Plain Text">
+  Always encrypt sensitive data before committing to version control. A single
+  leaked password can compromise your entire infrastructure.
+</Aside>
+
+---
+
+## What is Ansible Vault?
+
+Ansible Vault provides encryption for:
+
+- **Database credentials** - Passwords and connection strings
+- **API keys and tokens** - Third-party service authentication
+- **SSL/TLS certificates** - Private keys for secure communication
+- **SSH keys** - Private keys for server access
+- **Any sensitive variable** - Anything you don't want in plain text
+
+---
+
+## Setting Up group_vars
+
+Before creating vaults, set up the `group_vars` directory. Ansible automatically loads variable files from this directory based on group names.
+
+```bash
+mkdir -p group_vars/all
+mkdir -p group_vars/ubuntu
+mkdir -p group_vars/webservers
+```
+
+Structure:
+
+```
+ansible-project/
+├── group_vars/
+│   ├── all/           # Variables for all hosts
+│   │   └── vars.yml
+│   ├── ubuntu/        # Variables for ubuntu group
+│   │   ├── vars.yml
+│   │   └── vault.yml  # Encrypted!
+│   └── webservers/
+│       └── vars.yml
+└── inventory/
+    └── hosts.yml
+```
+
+---
+
+## Creating an Encrypted Vault
+
+<Steps>
+
+1. **Create a new vault file**
+
+   ```bash
+   ansible-vault create group_vars/ubuntu/vault.yml
+   ```
+
+2. **Enter a password when prompted**
+
+   You'll be asked to create and confirm a vault password.
+
+3. **Add your secrets in the editor**
+
+   Your default editor opens. Add secrets in YAML format:
+
+   ```yaml
+   vault_ansible_password: "SuperSecretPassword123!"
+   vault_db_password: "DatabasePass456!"
+   vault_api_key: "sk-1234567890abcdef"
+   ```
+
+4. **Save and close**
+
+   The file is automatically encrypted on save.
+
+</Steps>
+
+---
+
+## Vault Commands
+
+| Command                          | Description                        |
+| -------------------------------- | ---------------------------------- |
+| `ansible-vault create file.yml`  | Create a new encrypted file        |
+| `ansible-vault encrypt file.yml` | Encrypt an existing file           |
+| `ansible-vault decrypt file.yml` | Decrypt a file (use with caution!) |
+| `ansible-vault edit file.yml`    | Edit an encrypted file             |
+| `ansible-vault view file.yml`    | View contents without editing      |
+| `ansible-vault rekey file.yml`   | Change the vault password          |
+
+<Aside type="caution" title="Decrypt Warning">
+  The `decrypt` command converts the file back to plain text. Only use this
+  temporarily and re-encrypt immediately after editing.
+</Aside>
+
+---
+
+## Using Vault Variables
+
+### Reference Pattern
+
+The best practice is to prefix vault variables with `vault_` and create a separate vars file that references them:
+
+**group_vars/ubuntu/vault.yml** (encrypted):
+
+```yaml
+vault_ansible_password: "SuperSecretPassword123!"
+```
+
+**group_vars/ubuntu/vars.yml** (plain text):
+
+```yaml
+ansible_user: ubuntu
+ansible_password: "{{ vault_ansible_password }}"
+```
+
+This pattern provides:
+
+- Single source of truth for variable names
+- Easy to find all variables (in vars.yml)
+- Secrets stay encrypted (in vault.yml)
+
+<Flashcard
+  title="Vault Best Practice"
+  cards={[
+    {
+      front:
+        "Why prefix vault variables with 'vault_' and reference them in a separate file?",
+      back: "It provides a single place to find all variable names (vars.yml) while keeping secrets encrypted (vault.yml). Makes debugging easier.",
+    },
+  ]}
+/>
+
+---
+
+## Complete Example
+
+### Directory Structure
+
+```
+ansible-project/
+├── ansible.cfg
+├── group_vars/
+│   └── ubuntu/
+│       ├── vars.yml
+│       └── vault.yml
+├── inventory/
+│   └── hosts.yml
+└── playbooks/
+    └── test.yml
+```
+
+### group_vars/ubuntu/vault.yml
+
+```bash
+ansible-vault create group_vars/ubuntu/vault.yml
+```
+
+Content:
+
+```yaml
+vault_become_password: "sudoPassword123"
+```
+
+### group_vars/ubuntu/vars.yml
+
+```yaml
+ansible_user: ubuntu
+ansible_become_pass: "{{ vault_become_password }}"
+```
+
+### inventory/hosts.yml
+
+```yaml
+ubuntu:
+  hosts:
+    server1:
+      ansible_host: 192.168.1.10
+    server2:
+      ansible_host: 192.168.1.11
+```
+
+### Running with Vault
+
+```bash
+# Prompt for password
+ansible-playbook playbooks/test.yml --ask-vault-password
+
+# Or use shorthand
+ansible-playbook playbooks/test.yml --ask-vault-pass
+```
+
+---
+
+## Vault Password File
+
+Typing the password each time is tedious. Create a password file for development:
+
+<Steps>
+
+1. **Create password file**
+
+   ```bash
+   echo "YourVaultPassword" > .vault_password
+   chmod 600 .vault_password
+   ```
+
+2. **Add to .gitignore**
+
+   ```bash
+   echo ".vault_password" >> .gitignore
+   ```
+
+3. **Configure ansible.cfg**
+
+   ```ini
+   [defaults]
+   inventory = inventory
+   host_key_checking = False
+   vault_password_file = ./.vault_password
+   ```
+
+</Steps>
+
+Now playbooks run without prompting for the vault password:
+
+```bash
+ansible-playbook playbooks/test.yml
+```
+
+<Aside type="caution" title="Production Security">
+  In production, use environment variables, a password manager, or a secrets
+  management tool instead of a password file.
+</Aside>
+
+---
+
+## Testing Your Setup
+
+Verify vault variables are loaded correctly:
+
+```bash
+ansible -m debug -a 'var=hostvars[inventory_hostname]' ubuntu
+```
+
+You should see your variables, including the decrypted vault values:
+
+```json
+server1 | SUCCESS => {
+    "hostvars[inventory_hostname]": {
+        "ansible_become_pass": "sudoPassword123",
+        "ansible_host": "192.168.1.10",
+        "ansible_user": "ubuntu",
+        "vault_become_password": "sudoPassword123"
+    }
+}
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the vault command with its function"
+  pairs={[
+    { left: "ansible-vault create", right: "Create a new encrypted file" },
+    { left: "ansible-vault edit", right: "Edit an encrypted file" },
+    { left: "ansible-vault view", right: "View contents without editing" },
+    { left: "ansible-vault rekey", right: "Change the vault password" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "ansible-vault create group_vars/ubuntu/vault.yml",
+      output:
+        "New Vault password:\nConfirm New Vault password:\n[editor opens for secret input]",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="This naming convention helps identify encrypted variables"
+  sentence="Prefix vault variables with [BLANK:vault_] and reference them in a separate vars.yml file."
+/>
+
+<Quiz
+  question="What command creates a new encrypted vault file?"
+  options={[
+    "ansible-vault new",
+    "ansible-vault create",
+    "ansible-vault init",
+    "ansible-vault make",
+  ]}
+  correct={1}
+  explanation="Use 'ansible-vault create filename.yml' to create a new encrypted file."
+/>
+
+<Quiz
+  question="What is the recommended way to use vault variables?"
+  options={[
+    "Reference them directly",
+    "Prefix with vault_ and reference in vars.yml",
+    "Store in environment variables",
+    "Hard-code in playbooks",
+  ]}
+  correct={1}
+  explanation="Prefix vault variables with 'vault_' and create a vars.yml that references them for better organization."
+/>
+
+<Quiz
+  question="How do you avoid typing the vault password every time?"
+  options={[
+    "Disable vault encryption",
+    "Use --no-vault",
+    "Create a vault_password_file",
+    "Store in environment",
+  ]}
+  correct={2}
+  explanation="Configure vault_password_file in ansible.cfg to automatically use the password."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="ansible-vault"
+  title="Ansible Vault Checklist"
+  items={[
+    "Create group_vars directory structure",
+    "Create encrypted vault file",
+    "Add secrets with vault_ prefix",
+    "Create vars.yml referencing vault variables",
+    "Test with --ask-vault-password",
+    "Set up vault password file",
+    "Configure ansible.cfg for password file",
+    "Add .vault_password to .gitignore",
+  ]}
+/>
+
+---
+
+## Save Your Progress
+
+```bash
+git add .
+git commit -m "Ansible Vault configuration"
+git push
+```
+
+---
+
+## Source
+
+Based on [Ansible Vault Documentation](https://docs.ansible.com/ansible/latest/vault_guide/index.html) and DevHub examples.

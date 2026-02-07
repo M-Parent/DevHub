@@ -1,0 +1,370 @@
+---
+title: "Docker Port Mapping"
+description: "Learn how to expose container ports and make your applications accessible from outside Docker."
+sidebar:
+  label: "Exposing Ports"
+  order: 4
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+import DragDrop from "../../../../components/DragDrop.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+
+By default, containers run on an isolated network. To access applications inside containers, you need to map container ports to your host machine.
+
+---
+
+## The Problem
+
+When you run a container, ports aren't automatically accessible:
+
+```bash
+docker run -d --name web nginx
+```
+
+```bash
+docker ps
+# PORTS shows: 80/tcp
+```
+
+But trying to access it fails:
+
+```bash
+curl localhost:80
+# curl: (7) Failed to connect to localhost port 80: Connection refused
+```
+
+The container's port 80 is only available on Docker's internal bridge network, not on your host.
+
+---
+
+## Docker Networks
+
+Docker creates several networks by default:
+
+```bash
+docker network ls
+```
+
+```
+NETWORK ID     NAME      DRIVER    SCOPE
+180ad842df02   bridge    bridge    local
+442d45aab890   host      host      local
+5f026b68deaf   none      null      local
+```
+
+| Network  | Description                             |
+| -------- | --------------------------------------- |
+| `bridge` | Default isolated network for containers |
+| `host`   | Container shares host's network stack   |
+| `none`   | No networking                           |
+
+---
+
+## Method 1: Host Network
+
+The simplest (but least flexible) method - run on the host network:
+
+```bash
+docker run --network host nginx
+```
+
+Now the container uses your host's network directly:
+
+```bash
+curl localhost:80
+# Returns nginx welcome page!
+```
+
+<Aside type="caution" title="Host Network Limitations">
+  - No port control (all exposed ports are accessible) - No isolation from host
+  - Port conflicts with host services - Not recommended for production
+</Aside>
+
+---
+
+## Method 2: Port Mapping (Recommended)
+
+Map specific container ports to host ports using `-p`:
+
+### Dynamic Port Mapping
+
+Let Docker choose a random host port:
+
+```bash
+docker run -d -p 80 nginx
+```
+
+```bash
+docker ps
+# PORTS: 0.0.0.0:49153->80/tcp
+```
+
+Docker mapped container port 80 to host port 49153:
+
+```bash
+curl localhost:49153
+# Returns nginx welcome page!
+```
+
+### Specific Port Mapping
+
+Choose your own host port:
+
+```bash
+docker run -d -p 8080:80 nginx
+```
+
+Format: `-p HOST_PORT:CONTAINER_PORT`
+
+```bash
+docker ps
+# PORTS: 0.0.0.0:8080->80/tcp
+
+curl localhost:8080
+# Returns nginx welcome page!
+```
+
+<Flashcard
+  title="Port Mapping Syntax"
+  cards={[
+    {
+      front: "What is the format for Docker port mapping?",
+      back: "-p HOST_PORT:CONTAINER_PORT. For example, -p 8080:80 maps host port 8080 to container port 80.",
+    },
+  ]}
+/>
+
+---
+
+## Port Mapping Options
+
+### Multiple Ports
+
+```bash
+docker run -d \
+  -p 80:80 \
+  -p 443:443 \
+  nginx
+```
+
+### Specific Interface
+
+Bind to a specific IP address:
+
+```bash
+# Only accessible from localhost
+docker run -d -p 127.0.0.1:8080:80 nginx
+
+# Specific interface
+docker run -d -p 192.168.1.10:8080:80 nginx
+```
+
+### UDP Ports
+
+```bash
+docker run -d -p 53:53/udp dns-server
+```
+
+### Port Ranges
+
+```bash
+docker run -d -p 8000-8010:8000-8010 myapp
+```
+
+---
+
+## Publish All Ports
+
+Use `-P` (uppercase) to publish all exposed ports with random host ports:
+
+```bash
+docker run -d -P nginx
+```
+
+Docker reads the `EXPOSE` instruction from the Dockerfile and maps each port.
+
+---
+
+## EXPOSE vs -p
+
+| Concept                | Purpose                            |
+| ---------------------- | ---------------------------------- |
+| `EXPOSE` in Dockerfile | Documents which ports the app uses |
+| `-p` flag              | Actually publishes ports to host   |
+
+`EXPOSE` alone doesn't make ports accessible - it's documentation. You still need `-p` to publish.
+
+```dockerfile
+# Dockerfile
+EXPOSE 80 443
+```
+
+```bash
+# Still need -p to access
+docker run -d -p 80:80 -p 443:443 myimage
+```
+
+---
+
+## Checking Port Mappings
+
+### View Container Ports
+
+```bash
+docker port my_nginx
+# 80/tcp -> 0.0.0.0:8080
+```
+
+### From docker ps
+
+```bash
+docker ps --format "table {{.Names}}\t{{.Ports}}"
+```
+
+### Detailed View
+
+```bash
+docker inspect -f '{{range $p, $conf := .NetworkSettings.Ports}}{{$p}} -> {{(index $conf 0).HostPort}}{{end}}' my_nginx
+```
+
+---
+
+## Common Patterns
+
+### Web Server (HTTP/HTTPS)
+
+```bash
+docker run -d \
+  --name webserver \
+  -p 80:80 \
+  -p 443:443 \
+  nginx
+```
+
+### Database (Internal Only)
+
+For databases, often you don't expose ports publicly:
+
+```bash
+# Only accessible from other containers on same network
+docker run -d \
+  --name database \
+  --network myapp \
+  postgres
+```
+
+### Development with Different Ports
+
+```bash
+# Run multiple instances on different ports
+docker run -d --name app1 -p 8081:80 nginx
+docker run -d --name app2 -p 8082:80 nginx
+docker run -d --name app3 -p 8083:80 nginx
+```
+
+---
+
+## Troubleshooting
+
+| Issue                       | Solution                                               |
+| --------------------------- | ------------------------------------------------------ |
+| Port already in use         | Choose different host port or stop conflicting service |
+| Connection refused          | Check if container is running and port is mapped       |
+| Can't access from outside   | Check firewall rules, use `0.0.0.0` not `127.0.0.1`    |
+| Container exits immediately | Check logs with `docker logs container`                |
+
+### Check If Port Is In Use
+
+```bash
+# Linux
+sudo lsof -i :8080
+sudo netstat -tlnp | grep 8080
+
+# See what Docker is using
+docker ps --format "{{.Ports}}"
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  title="Port Mapping Syntax"
+  pairs={[
+    { left: "-p 8080:80", right: "Host 8080 to container 80" },
+    { left: "-p 127.0.0.1:8080:80", right: "Localhost only binding" },
+    { left: "-P", right: "Publish all EXPOSE ports randomly" },
+    { left: "-p 8080-8085:80-85", right: "Port range mapping" },
+  ]}
+/>
+
+<DragDrop
+  instruction="Complete the command to map host port 3000 to container port 80:"
+  sentence="docker run -d [BLANK] [BLANK]:[BLANK] nginx"
+  words={["-p", "3000", "80", "-v", "8080"]}
+  correctOrder={[0, 1, 2]}
+/>
+
+<FillBlank
+  instruction="Type the command to see port mappings:"
+  sentence="docker [BLANK:port] web"
+/>
+
+<Quiz
+  question="What is the correct format for port mapping?"
+  options={[
+    "CONTAINER:HOST",
+    "HOST:CONTAINER",
+    "PORT:PORT",
+    "-port HOST CONTAINER",
+  ]}
+  correct={1}
+  explanation="The format is -p HOST_PORT:CONTAINER_PORT, so -p 8080:80 maps host 8080 to container 80."
+/>
+
+<Quiz
+  question="What does the -P (uppercase) flag do?"
+  options={[
+    "Publishes port 80",
+    "Publishes all EXPOSE ports with random host ports",
+    "Publishes to localhost only",
+    "Creates a port range",
+  ]}
+  correct={1}
+  explanation="-P publishes all ports defined with EXPOSE in the Dockerfile using random available host ports."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="docker-ports"
+  title="Port Mapping Checklist"
+  items={[
+    "Understand Docker networks",
+    "Map specific ports with -p",
+    "Use dynamic port mapping",
+    "Map multiple ports",
+    "Bind to specific interfaces",
+    "Check port mappings",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Docker Networking Documentation](https://docs.docker.com/network/) and DevHub examples.

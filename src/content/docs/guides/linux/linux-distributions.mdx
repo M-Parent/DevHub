@@ -15,6 +15,7 @@ import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import MatchPairs from "../../../../components/MatchPairs.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Linux" class="linux" />
 
@@ -271,6 +272,11 @@ pacman -Ss nginx
     { left: "Arch", right: "pacman" },
     { left: "Debian", right: "dpkg" },
   ]}
+/>
+
+<FillBlank
+  instruction="Complete the package install command:"
+  sentence="sudo [BLANK:apt] install package-name"
 />
 
 <Quiz

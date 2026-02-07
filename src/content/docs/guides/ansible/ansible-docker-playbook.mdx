@@ -1,0 +1,376 @@
+---
+title: "Ansible Playbook: Install Docker"
+description: "A complete Ansible playbook to install Docker CE on Ubuntu servers with proper configuration."
+sidebar:
+  label: "Playbook: Docker"
+  order: 6
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Ansible" class="ansible" />
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+
+This guide provides a production-ready Ansible playbook for installing Docker CE on Ubuntu servers. You'll learn proper apt repository management, GPG key handling, and user configuration.
+
+<Aside type="tip" title="Why Automate Docker Installation?">
+  Installing Docker manually on multiple servers is time-consuming and
+  error-prone. This playbook ensures consistent, repeatable installations across
+  your entire infrastructure.
+</Aside>
+
+---
+
+## Prerequisites
+
+Before running this playbook, ensure you have:
+
+- Ansible installed on your control node
+- SSH access to target Ubuntu servers
+- Sudo privileges on target servers
+- Inventory configured with your hosts
+
+---
+
+## The Playbook
+
+Create a file called `install-docker.yml`:
+
+```yaml
+---
+- name: Install Docker CE on Ubuntu
+  hosts: all
+  become: true
+
+  vars:
+    docker_users:
+      - "{{ ansible_user }}"
+
+  tasks:
+    - name: Install required system packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: true
+
+    - name: Create keyrings directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Add Docker GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        keyring: /etc/apt/keyrings/docker.gpg
+        state: present
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+
+    - name: Install Docker packages
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker service is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create docker group
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Add users to docker group
+      ansible.builtin.user:
+        name: "{{ item }}"
+        groups: docker
+        append: true
+      loop: "{{ docker_users }}"
+
+    - name: Verify Docker installation
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Show Docker version
+      ansible.builtin.debug:
+        msg: "Docker installed: {{ docker_version.stdout }}"
+```
+
+---
+
+## Playbook Breakdown
+
+### 1. Package Installation
+
+```yaml
+- name: Install required system packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: true
+```
+
+These packages are required for:
+
+- `ca-certificates` - HTTPS certificate validation
+- `curl` - Downloading files (used by some tasks)
+- `gnupg` - GPG key management
+- `lsb-release` - Distribution release detection
+
+### 2. GPG Key Management
+
+```yaml
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    keyring: /etc/apt/keyrings/docker.gpg
+    state: present
+```
+
+This adds Docker's official GPG key to verify package signatures.
+
+### 3. Repository Configuration
+
+```yaml
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+```
+
+Uses Ansible facts:
+
+- `ansible_architecture` - System architecture (amd64, arm64)
+- `ansible_distribution_release` - Ubuntu codename (jammy, focal)
+
+### 4. User Group Management
+
+```yaml
+- name: Add users to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker_users }}"
+```
+
+Allows users to run Docker without sudo.
+
+<Aside type="caution" title="Group Changes Require Re-login">
+  Users need to log out and back in for group membership changes to take effect.
+</Aside>
+
+---
+
+## Running the Playbook
+
+### Basic Execution
+
+```bash
+ansible-playbook install-docker.yml
+```
+
+### With Custom Users
+
+```bash
+ansible-playbook install-docker.yml -e '{"docker_users": ["ubuntu", "devops", "deploy"]}'
+```
+
+### Check Mode (Dry Run)
+
+```bash
+ansible-playbook install-docker.yml --check
+```
+
+### Limit to Specific Hosts
+
+```bash
+ansible-playbook install-docker.yml --limit webservers
+```
+
+---
+
+## Verification
+
+After running the playbook, verify Docker works:
+
+```bash
+# SSH to a target server
+ssh user@server
+
+# Check Docker version
+docker --version
+
+# Run hello-world
+docker run hello-world
+
+# Check Docker Compose
+docker compose version
+```
+
+---
+
+## Role Version
+
+For larger projects, convert this to a role:
+
+```
+roles/docker/
+├── tasks/
+│   └── main.yml
+├── defaults/
+│   └── main.yml
+└── handlers/
+    └── main.yml
+```
+
+### roles/docker/defaults/main.yml
+
+```yaml
+---
+docker_users:
+  - "{{ ansible_user }}"
+
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+```
+
+<Aside type="tip" title="Use Galaxy Instead">
+  Consider using `geerlingguy.docker` from Ansible Galaxy for a battle-tested
+  Docker role with more options.
+</Aside>
+
+---
+
+## Troubleshooting
+
+| Issue                | Solution                                                         |
+| -------------------- | ---------------------------------------------------------------- |
+| GPG key error        | Ensure curl and gnupg are installed                              |
+| Repository error     | Check `ansible_distribution_release` matches your Ubuntu version |
+| Permission denied    | User needs to re-login after being added to docker group         |
+| Service not starting | Check `journalctl -u docker` for errors                          |
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the Docker playbook component with its purpose"
+  pairs={[
+    { left: "apt_key", right: "Add GPG key for package verification" },
+    { left: "apt_repository", right: "Add Docker's official apt source" },
+    { left: "docker group", right: "Allows running Docker without sudo" },
+    {
+      left: "ansible_distribution_release",
+      right: "Ubuntu codename (jammy, focal)",
+    },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "ansible-playbook install-docker.yml --check",
+      output:
+        "PLAY [Install Docker] ****\n\nTASK [Gathering Facts] ****\nok: [ubuntu-server]\n\nTASK [Install prerequisites] ****\nchanged: [ubuntu-server]\n\nPLAY RECAP ****\nubuntu-server: ok=2 changed=1",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="This fact returns values like 'jammy' or 'focal'"
+  sentence="The [BLANK:ansible_distribution_release] Ansible fact provides the Ubuntu codename for configuring the Docker repository."
+/>
+
+<Quiz
+  question="Why do we add users to the docker group?"
+  options={[
+    "For security",
+    "To allow Docker commands without sudo",
+    "Docker requires it",
+    "For logging purposes",
+  ]}
+  correct={1}
+  explanation="Adding users to the docker group allows them to run Docker commands without needing sudo."
+/>
+
+<Quiz
+  question="What Ansible fact provides the Ubuntu codename (e.g., 'jammy')?"
+  options={[
+    "ansible_distribution",
+    "ansible_os_family",
+    "ansible_distribution_release",
+    "ansible_version",
+  ]}
+  correct={2}
+  explanation="ansible_distribution_release provides the codename like 'jammy', 'focal', etc."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="ansible-docker-playbook"
+  title="Docker Playbook Checklist"
+  items={[
+    "Understand the playbook structure",
+    "Run the playbook on a test server",
+    "Verify Docker installation",
+    "Add custom users to docker group",
+    "Convert to a reusable role (optional)",
+  ]}
+/>
+
+---
+
+## Save Your Progress
+
+```bash
+git add .
+git commit -m "Docker installation playbook"
+git push
+```
+
+---
+
+## Source
+
+Based on [Docker Installation Documentation](https://docs.docker.com/engine/install/ubuntu/) and DevHub examples.

@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Terraform" class="terraform" />
 
@@ -309,6 +312,53 @@ variable "num_vms" {
 ---
 
 ## Knowledge Check
+
+<Flashcard
+  title="Terraform Variables"
+  cards={[
+    {
+      front: "What variable types does Terraform support?",
+      back: "string, number, bool, list, map, and object types.",
+    },
+    {
+      front: "How do you reference a variable in Terraform?",
+      back: "Use var.variable_name, or ${var.variable_name} inside strings for interpolation.",
+    },
+    {
+      front: "What is count.index?",
+      back: "A special variable that returns the current iteration number (starting at 0) when using count to create multiple resources.",
+    },
+    {
+      front: "What is the purpose of .tfvars files?",
+      back: "To store variable values separately from definitions, useful for different environments (dev, prod).",
+    },
+  ]}
+/>
+
+<MatchPairs
+  instruction="Match the variable type with its example"
+  pairs={[
+    { left: "string", right: '"hello"' },
+    { left: "number", right: "42" },
+    { left: "bool", right: "true" },
+    { left: "list", right: '["a", "b", "c"]' },
+    { left: "map", right: '{key = "value"}' },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "terraform apply -var-file=prod.tfvars",
+      output: "Apply complete! Resources: 3 added, 0 changed, 0 destroyed.",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="This prevents the value from showing in logs"
+  sentence="To mark a variable as sensitive: variable \"password\" { type = string [BLANK:sensitive] = true }"
+/>
 
 <Quiz
   question="What happens if a variable has no default value?"

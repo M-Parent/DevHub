@@ -665,6 +665,20 @@ input[type="search"]:focus {
   color: #bef264 !important;
 }
 
+/* Misc - Gray (standalone/orphan articles) */
+.sl-badge.misc {
+  background: rgba(107, 114, 128, 0.15) !important;
+  border-color: rgba(107, 114, 128, 0.4) !important;
+  color: #9ca3af !important;
+}
+
+/* DevOps - Slate (CI/CD, automation) */
+.sl-badge.devops {
+  background: rgba(71, 85, 105, 0.15) !important;
+  border-color: rgba(71, 85, 105, 0.4) !important;
+  color: #94a3b8 !important;
+}
+
 /* ─────────────────────────────────────────────────────────
    Programming Language Badges
 ───────────────────────────────────────────────────────── */

@@ -1,0 +1,399 @@
+---
+title: "Ansible Inventory Management"
+description: "Learn how to organize your hosts and groups in Ansible inventory files using YAML format."
+sidebar:
+  label: "Inventory Management"
+  order: 2
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Ansible" class="ansible" />
+<Badge text="Linux" class="linux" />
+
+The inventory file is the heart of Ansible - it defines which hosts you want to manage and how to connect to them. Understanding inventory organization is crucial for scaling your automation.
+
+<Aside type="tip" title="Inventory Formats">
+  Ansible supports both INI and YAML formats for inventory. This guide uses YAML
+  as it's more readable and supports complex structures better.
+</Aside>
+
+---
+
+## Inventory Basics
+
+The default location for the inventory file is `/etc/ansible/hosts`. However, it's best practice to include the inventory within your project folder and reference it in `ansible.cfg`.
+
+### Recommended Project Structure
+
+```
+ansible-project/
+├── ansible.cfg
+├── files/
+├── inventory/
+│   └── hosts.yml
+├── roles/
+└── templates/
+```
+
+<Steps>
+
+1. **Create the inventory directory**
+
+   ```bash
+   mkdir -p inventory
+   ```
+
+2. **Create the hosts file**
+
+   ```bash
+   vi inventory/hosts.yml
+   ```
+
+3. **Configure ansible.cfg**
+
+   ```ini
+   [defaults]
+   inventory = inventory
+   host_key_checking = False
+   ```
+
+</Steps>
+
+---
+
+## Basic Inventory Structure
+
+### Simple YAML Inventory
+
+```yaml
+# inventory/hosts.yml
+webservers:
+  hosts:
+    web1:
+      ansible_host: 192.168.1.10
+    web2:
+      ansible_host: 192.168.1.11
+  vars:
+    ansible_user: ubuntu
+    http_port: 80
+
+dbservers:
+  hosts:
+    db1:
+      ansible_host: 192.168.1.20
+    db2:
+      ansible_host: 192.168.1.21
+  vars:
+    ansible_user: ubuntu
+    db_port: 5432
+```
+
+### INI Format (Alternative)
+
+For comparison, here's the same inventory in INI format:
+
+```ini
+mail.devhub.local
+
+[webservers]
+web1 ansible_host=192.168.1.10
+web2 ansible_host=192.168.1.11
+
+[dbservers]
+db1 ansible_host=192.168.1.20
+db2 ansible_host=192.168.1.21
+```
+
+---
+
+## Testing Your Inventory
+
+Verify your inventory works by pinging all hosts:
+
+```bash
+# Ping all hosts
+ansible all -m ping
+
+# Ping a specific group
+ansible webservers -m ping
+
+# List all hosts in inventory
+ansible-inventory --list
+
+# Graph view of inventory
+ansible-inventory --graph
+```
+
+---
+
+## Default Groups
+
+Ansible automatically creates two default groups:
+
+| Group       | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `all`       | Contains every host in the inventory                 |
+| `ungrouped` | Contains hosts not in any other group (except `all`) |
+
+Every host belongs to at least two groups: `all` and either `ungrouped` or another group you define.
+
+---
+
+## Hosts in Multiple Groups
+
+Hosts can belong to multiple groups. This is useful for targeting hosts by different criteria:
+
+```yaml
+# inventory/hosts.yml
+ungrouped:
+  hosts:
+    mail.devhub.local:
+
+webservers:
+  hosts:
+    web1.devhub.local:
+    web2.devhub.local:
+
+dbservers:
+  hosts:
+    db1.devhub.local:
+    db2.devhub.local:
+    db3.devhub.local:
+
+# Geographic groups
+east:
+  hosts:
+    web1.devhub.local:
+    db1.devhub.local:
+    db2.devhub.local:
+
+west:
+  hosts:
+    web2.devhub.local:
+    db3.devhub.local:
+
+# Environment groups
+production:
+  hosts:
+    web1.devhub.local:
+    db1.devhub.local:
+    db2.devhub.local:
+
+staging:
+  hosts:
+    web2.devhub.local:
+    db3.devhub.local:
+```
+
+In this example, `db1.devhub.local` belongs to `dbservers`, `east`, and `production` groups.
+
+<Flashcard
+  title="Inventory Groups"
+  cards={[
+    {
+      front: "What are the two default groups Ansible creates?",
+      back: "all (contains every host) and ungrouped (hosts without any other group)",
+    },
+  ]}
+/>
+
+---
+
+## Parent/Child Groups
+
+Create hierarchies using the `children:` keyword:
+
+```yaml
+# inventory/hosts.yml
+webservers:
+  hosts:
+    web1.devhub.local:
+    web2.devhub.local:
+
+dbservers:
+  hosts:
+    db1.devhub.local:
+    db2.devhub.local:
+
+east:
+  hosts:
+    web1.devhub.local:
+    db1.devhub.local:
+
+west:
+  hosts:
+    web2.devhub.local:
+    db2.devhub.local:
+
+# Parent groups using children
+production:
+  children:
+    east:
+
+staging:
+  children:
+    west:
+```
+
+Now `production` includes all hosts from `east`, and `staging` includes all from `west`.
+
+---
+
+## Variables in Inventory
+
+### Host Variables
+
+Assign variables to specific hosts:
+
+```yaml
+atlanta:
+  hosts:
+    host1:
+      ansible_host: 192.168.1.10
+      http_port: 80
+      max_requests: 808
+    host2:
+      ansible_host: 192.168.1.11
+      http_port: 443
+      max_requests: 909
+```
+
+### Group Variables
+
+Apply variables to all hosts in a group:
+
+```yaml
+atlanta:
+  hosts:
+    host1:
+    host2:
+  vars:
+    ntp_server: ntp.devhub.local
+    proxy: proxy.devhub.local
+    ansible_user: ubuntu
+```
+
+### Variable Precedence
+
+Child group variables override parent group variables:
+
+```yaml
+usa:
+  children:
+    southeast:
+      children:
+        atlanta:
+          hosts:
+            host1:
+            host2:
+      vars:
+        halon_system_timeout: 30
+        self_destruct_countdown: 60
+    northeast:
+    northwest:
+    southwest:
+```
+
+---
+
+## Using Multiple Inventories
+
+You can specify multiple inventory directories when running playbooks:
+
+```bash
+ansible-playbook deploy.yml -i staging -i production
+```
+
+This is useful for separating environments while using the same playbooks.
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the inventory concept with its description"
+  pairs={[
+    { left: "all", right: "Default group containing every host" },
+    { left: "ungrouped", right: "Hosts not in any other group" },
+    { left: "children:", right: "Keyword for creating nested groups" },
+    { left: "vars:", right: "Keyword for defining group variables" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "ansible-inventory --graph",
+      output:
+        "@all:\n  |--@ungrouped:\n  |--@webservers:\n  |  |--web1\n  |  |--web2\n  |--@databases:\n  |  |--db1",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="This keyword nests groups inside other groups"
+  sentence="Use the [BLANK:children] keyword to create parent/child group relationships in YAML inventory."
+/>
+
+<Quiz
+  question="Which group contains every host in the inventory?"
+  options={["default", "all", "ungrouped", "hosts"]}
+  correct={1}
+  explanation="The 'all' group automatically contains every host defined in your inventory."
+/>
+
+<Quiz
+  question="How do you create parent/child group relationships?"
+  options={[
+    "Using 'groups:' keyword",
+    "Using 'children:' keyword",
+    "Using 'parent:' keyword",
+    "Using 'nested:' keyword",
+  ]}
+  correct={1}
+  explanation="Use the 'children:' keyword to create nested group relationships in YAML inventory."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="ansible-inventory"
+  title="Inventory Management Checklist"
+  items={[
+    "Create inventory directory structure",
+    "Write hosts.yml in YAML format",
+    "Configure ansible.cfg to use inventory",
+    "Test inventory with ansible ping",
+    "Create groups and child groups",
+    "Add host and group variables",
+  ]}
+/>
+
+---
+
+## Save Your Progress
+
+```bash
+git add .
+git commit -m "Ansible inventory management"
+git push
+```
+
+---
+
+## Source
+
+Based on [Ansible Inventory Documentation](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html) and DevHub examples.

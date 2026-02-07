@@ -1,0 +1,364 @@
+---
+title: "Docker Volumes & Persistent Storage"
+description: "Learn how to persist data in Docker using volumes and bind mounts to survive container restarts."
+sidebar:
+  label: "Volumes & Storage"
+  order: 5
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import DragDrop from "../../../../components/DragDrop.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+
+Containers are ephemeral - when they're removed, all data inside is lost. Docker volumes provide persistent storage that survives container lifecycle.
+
+<Aside type="caution" title="Data Loss Warning">
+  Without volumes, all data in a container is lost when the container is
+  removed. Always use volumes for databases and important data!
+</Aside>
+
+---
+
+## Storage Types
+
+Docker offers two main ways to persist data:
+
+| Type            | Description                                | Use Case                       |
+| --------------- | ------------------------------------------ | ------------------------------ |
+| **Volumes**     | Managed by Docker, stored in Docker's area | Databases, persistent app data |
+| **Bind Mounts** | Maps host directory to container           | Development, config files      |
+
+---
+
+## Docker Volumes
+
+### Create a Volume
+
+```bash
+docker volume create my_data
+```
+
+### List Volumes
+
+```bash
+docker volume ls
+```
+
+### Inspect a Volume
+
+```bash
+docker volume inspect my_data
+```
+
+Output shows the mount point (usually `/var/lib/docker/volumes/`).
+
+### Remove a Volume
+
+```bash
+docker volume rm my_data
+
+# Remove all unused volumes
+docker volume prune
+```
+
+---
+
+## Using Volumes
+
+### Attach Volume to Container
+
+```bash
+docker run -d \
+  --name web \
+  -v my_data:/usr/share/nginx/html \
+  nginx
+```
+
+Format: `-v VOLUME_NAME:CONTAINER_PATH`
+
+The data in `/usr/share/nginx/html` persists even if the container is removed.
+
+### Anonymous Volumes
+
+Create a volume without a name:
+
+```bash
+docker run -d -v /data myimage
+```
+
+Docker creates a volume with a random name.
+
+<Flashcard
+  title="Volume Syntax"
+  cards={[
+    {
+      front: "What is the format for mounting a Docker volume?",
+      back: "-v VOLUME_NAME:CONTAINER_PATH. For example: -v mydata:/var/lib/mysql mounts the 'mydata' volume to /var/lib/mysql in the container.",
+    },
+  ]}
+/>
+
+---
+
+## Bind Mounts
+
+Bind mounts map a host directory directly into the container.
+
+### Basic Bind Mount
+
+```bash
+docker run -d \
+  --name web \
+  -v /home/user/website:/usr/share/nginx/html \
+  nginx
+```
+
+### Using Current Directory
+
+```bash
+docker run -d \
+  --name web \
+  -v $PWD/website:/usr/share/nginx/html \
+  nginx
+```
+
+<Aside type="tip" title="Development Workflow">
+  Bind mounts are perfect for development - edit files on your host and see
+  changes immediately in the container.
+</Aside>
+
+### Read-Only Bind Mount
+
+Prevent the container from modifying host files:
+
+```bash
+docker run -d \
+  -v $PWD/config:/etc/app/config:ro \
+  myapp
+```
+
+The `:ro` suffix makes the mount read-only.
+
+---
+
+## Volumes vs Bind Mounts
+
+| Feature           | Volumes               | Bind Mounts      |
+| ----------------- | --------------------- | ---------------- |
+| Managed by Docker | ✅ Yes                | ❌ No            |
+| Location          | Docker's storage area | Anywhere on host |
+| Backup/Migrate    | Easy                  | Manual           |
+| Pre-populate      | ✅ Yes                | ❌ No            |
+| Performance       | Optimized             | Host filesystem  |
+| Best for          | Production data       | Development      |
+
+---
+
+## Practical Examples
+
+### Database with Persistent Storage
+
+```bash
+# Create volume for database
+docker volume create postgres_data
+
+# Run PostgreSQL with persistent data
+docker run -d \
+  --name postgres \
+  -e POSTGRES_PASSWORD=secret \
+  -v postgres_data:/var/lib/postgresql/data \
+  postgres
+```
+
+### Web Server with Local Files
+
+```bash
+# Serve files from current directory
+docker run -d \
+  --name webserver \
+  -p 8080:80 \
+  -v $PWD:/usr/share/nginx/html:ro \
+  nginx
+```
+
+### Sharing Data Between Containers
+
+```bash
+# Create shared volume
+docker volume create shared_data
+
+# Container 1 writes data
+docker run -d \
+  --name writer \
+  -v shared_data:/data \
+  alpine sh -c "while true; do date >> /data/log.txt; sleep 5; done"
+
+# Container 2 reads data
+docker run -it \
+  --name reader \
+  -v shared_data:/data \
+  alpine cat /data/log.txt
+```
+
+---
+
+## Volume in Docker Compose
+
+```yaml
+version: "3.9"
+services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+
+  web:
+    image: nginx
+    volumes:
+      # Named volume
+      - static_files:/var/www/static
+      # Bind mount
+      - ./html:/usr/share/nginx/html:ro
+
+volumes:
+  db_data:
+  static_files:
+```
+
+---
+
+## Backup and Restore
+
+### Backup a Volume
+
+```bash
+docker run --rm \
+  -v my_data:/source:ro \
+  -v $PWD:/backup \
+  alpine tar czf /backup/my_data_backup.tar.gz -C /source .
+```
+
+### Restore a Volume
+
+```bash
+docker run --rm \
+  -v my_data:/target \
+  -v $PWD:/backup:ro \
+  alpine tar xzf /backup/my_data_backup.tar.gz -C /target
+```
+
+---
+
+## tmpfs Mounts
+
+For sensitive data that shouldn't persist or touch the host filesystem:
+
+```bash
+docker run -d \
+  --name secure_app \
+  --tmpfs /tmp \
+  --tmpfs /run:size=100m \
+  myapp
+```
+
+tmpfs mounts:
+
+- Stored in host memory only
+- Removed when container stops
+- Good for secrets, temp files
+
+---
+
+## Troubleshooting
+
+| Issue               | Solution                                 |
+| ------------------- | ---------------------------------------- |
+| Permission denied   | Check ownership, use same UID/GID        |
+| Volume not mounting | Verify path exists, check syntax         |
+| Data not persisting | Ensure using named volume, not anonymous |
+| Can't delete volume | Stop/remove containers using it first    |
+
+### Check Volume Usage
+
+```bash
+# See which containers use a volume
+docker ps -a --filter volume=my_data
+
+# Disk usage
+docker system df -v
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  title="Docker Storage Types"
+  pairs={[
+    { left: "Volumes", right: "Managed by Docker, stored in Docker area" },
+    { left: "Bind mounts", right: "Maps host directory to container" },
+    { left: "tmpfs", right: "Stored in host memory only" },
+    { left: ":ro flag", right: "Mount as read-only" },
+  ]}
+/>
+
+<DragDrop
+  instruction="Complete the command to run postgres with a volume:"
+  sentence="docker run -d [BLANK] [BLANK]:/var/lib/postgresql/data postgres"
+  words={["-v", "pgdata", "-p", "myvolume"]}
+  correctOrder={[0, 1]}
+/>
+
+<Quiz
+  question="What happens to data in a container without volumes when the container is removed?"
+  options={[
+    "Data is saved to host",
+    "Data is lost",
+    "Data is compressed",
+    "Data moves to another container",
+  ]}
+  correct={1}
+  explanation="Without volumes, all data inside a container is lost when the container is removed."
+/>
+
+<Quiz
+  question="Which storage type is best for production database data?"
+  options={["Bind mounts", "Docker volumes", "tmpfs", "Container filesystem"]}
+  correct={1}
+  explanation="Docker volumes are managed by Docker, optimized for performance, and easy to backup - ideal for production data."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="docker-volumes"
+  title="Volumes & Storage Checklist"
+  items={[
+    "Create and manage Docker volumes",
+    "Mount volumes to containers",
+    "Use bind mounts for development",
+    "Share volumes between containers",
+    "Backup and restore volumes",
+    "Use read-only mounts",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Docker Volumes Documentation](https://docs.docker.com/storage/volumes/) and DevHub examples.

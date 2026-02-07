@@ -30,7 +30,7 @@ Master Ansible from the ground up. This learning path takes you from basic autom
 
 |               |                                      |
 | ------------- | ------------------------------------ |
-| 📚 **Guides** | 0 available (coming soon)            |
+| 📚 **Guides** | 6 available                          |
 | 🎯 **Goal**   | Automate infrastructure with Ansible |
 
 ---
@@ -49,39 +49,75 @@ Before starting, make sure you complete:
 
 ## Learning Path
 
-### 1. Ansible Fundamentals <Badge text="Coming Soon" variant="note" /> <Badge text="Theory" variant="note" />
+### 1. Installing Ansible <Badge text="Novice" variant="tip" />
 
-Understand how Ansible works, inventory, and ad-hoc commands.
+Install Ansible with pipx and set up your first project.
 
----
-
-### 2. Your First Playbook <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
-
-Write and run your first Ansible playbook.
-
----
-
-### 3. Variables & Facts <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
-
-Use variables, facts, and templates in playbooks.
+<LinkCard
+  title="Installing Ansible"
+  description="Get started with Ansible installation and project setup"
+  href="/guides/ansible/ansible-install/"
+/>
 
 ---
 
-### 4. Roles & Structure <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+### 2. Inventory Management <Badge text="Novice" variant="tip" />
 
-Organize playbooks with roles and best practices.
+Define your hosts, groups, and connection settings.
+
+<LinkCard
+  title="Inventory Management"
+  description="Organize hosts with YAML inventory files"
+  href="/guides/ansible/ansible-inventory/"
+/>
 
 ---
 
-### 5. Ansible Galaxy <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+### 3. Your First Playbook <Badge text="Novice" variant="tip" />
 
-Use community roles and collections.
+Write and run playbooks with variables and loops.
+
+<LinkCard
+  title="Basic Playbooks"
+  description="Create your first Ansible playbook"
+  href="/guides/ansible/ansible-playbooks/"
+/>
 
 ---
 
-### 6. Ansible Vault <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+### 4. Ansible Vault <Badge text="Mid" variant="caution" />
 
-Encrypt sensitive data in your playbooks.
+Encrypt sensitive data like passwords and API keys.
+
+<LinkCard
+  title="Ansible Vault"
+  description="Secure your secrets with encryption"
+  href="/guides/ansible/ansible-vault/"
+/>
+
+---
+
+### 5. Roles & Galaxy <Badge text="Mid" variant="caution" />
+
+Organize playbooks with roles and use community content.
+
+<LinkCard
+  title="Roles & Galaxy"
+  description="Modular automation with roles and Galaxy"
+  href="/guides/ansible/ansible-roles-galaxy/"
+/>
+
+---
+
+### 6. Playbook: Install Docker <Badge text="Mid" variant="caution" />
+
+A complete playbook example for installing Docker.
+
+<LinkCard
+  title="Playbook: Docker"
+  description="Production-ready Docker installation playbook"
+  href="/guides/ansible/ansible-docker-playbook/"
+/>
 
 ---
 
@@ -101,9 +137,13 @@ Integrate Ansible into your deployment pipeline.
 
 Hands-on projects to practice your Ansible skills.
 
-<Aside type="note" title="Coming Soon">
-  Ansible projects will be added here as they become available.
-</Aside>
+<CardGrid>
+  <LinkCard
+    title="Project: Deploy Harbor"
+    description="Install Harbor container registry with Ansible"
+    href="/projects/ansible/project-harbor/"
+  />
+</CardGrid>
 
 ---
 
@@ -112,7 +152,16 @@ Hands-on projects to practice your Ansible skills.
 <ProgressCheck
   id="ansible-learning-path"
   title="Ansible Checklist"
-  items={[]}
+  items={[
+    "Install Ansible with pipx",
+    "Create inventory with hosts and groups",
+    "Write your first playbook",
+    "Use register and debug for output",
+    "Encrypt secrets with Ansible Vault",
+    "Create and use roles",
+    "Install roles from Galaxy",
+    "Complete the Harbor project",
+  ]}
 />
 
 ---

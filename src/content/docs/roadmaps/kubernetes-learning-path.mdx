@@ -30,7 +30,7 @@ Master Kubernetes from the ground up. This learning path takes you from Docker t
 
 |               |                                       |
 | ------------- | ------------------------------------- |
-| 📚 **Guides** | 0 available (coming soon)             |
+| 📚 **Guides** | 5 available                           |
 | 🎯 **Goal**   | Deploy and manage Kubernetes clusters |
 
 ---
@@ -47,51 +47,93 @@ Before starting, make sure you complete:
 
 ---
 
-## Learning Path
+## Phase 1: Getting Started
 
-### 1. Kubernetes Fundamentals <Badge text="Coming Soon" variant="note" /> <Badge text="Theory" variant="note" />
+### 1. Kubernetes Fundamentals <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
 
-Understand pods, deployments, services, and the K8s architecture.
+Understand what Kubernetes is, when to use it, and core architecture concepts.
 
----
-
-### 2. kubectl Basics <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
-
-Master the Kubernetes command-line tool.
-
----
-
-### 3. Local K8s with Minikube <Badge text="Coming Soon" variant="note" /> <Badge text="Novice" variant="tip" />
-
-Set up a local Kubernetes cluster for learning.
+<LinkCard
+  title="Kubernetes Fundamentals"
+  description="What is K8s, why use it, K8s vs Swarm, core components"
+  href="/guides/kubernetes/kubernetes-fundamentals/"
+/>
 
 ---
 
-### 4. Deployments & Services <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+### 2. Local K8s Installation <Badge text="Available" variant="tip" /> <Badge text="Novice" variant="tip" />
 
-Deploy applications and expose them with services.
+Set up a local Kubernetes cluster with Docker Desktop, Minikube, or MicroK8s.
+
+<LinkCard
+  title="Installing Kubernetes Locally"
+  description="Docker Desktop, Minikube, MicroK8s setup"
+  href="/guides/kubernetes/kubernetes-install-local/"
+/>
 
 ---
 
-### 5. ConfigMaps & Secrets <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+## Phase 2: Core Concepts
+
+### 3. Pods & Controllers <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Understand Kubernetes abstractions - Pods, Deployments, ReplicaSets, and other controllers.
+
+<LinkCard
+  title="Pods & Controllers"
+  description="Pods, Deployments, DaemonSets, scaling"
+  href="/guides/kubernetes/kubernetes-pods-controllers/"
+/>
+
+---
+
+### 4. Services & Networking <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Expose applications with Services - ClusterIP, NodePort, LoadBalancer, and service discovery.
+
+<LinkCard
+  title="Services & Networking"
+  description="Service types, DNS, load balancing"
+  href="/guides/kubernetes/kubernetes-services/"
+/>
+
+---
+
+### 5. YAML & Configuration <Badge text="Available" variant="tip" /> <Badge text="Mid" variant="caution" />
+
+Master Kubernetes configuration with YAML manifests and understand imperative vs declarative approaches.
+
+<LinkCard
+  title="YAML & Configuration"
+  description="Imperative vs declarative, YAML structure, generators"
+  href="/guides/kubernetes/kubernetes-yaml-config/"
+/>
+
+---
+
+## Phase 3: Data & Config (Coming Soon)
+
+### 6. ConfigMaps & Secrets <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
 
 Manage configuration and sensitive data.
 
 ---
 
-### 6. Persistent Storage <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
+### 7. Persistent Storage <Badge text="Coming Soon" variant="note" /> <Badge text="Mid" variant="caution" />
 
 Use PersistentVolumes and PersistentVolumeClaims.
 
 ---
 
-### 7. Helm Charts <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
+## Phase 4: Advanced Topics (Coming Soon)
+
+### 8. Helm Charts <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
 
 Package and deploy applications with Helm.
 
 ---
 
-### 8. Production Clusters <Badge text="Coming Soon" variant="note" /> <Badge text="Expert" variant="success" />
+### 9. Production Clusters <Badge text="Coming Soon" variant="note" /> <Badge text="Advanced" variant="danger" />
 
 Set up production-ready K8s with monitoring and logging.
 
@@ -112,7 +154,13 @@ Hands-on projects to practice your Kubernetes skills.
 <ProgressCheck
   id="kubernetes-learning-path"
   title="Kubernetes Checklist"
-  items={[]}
+  items={[
+    "Kubernetes Fundamentals",
+    "Local K8s Installation",
+    "Pods & Controllers",
+    "Services & Networking",
+    "YAML & Configuration",
+  ]}
 />
 
 ---
@@ -124,7 +172,8 @@ After completing this path, you'll be able to:
 - Understand Kubernetes architecture
 - Deploy applications to K8s
 - Manage cluster resources
-- Use Helm for deployments
+- Configure services and networking
+- Use declarative YAML manifests
 
 ### Related
 

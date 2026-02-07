@@ -1,0 +1,420 @@
+---
+title: "Kubernetes Pods & Controllers"
+description: "Understanding Kubernetes container abstractions - Pods, Deployments, ReplicaSets, and other controllers."
+sidebar:
+  label: "Pods & Controllers"
+  order: 3
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Kubernetes" class="kubernetes" />
+
+Kubernetes abstracts containers into higher-level objects. Understanding Pods and Controllers is essential for deploying applications.
+
+---
+
+## Container Abstractions
+
+| Object         | Description                                             |
+| -------------- | ------------------------------------------------------- |
+| **Pod**        | One or more containers running together on one node     |
+| **Controller** | Creates and updates pods (Deployment, ReplicaSet, etc.) |
+| **Service**    | Network endpoint to connect to pods                     |
+| **Namespace**  | Logical grouping of objects                             |
+
+---
+
+## Pods
+
+Pods are the **basic unit of deployment** in Kubernetes.
+
+### Key Concepts
+
+- Containers are **always** in pods
+- Pods share network namespace (same IP)
+- Pods share storage volumes
+- Usually one container per pod
+- Pods are ephemeral (they die and are replaced)
+
+```yaml
+# Simple pod definition
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.25
+      ports:
+        - containerPort: 80
+```
+
+### Create a Pod
+
+```bash
+# Imperative way
+kubectl run nginx --image=nginx
+
+# Declarative way
+kubectl apply -f pod.yaml
+```
+
+### Pod Lifecycle
+
+```
+Pending → Running → Succeeded/Failed
+            ↓
+      (or Crash Loop)
+```
+
+<Flashcard
+  title="Pod Basics"
+  cards={[
+    {
+      front: "Why shouldn't you deploy pods directly?",
+      back: "Pods are ephemeral - if a pod dies, it's not recreated. Use controllers (Deployments) instead, which watch and maintain the desired number of pods.",
+    },
+  ]}
+/>
+
+---
+
+## Deployments
+
+Deployments are the most common controller for running stateless applications.
+
+### What Deployments Do
+
+- Create and manage ReplicaSets
+- Provide rolling updates
+- Enable rollbacks
+- Maintain desired replica count
+
+### Deployment Architecture
+
+```
+┌─────────────────────────────────────┐
+│           Deployment                │
+│     (desired: 3 replicas)           │
+└───────────────┬─────────────────────┘
+                │
+┌───────────────┴─────────────────────┐
+│           ReplicaSet                │
+│     (maintains 3 pods)              │
+└───┬───────────┬───────────┬─────────┘
+    │           │           │
+┌───┴───┐   ┌───┴───┐   ┌───┴───┐
+│ Pod 1 │   │ Pod 2 │   │ Pod 3 │
+└───────┘   └───────┘   └───────┘
+```
+
+### Create a Deployment
+
+```bash
+# Imperative
+kubectl create deployment nginx --image=nginx --replicas=3
+
+# See what was created
+kubectl get deployments
+kubectl get replicasets
+kubectl get pods
+```
+
+### Deployment YAML
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25
+          ports:
+            - containerPort: 80
+```
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+---
+
+## Scaling
+
+### Scale a Deployment
+
+```bash
+# Scale to 5 replicas
+kubectl scale deployment nginx --replicas=5
+
+# Check the scaling
+kubectl get pods -w
+```
+
+### What Happens When You Scale
+
+1. `kubectl scale` changes the Deployment record
+2. Controller Manager sees replica count changed
+3. It updates the ReplicaSet
+4. Scheduler assigns new pods to nodes
+5. Kubelet starts new containers
+
+<Aside type="tip" title="Auto-scaling">
+  Use Horizontal Pod Autoscaler (HPA) for automatic scaling based on CPU/memory
+  usage.
+</Aside>
+
+---
+
+## Other Controllers
+
+| Controller      | Use Case                                               |
+| --------------- | ------------------------------------------------------ |
+| **ReplicaSet**  | Maintains pod replicas (usually managed by Deployment) |
+| **DaemonSet**   | One pod per node (monitoring, logging)                 |
+| **StatefulSet** | Stateful apps (databases) with stable identity         |
+| **Job**         | Run-to-completion tasks                                |
+| **CronJob**     | Scheduled jobs                                         |
+
+### DaemonSet Example
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+spec:
+  selector:
+    matchLabels:
+      app: node-exporter
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+    spec:
+      containers:
+        - name: node-exporter
+          image: prom/node-exporter
+```
+
+### Job Example
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: backup-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: backup
+          image: backup-tool
+          command: ["backup.sh"]
+      restartPolicy: Never
+```
+
+<Flashcard
+  title="Controller Types"
+  cards={[
+    {
+      front: "When would you use a DaemonSet instead of a Deployment?",
+      back: "Use DaemonSet when you need exactly one pod per node - like monitoring agents, log collectors, or network plugins. Deployment is for stateless apps where you control replica count.",
+    },
+  ]}
+/>
+
+---
+
+## Managing Pods
+
+### List Pods
+
+```bash
+kubectl get pods
+kubectl get pods -o wide        # More details
+kubectl get pods -w             # Watch for changes
+kubectl get pods -n kube-system # Specific namespace
+```
+
+### Describe Pod
+
+```bash
+kubectl describe pod nginx-pod
+```
+
+### Pod Logs
+
+```bash
+kubectl logs nginx-pod
+kubectl logs nginx-pod -f           # Follow
+kubectl logs nginx-pod -c container # Specific container
+```
+
+### Execute in Pod
+
+```bash
+kubectl exec -it nginx-pod -- /bin/bash
+kubectl exec nginx-pod -- cat /etc/nginx/nginx.conf
+```
+
+### Delete Pod
+
+```bash
+kubectl delete pod nginx-pod
+```
+
+---
+
+## Labels and Selectors
+
+Labels are key-value pairs attached to objects.
+
+### Add Labels
+
+```bash
+kubectl label pod nginx-pod env=prod
+
+# In YAML
+metadata:
+  labels:
+    app: nginx
+    env: production
+    tier: frontend
+```
+
+### Select by Label
+
+```bash
+kubectl get pods -l app=nginx
+kubectl get pods -l env=prod
+kubectl get pods -l 'app in (nginx,apache)'
+```
+
+### Selector in Deployment
+
+```yaml
+spec:
+  selector:
+    matchLabels:
+      app: nginx # Must match template labels
+  template:
+    metadata:
+      labels:
+        app: nginx # Must match selector
+```
+
+---
+
+## Namespaces
+
+Namespaces provide logical separation within a cluster.
+
+```bash
+# List namespaces
+kubectl get namespaces
+
+# Default namespaces
+# - default
+# - kube-system
+# - kube-public
+# - kube-node-lease
+
+# Create namespace
+kubectl create namespace development
+
+# Deploy to namespace
+kubectl apply -f deployment.yaml -n development
+
+# Set default namespace
+kubectl config set-context --current --namespace=development
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the controller type with its use case"
+  pairs={[
+    { left: "Deployment", right: "Manages stateless application replicas" },
+    { left: "DaemonSet", right: "One pod per node for agents" },
+    { left: "StatefulSet", right: "Stateful apps with stable identity" },
+    { left: "Job", right: "Run-to-completion tasks" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "kubectl get pods",
+      output:
+        "NAME                     READY   STATUS    RESTARTS   AGE\nnginx-7854ff8877-abc12   1/1     Running   0          5m\nnginx-7854ff8877-def34   1/1     Running   0          5m",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="The kubectl command to change replica count"
+  sentence="To scale a deployment to 5 replicas: kubectl [BLANK:scale] deployment nginx --replicas=5"
+/>
+
+<Quiz
+  question="Which controller ensures one pod runs on every node?"
+  options={["Deployment", "ReplicaSet", "DaemonSet", "StatefulSet"]}
+  correct={2}
+  explanation="DaemonSet ensures exactly one pod runs on every (or selected) node. Common for monitoring agents and log collectors."
+/>
+
+<Quiz
+  question="What does a Deployment create to manage pods?"
+  options={["Service", "ReplicaSet", "ConfigMap", "DaemonSet"]}
+  correct={1}
+  explanation="Deployments create and manage ReplicaSets, which in turn create and maintain the desired number of pods."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="k8s-pods-controllers"
+  title="Pods & Controllers Checklist"
+  items={[
+    "Understand pod concept and lifecycle",
+    "Create deployments imperatively and declaratively",
+    "Scale deployments",
+    "Know different controller types",
+    "Use labels and selectors",
+    "Work with namespaces",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Kubernetes Documentation](https://kubernetes.io/docs/concepts/workloads/) and DevHub examples.

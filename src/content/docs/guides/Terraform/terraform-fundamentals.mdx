@@ -13,6 +13,10 @@ tableOfContents: true
 import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../components/Quiz.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Terraform" class="terraform" />
 <Badge text="Linux" class="linux" />
@@ -334,6 +338,54 @@ terraform apply
 ---
 
 ## Knowledge Check
+
+<Flashcard
+  title="Terraform Fundamentals"
+  cards={[
+    {
+      front: "What is Terraform?",
+      back: "An open-source Infrastructure as Code (IaC) tool by HashiCorp that lets you define and provision infrastructure using HCL.",
+    },
+    {
+      front: "What is HCL?",
+      back: "HashiCorp Configuration Language - a declarative language used to define infrastructure in Terraform configurations.",
+    },
+    {
+      front: "What is a provider in Terraform?",
+      back: "A plugin that lets Terraform interact with cloud platforms, SaaS providers, and other APIs (e.g., AWS, Azure, GCP).",
+    },
+    {
+      front: "What files should never be committed to Git?",
+      back: ".tfstate files and .tfvars files containing sensitive data like passwords and API keys.",
+    },
+  ]}
+/>
+
+<MatchPairs
+  instruction="Match the Terraform command with its purpose"
+  pairs={[
+    { left: "terraform init", right: "Initialize and download providers" },
+    { left: "terraform plan", right: "Preview changes before applying" },
+    { left: "terraform apply", right: "Create or update infrastructure" },
+    { left: "terraform destroy", right: "Remove all managed resources" },
+    { left: "terraform fmt", right: "Format configuration files" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "terraform init",
+      output:
+        "Initializing the backend...\nInitializing provider plugins...\n\nTerraform has been successfully initialized!",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="This command shows what Terraform will do"
+  sentence="To preview infrastructure changes without applying them: terraform [BLANK:plan]"
+/>
 
 <Quiz
   question="What command downloads the required providers?"

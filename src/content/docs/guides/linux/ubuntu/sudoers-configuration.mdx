@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../../components/Quiz.astro";
 import Flashcard from "../../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../../components/MatchPairs.astro";
+import Terminal from "../../../../../components/Terminal.astro";
+import FillBlank from "../../../../../components/FillBlank.astro";
 
 <Badge text="Linux" class="linux" />
 
@@ -255,6 +258,27 @@ sudo -l -U devuser
       back: "/etc/sudoers.d/ directory",
     },
   ]}
+/>
+
+<MatchPairs
+  instruction="Match the sudoers syntax with its meaning"
+  pairs={[
+    { left: "ALL=(ALL:ALL)", right: "Any host, any user, any group" },
+    { left: "%wheel", right: "Wheel group members" },
+    { left: "NOPASSWD:", right: "No password required" },
+    { left: "/usr/bin/apt", right: "Specific command allowed" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    { input: "sudo visudo -f /etc/sudoers.d/custom-rules", output: "" },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the sudoers rule:"
+  sentence="To allow user 'deploy' to run apt without password: deploy ALL=(ALL) [BLANK:NOPASSWD]: /usr/bin/apt"
 />
 
 <Quiz

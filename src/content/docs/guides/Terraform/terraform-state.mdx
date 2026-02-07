@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Terraform" class="terraform" />
 <Badge text="Linux" class="linux" />
@@ -273,6 +276,53 @@ terraform workspace delete dev
 ---
 
 ## Knowledge Check
+
+<Flashcard
+  title="Terraform State"
+  cards={[
+    {
+      front: "What is terraform.tfstate?",
+      back: "A JSON file that maps your configuration to real-world resources and stores their current attributes.",
+    },
+    {
+      front: "What's the difference between data and resource blocks?",
+      back: "data blocks query existing resources, while resource blocks create new infrastructure.",
+    },
+    {
+      front: "What are Terraform workspaces used for?",
+      back: "Maintaining multiple state files for the same configuration (e.g., dev, staging, production environments).",
+    },
+    {
+      front: "What happens if you lose your state file?",
+      back: "Terraform loses the connection between your config and existing resources, making them unmanaged.",
+    },
+  ]}
+/>
+
+<MatchPairs
+  instruction="Match the workspace command with its function"
+  pairs={[
+    { left: "terraform workspace list", right: "Show all workspaces" },
+    { left: "terraform workspace new", right: "Create a workspace" },
+    { left: "terraform workspace select", right: "Switch workspaces" },
+    { left: "terraform workspace delete", right: "Remove a workspace" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "terraform output",
+      output:
+        'instance_ip = "192.168.1.100"\ninstance_id = "i-0abc123def456789"',
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Command to create a new workspace"
+  sentence="To create a new workspace named 'dev': terraform workspace [BLANK:new] dev"
+/>
 
 <Quiz
   question="What does the terraform state file contain?"

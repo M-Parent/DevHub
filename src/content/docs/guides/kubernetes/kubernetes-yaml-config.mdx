@@ -1,0 +1,506 @@
+---
+title: "Kubernetes YAML & Configuration"
+description: "Master Kubernetes configuration with YAML manifests - imperative vs declarative approaches and best practices."
+sidebar:
+  label: "YAML & Config"
+  order: 5
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Kubernetes" class="kubernetes" />
+
+Kubernetes configuration can be done imperatively (commands) or declaratively (YAML files). Understanding both approaches is key to effective cluster management.
+
+---
+
+## Imperative vs Declarative
+
+| Approach        | Description                      | Use Case              |
+| --------------- | -------------------------------- | --------------------- |
+| **Imperative**  | Tell K8s what to do step-by-step | Learning, quick tests |
+| **Declarative** | Tell K8s the desired end state   | Production, GitOps    |
+
+### Imperative Example
+
+```bash
+kubectl run nginx --image=nginx
+kubectl create deployment web --image=nginx
+kubectl scale deployment web --replicas=3
+kubectl expose deployment web --port=80
+```
+
+### Declarative Example
+
+```yaml
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+```
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+<Flashcard
+  title="Imperative vs Declarative"
+  cards={[
+    {
+      front: "What's the main difference between imperative and declarative?",
+      back: "Imperative: 'Run these commands' (you specify each step). Declarative: 'Make it look like this' (you specify desired state, K8s figures out the steps). Declarative is better for automation and GitOps.",
+    },
+  ]}
+/>
+
+---
+
+## Three Management Approaches
+
+### 1. Imperative Commands
+
+```bash
+kubectl run nginx --image=nginx
+kubectl expose deployment nginx --port=80
+kubectl scale deployment nginx --replicas=3
+```
+
+**Best for:** Learning, development, quick tests
+
+**Pros:**
+
+- Easy to learn
+- Fast for one-off tasks
+
+**Cons:**
+
+- Hard to track changes
+- Difficult to reproduce
+- Not automatable
+
+---
+
+### 2. Imperative Objects
+
+```bash
+kubectl create -f deployment.yaml
+kubectl replace -f deployment.yaml
+kubectl delete -f deployment.yaml
+```
+
+**Best for:** Small environments, single-file deployments
+
+**Pros:**
+
+- YAML provides documentation
+- Reproducible
+
+**Cons:**
+
+- Must track current vs desired state
+- Different commands for create/update
+- Still hard to automate
+
+---
+
+### 3. Declarative Objects
+
+```bash
+kubectl apply -f deployment.yaml
+kubectl apply -f ./manifests/
+kubectl diff -f deployment.yaml
+```
+
+**Best for:** Production, automation, GitOps
+
+**Pros:**
+
+- Same command every time
+- Easy to automate
+- Can apply entire directories
+- Supports dry-run and diff
+
+**Cons:**
+
+- More complex to understand
+- Need to learn YAML structure
+
+<Aside type="caution" title="Don't Mix Approaches">
+  Pick one approach and stick with it. Mixing imperative and declarative on the
+  same resources causes confusion.
+</Aside>
+
+---
+
+## YAML Structure
+
+Every Kubernetes YAML needs four parts:
+
+```yaml
+apiVersion: apps/v1 # 1. API version
+kind: Deployment # 2. Resource type
+metadata: # 3. Object metadata
+  name: nginx
+  labels:
+    app: nginx
+spec: # 4. Desired state
+  replicas: 3
+  template:
+    # ...
+```
+
+### Find API Version
+
+```bash
+# List resources and their API versions
+kubectl api-resources
+
+# Output includes:
+# NAME          SHORTNAMES   APIVERSION   NAMESPACED   KIND
+# deployments   deploy       apps/v1      true         Deployment
+# services      svc          v1           true         Service
+# pods          po           v1           true         Pod
+```
+
+### Find Resource Schema
+
+```bash
+kubectl explain deployment
+kubectl explain deployment.spec
+kubectl explain deployment.spec.template
+```
+
+---
+
+## Resource Generators
+
+Kubernetes has built-in generators to create YAML templates.
+
+### Generate YAML (Don't Apply)
+
+```bash
+# Deployment template
+kubectl create deployment nginx --image=nginx --dry-run=client -o yaml
+
+# Service template
+kubectl create service clusterip nginx --tcp=80:80 --dry-run=client -o yaml
+
+# Save to file
+kubectl create deployment nginx --image=nginx --dry-run=client -o yaml > deployment.yaml
+```
+
+### Useful Generator Flags
+
+| Flag               | Description          |
+| ------------------ | -------------------- |
+| `--dry-run=client` | Don't send to server |
+| `-o yaml`          | Output as YAML       |
+| `-o json`          | Output as JSON       |
+
+<Flashcard
+  title="Resource Generators"
+  cards={[
+    {
+      front: "How can you generate a YAML template from kubectl?",
+      back: "Use --dry-run=client -o yaml flags: kubectl create deployment nginx --image=nginx --dry-run=client -o yaml > deployment.yaml. This outputs the YAML without applying it.",
+    },
+  ]}
+/>
+
+---
+
+## Working with YAML Files
+
+### Apply Single File
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+### Apply Directory
+
+```bash
+kubectl apply -f ./manifests/
+```
+
+### Apply from URL
+
+```bash
+kubectl apply -f https://example.com/deployment.yaml
+```
+
+### Preview Changes
+
+```bash
+kubectl diff -f deployment.yaml
+```
+
+### Dry Run
+
+```bash
+kubectl apply -f deployment.yaml --dry-run=client
+kubectl apply -f deployment.yaml --dry-run=server  # Validates on server
+```
+
+---
+
+## Complete Example
+
+<Steps>
+
+1. **Generate base YAML**
+
+   ```bash
+   kubectl create deployment web --image=nginx --replicas=3 \
+     --dry-run=client -o yaml > web-deployment.yaml
+   ```
+
+2. **Edit the YAML**
+
+   ```yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: web
+     labels:
+       app: web
+   spec:
+     replicas: 3
+     selector:
+       matchLabels:
+         app: web
+     template:
+       metadata:
+         labels:
+           app: web
+       spec:
+         containers:
+           - name: nginx
+             image: nginx:1.25
+             ports:
+               - containerPort: 80
+             resources:
+               limits:
+                 cpu: "100m"
+                 memory: "128Mi"
+   ```
+
+3. **Preview changes**
+
+   ```bash
+   kubectl diff -f web-deployment.yaml
+   ```
+
+4. **Apply**
+
+   ```bash
+   kubectl apply -f web-deployment.yaml
+   ```
+
+5. **Generate service**
+
+   ```bash
+   kubectl create service clusterip web --tcp=80:80 \
+     --dry-run=client -o yaml > web-service.yaml
+   kubectl apply -f web-service.yaml
+   ```
+
+</Steps>
+
+---
+
+## Multi-Document YAML
+
+Combine multiple resources in one file using `---`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 3
+  # ...
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  type: ClusterIP
+  # ...
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+data:
+  key: value
+```
+
+```bash
+kubectl apply -f app.yaml  # Applies all resources
+```
+
+---
+
+## Labels and Annotations
+
+### Labels (For Selection)
+
+```yaml
+metadata:
+  labels:
+    app: nginx
+    env: production
+    tier: frontend
+```
+
+```bash
+kubectl get pods -l app=nginx
+kubectl get pods -l 'env in (production,staging)'
+```
+
+### Annotations (For Metadata)
+
+```yaml
+metadata:
+  annotations:
+    description: "Frontend web server"
+    maintainer: "team@example.com"
+```
+
+---
+
+## Best Practices
+
+### File Organization
+
+```
+manifests/
+├── base/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── configmap.yaml
+├── overlays/
+│   ├── dev/
+│   │   └── kustomization.yaml
+│   └── prod/
+│       └── kustomization.yaml
+```
+
+### Recommendations
+
+1. **Use declarative approach** for production
+2. **Keep YAML in version control** (Git)
+3. **Use labels consistently** for organization
+4. **Separate by environment** (dev, staging, prod)
+5. **Validate before applying** with `--dry-run=server`
+6. **Use diff** to preview changes
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the management approach with its description"
+  pairs={[
+    {
+      left: "Imperative commands",
+      right: "kubectl run, create, scale directly",
+    },
+    {
+      left: "Imperative objects",
+      right: "kubectl create/replace -f file.yaml",
+    },
+    { left: "Declarative objects", right: "kubectl apply -f file.yaml" },
+    { left: "Resource generators", right: "--dry-run=client -o yaml" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "kubectl apply -f deployment.yaml",
+      output: "deployment.apps/nginx-deployment created",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="The output format for YAML generation"
+  sentence="To generate YAML without applying: kubectl create deployment nginx --image=nginx --dry-run=client -o [BLANK:yaml]"
+/>
+
+<Quiz
+  question="Which command shows what would change without applying?"
+  options={[
+    "kubectl apply --preview",
+    "kubectl diff -f file.yaml",
+    "kubectl describe -f file.yaml",
+    "kubectl show -f file.yaml",
+  ]}
+  correct={1}
+  explanation="kubectl diff -f file.yaml shows the differences between the current state and what would be applied, without making changes."
+/>
+
+<Quiz
+  question="How do you generate YAML without creating the resource?"
+  options={[
+    "--output=yaml",
+    "--dry-run=client -o yaml",
+    "--template=yaml",
+    "--generate-yaml",
+  ]}
+  correct={1}
+  explanation="Use --dry-run=client -o yaml to output the YAML that would be created without actually sending it to the server."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="k8s-yaml-config"
+  title="K8s YAML Configuration Checklist"
+  items={[
+    "Understand imperative vs declarative",
+    "Know the four required YAML fields",
+    "Generate YAML templates with --dry-run",
+    "Use kubectl diff to preview changes",
+    "Apply files and directories",
+    "Organize manifests in version control",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Kubernetes Documentation](https://kubernetes.io/docs/concepts/overview/working-with-objects/) and DevHub examples.

@@ -1,0 +1,455 @@
+---
+title: "Swarm Services"
+description: "Learn how to create, scale, update, and manage Docker Swarm services and stacks."
+sidebar:
+  label: "Services & Stacks"
+  order: 2
+  badge:
+    text: "Adv"
+    variant: "danger"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+<Badge text="Orchestration" class="devops" />
+
+Services are the core abstraction in Docker Swarm. They define what containers to run, how many replicas, and how to update them.
+
+---
+
+## Creating Services
+
+### Basic Service
+
+```bash
+docker service create --name webserver nginx
+```
+
+### Service with Replicas and Port
+
+```bash
+docker service create \
+  --name web \
+  --replicas 3 \
+  --publish 80:80 \
+  nginx:1.25
+```
+
+### Full Service Example
+
+```bash
+docker service create \
+  --name api \
+  --replicas 5 \
+  --publish 8080:3000 \
+  --env NODE_ENV=production \
+  --env DATABASE_URL=postgres://db:5432 \
+  --mount type=volume,source=api-data,target=/data \
+  --constraint 'node.role==worker' \
+  --update-parallelism 2 \
+  --update-delay 10s \
+  myregistry/api:1.0.0
+```
+
+<Flashcard
+  title="Services vs Containers"
+  cards={[
+    {
+      front:
+        "Why use 'docker service create' instead of 'docker run' in Swarm?",
+      back: "Services are the Swarm abstraction. They handle replication, load balancing, rolling updates, and self-healing. 'docker run' only creates local containers without orchestration.",
+    },
+  ]}
+/>
+
+---
+
+## Service Management
+
+### List Services
+
+```bash
+docker service ls
+```
+
+```
+ID             NAME      MODE         REPLICAS   IMAGE
+abc123         web       replicated   3/3        nginx:1.25
+def456         api       replicated   5/5        myapi:1.0
+```
+
+### Inspect Service
+
+```bash
+docker service inspect web --pretty
+```
+
+### View Service Tasks (Containers)
+
+```bash
+docker service ps web
+```
+
+```
+ID         NAME      IMAGE        NODE      CURRENT STATE
+abc123     web.1     nginx:1.25   worker1   Running 2 hours ago
+def456     web.2     nginx:1.25   worker2   Running 2 hours ago
+ghi789     web.3     nginx:1.25   manager1  Running 2 hours ago
+```
+
+### Service Logs
+
+```bash
+docker service logs web
+docker service logs web --follow
+docker service logs web --tail 100
+```
+
+---
+
+## Scaling Services
+
+### Scale Up/Down
+
+```bash
+# Scale to 5 replicas
+docker service scale web=5
+
+# Scale multiple services
+docker service scale web=5 api=10 worker=3
+```
+
+### Using Update Command
+
+```bash
+docker service update --replicas 10 web
+```
+
+<Aside type="tip" title="Scaling Best Practices">
+  Scale incrementally and monitor. Going from 1 to 100 replicas at once can
+  overwhelm your infrastructure.
+</Aside>
+
+---
+
+## Rolling Updates
+
+### Update Image Version
+
+```bash
+docker service update --image nginx:1.26 web
+```
+
+### Controlled Rolling Update
+
+```bash
+docker service update \
+  --image myapi:2.0.0 \
+  --update-parallelism 2 \
+  --update-delay 30s \
+  --update-failure-action rollback \
+  --update-order start-first \
+  api
+```
+
+| Option                    | Description                                   |
+| ------------------------- | --------------------------------------------- |
+| `--update-parallelism`    | How many containers to update at once         |
+| `--update-delay`          | Wait time between batches                     |
+| `--update-failure-action` | `pause`, `continue`, or `rollback` on failure |
+| `--update-order`          | `stop-first` (default) or `start-first`       |
+
+### Watch Update Progress
+
+```bash
+docker service ps api
+```
+
+### Rollback
+
+```bash
+docker service rollback api
+```
+
+---
+
+## Service Modes
+
+### Replicated (Default)
+
+Run specified number of replicas across the swarm:
+
+```bash
+docker service create --replicas 3 --name web nginx
+```
+
+### Global
+
+Run exactly one container on every node:
+
+```bash
+docker service create --mode global --name monitoring prometheus-node-exporter
+```
+
+Use global mode for:
+
+- Monitoring agents
+- Log collectors
+- Security scanners
+
+---
+
+## Placement Constraints
+
+Control where services run:
+
+```bash
+# Only on workers
+docker service create --constraint 'node.role==worker' nginx
+
+# Specific node
+docker service create --constraint 'node.hostname==server1' nginx
+
+# With label
+docker service create --constraint 'node.labels.zone==us-east' nginx
+```
+
+### Label Nodes First
+
+```bash
+docker node update --label-add zone=us-east worker1
+docker node update --label-add zone=us-west worker2
+```
+
+---
+
+## Docker Stacks
+
+Stacks deploy multi-service applications using Compose files.
+
+### Stack Compose File
+
+```yaml
+# docker-stack.yml
+version: "3.9"
+
+services:
+  web:
+    image: nginx:1.25
+    ports:
+      - "80:80"
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    networks:
+      - frontend
+
+  api:
+    image: myregistry/api:1.0.0
+    deploy:
+      replicas: 5
+      placement:
+        constraints:
+          - node.role == worker
+    environment:
+      - DATABASE_URL=postgres://db:5432/app
+    networks:
+      - frontend
+      - backend
+
+  db:
+    image: postgres:15
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == ssd
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  db_data:
+```
+
+### Deploy Stack
+
+```bash
+docker stack deploy -c docker-stack.yml myapp
+```
+
+### Stack Commands
+
+```bash
+# List stacks
+docker stack ls
+
+# List stack services
+docker stack services myapp
+
+# List stack tasks
+docker stack ps myapp
+
+# Remove stack
+docker stack rm myapp
+```
+
+<Aside type="caution" title="Stack vs Compose">
+  Stacks use Compose file syntax but run via `docker stack deploy`, not `docker
+  compose up`. The `deploy` key is only used by Swarm, and `build` is ignored
+  (you must push pre-built images).
+</Aside>
+
+---
+
+## Service Secrets and Configs
+
+### Create a Secret
+
+```bash
+echo "supersecret" | docker secret create db_password -
+```
+
+### Use Secret in Service
+
+```bash
+docker service create \
+  --name api \
+  --secret db_password \
+  myapi
+```
+
+The secret is available at `/run/secrets/db_password` inside the container.
+
+### In Stack File
+
+```yaml
+services:
+  api:
+    image: myapi
+    secrets:
+      - db_password
+
+secrets:
+  db_password:
+    external: true
+```
+
+---
+
+## Resource Limits
+
+```bash
+docker service create \
+  --name api \
+  --limit-cpu 0.5 \
+  --limit-memory 512M \
+  --reserve-cpu 0.25 \
+  --reserve-memory 256M \
+  myapi
+```
+
+In stack file:
+
+```yaml
+services:
+  api:
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the service command with its function"
+  pairs={[
+    { left: "docker service create", right: "Create a new service" },
+    { left: "docker service scale", right: "Change replica count" },
+    { left: "docker service update", right: "Modify running service" },
+    { left: "docker stack deploy", right: "Deploy multi-service app" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    { input: "docker service scale web=5", output: "web scaled to 5" },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the sentence:"
+  sentence="The [BLANK:global] service mode runs exactly one container on every node"
+/>
+
+<Quiz
+  question="What command scales a service to 10 replicas?"
+  options={[
+    "docker service replicas web 10",
+    "docker service scale web=10",
+    "docker scale web 10",
+    "docker service update web --scale 10",
+  ]}
+  correct={1}
+  explanation="Use 'docker service scale web=10' to scale a service. You can also use 'docker service update --replicas 10 web'."
+/>
+
+<Quiz
+  question="What does '--mode global' do when creating a service?"
+  options={[
+    "Makes the service accessible globally",
+    "Runs one replica on every node",
+    "Removes replica limits",
+    "Enables global load balancing",
+  ]}
+  correct={1}
+  explanation="Global mode runs exactly one container on every node in the swarm - useful for monitoring agents and log collectors."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="swarm-services"
+  title="Swarm Services Checklist"
+  items={[
+    "Create services with replicas",
+    "Scale services up and down",
+    "Perform rolling updates",
+    "Use placement constraints",
+    "Deploy stacks from Compose files",
+    "Use secrets in services",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Docker Swarm Services Documentation](https://docs.docker.com/engine/swarm/services/) and DevHub examples.

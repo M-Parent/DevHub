@@ -4,6 +4,7 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://devhub.mpmk.app",
   integrations: [
     starlight({
       title: "DevHub",
@@ -38,6 +39,11 @@ export default defineConfig({
         {
           label: "Cheat Sheets",
           autogenerate: { directory: "cheatsheets" },
+          collapsed: true,
+        },
+        {
+          label: "Misc",
+          autogenerate: { directory: "misc" },
           collapsed: true,
         },
       ],

@@ -14,6 +14,9 @@ import { Aside, Badge } from "@astrojs/starlight/components";
 import Quiz from "../../../../../components/Quiz.astro";
 import Flashcard from "../../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../../components/MatchPairs.astro";
+import Terminal from "../../../../../components/Terminal.astro";
+import FillBlank from "../../../../../components/FillBlank.astro";
 
 <Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
 
@@ -247,6 +250,30 @@ openssl s_client -connect devhub.local:443 -servername devhub.local -showcerts <
       back: "PEM is Base64-encoded text, DER is binary format",
     },
   ]}
+/>
+
+<MatchPairs
+  instruction="Match the openssl x509 flag with its output"
+  pairs={[
+    { left: "-subject", right: "Certificate subject DN" },
+    { left: "-issuer", right: "CA that signed it" },
+    { left: "-dates", right: "Validity period" },
+    { left: "-fingerprint", right: "SHA hash of cert" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "openssl x509 -in cert.pem -text -noout",
+      output: "Certificate: Data: Version: 3 (0x2)",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the command:"
+  sentence="To verify a certificate against a CA: openssl [BLANK:verify] -CAfile ca.pem cert.pem"
 />
 
 <Quiz

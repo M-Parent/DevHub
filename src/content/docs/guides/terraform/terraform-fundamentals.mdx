@@ -13,6 +13,9 @@ tableOfContents: true
 import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../components/Quiz.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Terraform" class="terraform" />
 <Badge text="Linux" class="linux" />
@@ -205,42 +208,63 @@ terraform apply
 
 ## Knowledge Check
 
-<Quiz
-  id="terraform-fundamentals-quiz"
-  title="Terraform Basics Quiz"
-  questions={[
+<MatchPairs
+  instruction="Match the Terraform command with its description"
+  pairs={[
     {
-      question: "What command downloads the required providers?",
-      options: [
-        "terraform plan",
-        "terraform init",
-        "terraform apply",
-        "terraform get",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "terraform init initializes the working directory and downloads provider plugins.",
+      left: "terraform init",
+      right: "Initialize working directory and download providers",
     },
+    { left: "terraform plan", right: "Preview changes before applying" },
+    { left: "terraform apply", right: "Create or update infrastructure" },
+    { left: "terraform destroy", right: "Remove all managed infrastructure" },
+  ]}
+/>
+
+<Terminal
+  commands={[
     {
-      question: "What language does Terraform use for configuration?",
-      options: ["YAML", "JSON", "HCL", "XML"],
-      correctAnswer: 2,
-      explanation:
-        "Terraform uses HCL (HashiCorp Configuration Language), though JSON is also supported.",
-    },
-    {
-      question: "Which command previews changes without applying them?",
-      options: [
-        "terraform preview",
-        "terraform plan",
-        "terraform check",
-        "terraform diff",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "terraform plan shows what changes will be made without actually making them.",
+      input: "terraform init",
+      output:
+        "Initializing the backend...\nInitializing provider plugins...\n\nTerraform has been successfully initialized!",
     },
   ]}
+/>
+
+<FillBlank
+  instruction="Flag to skip interactive approval"
+  sentence="To apply changes without confirmation: terraform apply -[BLANK:auto-approve]"
+/>
+
+<Quiz
+  question="What command downloads the required providers?"
+  options={[
+    "terraform plan",
+    "terraform init",
+    "terraform apply",
+    "terraform get",
+  ]}
+  correct={1}
+  explanation="terraform init initializes the working directory and downloads provider plugins."
+/>
+
+<Quiz
+  question="What language does Terraform use for configuration?"
+  options={["YAML", "JSON", "HCL", "XML"]}
+  correct={2}
+  explanation="Terraform uses HCL (HashiCorp Configuration Language), though JSON is also supported."
+/>
+
+<Quiz
+  question="Which command previews changes without applying them?"
+  options={[
+    "terraform preview",
+    "terraform plan",
+    "terraform check",
+    "terraform diff",
+  ]}
+  correct={1}
+  explanation="terraform plan shows what changes will be made without actually making them."
 />
 
 ---

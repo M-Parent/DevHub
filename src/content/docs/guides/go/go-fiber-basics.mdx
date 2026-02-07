@@ -1,0 +1,384 @@
+---
+title: "Getting Started with Go Fiber"
+description: "Build a REST API with Go Fiber - a fast and lightweight web framework for Go."
+sidebar:
+  label: "Go Fiber Basics"
+  order: 1
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Go" class="go" />
+<Badge text="Coding" class="coding" />
+
+Fiber is an Express-inspired web framework built on top of Fasthttp, the fastest HTTP engine for Go. This guide helps you create your first API.
+
+---
+
+## Prerequisites
+
+- Go installed on your system
+- Basic Go knowledge
+
+```bash
+# Verify Go installation
+go version
+```
+
+---
+
+## Create a New Project
+
+<Steps>
+
+1. **Create project folder**
+
+   ```bash
+   mkdir my-fiber-api
+   cd my-fiber-api
+   ```
+
+2. **Initialize Go module**
+
+   ```bash
+   go mod init my-fiber-api
+   ```
+
+   This creates a `go.mod` file for dependency management.
+
+3. **Install Fiber**
+
+   ```bash
+   go get github.com/gofiber/fiber/v2
+   ```
+
+</Steps>
+
+---
+
+## Your First Fiber App
+
+Create `main.go`:
+
+```go
+package main
+
+import "github.com/gofiber/fiber/v2"
+
+func main() {
+    // Create new Fiber instance
+    app := fiber.New()
+
+    // Define route
+    app.Get("/", func(c *fiber.Ctx) error {
+        return c.SendString("Hello Fiber 🚀")
+    })
+
+    // Start server on port 3000
+    app.Listen(":3000")
+}
+```
+
+### Run the Server
+
+```bash
+go run main.go
+```
+
+Visit `http://localhost:3000` to see your API running!
+
+<Flashcard
+  title="Fiber Basics"
+  cards={[
+    {
+      front: "Why is Fiber considered fast?",
+      back: "Fiber is built on Fasthttp, which is significantly faster than Go's net/http. It also has zero memory allocation in hot paths and efficient routing.",
+    },
+  ]}
+/>
+
+---
+
+## Basic Routing
+
+```go
+package main
+
+import "github.com/gofiber/fiber/v2"
+
+func main() {
+    app := fiber.New()
+
+    // GET request
+    app.Get("/", func(c *fiber.Ctx) error {
+        return c.SendString("GET request")
+    })
+
+    // POST request
+    app.Post("/users", func(c *fiber.Ctx) error {
+        return c.SendString("POST request - Create user")
+    })
+
+    // PUT request
+    app.Put("/users/:id", func(c *fiber.Ctx) error {
+        id := c.Params("id")
+        return c.SendString("PUT request - Update user " + id)
+    })
+
+    // DELETE request
+    app.Delete("/users/:id", func(c *fiber.Ctx) error {
+        id := c.Params("id")
+        return c.SendString("DELETE request - Delete user " + id)
+    })
+
+    app.Listen(":3000")
+}
+```
+
+---
+
+## Route Parameters
+
+```go
+// Path parameter
+app.Get("/users/:id", func(c *fiber.Ctx) error {
+    id := c.Params("id")
+    return c.SendString("User ID: " + id)
+})
+
+// Optional parameter
+app.Get("/users/:id?", func(c *fiber.Ctx) error {
+    id := c.Params("id", "default")
+    return c.SendString("User ID: " + id)
+})
+
+// Query parameters
+app.Get("/search", func(c *fiber.Ctx) error {
+    query := c.Query("q")
+    page := c.Query("page", "1")
+    return c.SendString("Search: " + query + ", Page: " + page)
+})
+```
+
+---
+
+## JSON Responses
+
+```go
+app.Get("/api/user", func(c *fiber.Ctx) error {
+    return c.JSON(fiber.Map{
+        "name":  "John Doe",
+        "email": "john@example.com",
+        "age":   30,
+    })
+})
+```
+
+### With Struct
+
+```go
+type User struct {
+    Name  string `json:"name"`
+    Email string `json:"email"`
+    Age   int    `json:"age"`
+}
+
+app.Get("/api/user", func(c *fiber.Ctx) error {
+    user := User{
+        Name:  "John Doe",
+        Email: "john@example.com",
+        Age:   30,
+    }
+    return c.JSON(user)
+})
+```
+
+---
+
+## Request Body
+
+```go
+type CreateUserRequest struct {
+    Name  string `json:"name"`
+    Email string `json:"email"`
+}
+
+app.Post("/users", func(c *fiber.Ctx) error {
+    req := new(CreateUserRequest)
+
+    if err := c.BodyParser(req); err != nil {
+        return c.Status(400).JSON(fiber.Map{
+            "error": "Invalid request body",
+        })
+    }
+
+    return c.JSON(fiber.Map{
+        "message": "User created",
+        "user":    req,
+    })
+})
+```
+
+---
+
+## Project Structure
+
+For larger APIs, organize your code:
+
+```
+my-fiber-api/
+├── cmd/
+│   └── api/
+│       └── main.go         # Entry point
+├── config/
+│   └── config.go           # Configuration
+├── db/
+│   └── postgres.go         # Database connection
+├── handlers/
+│   └── auth_handler.go     # Route handlers
+├── models/
+│   └── user.go             # Data models
+├── services/
+│   └── auth_service.go     # Business logic
+├── routes/
+│   └── routes.go           # Route definitions
+├── migrations/
+│   └── 001_init.sql        # Database migrations
+├── .env
+├── go.mod
+└── go.sum
+```
+
+<Aside type="tip" title="Separation of Concerns">
+  Keep handlers thin. Put business logic in services and data access in
+  repositories.
+</Aside>
+
+---
+
+## Middleware
+
+```go
+// Logger middleware
+app.Use(logger.New())
+
+// Custom middleware
+app.Use(func(c *fiber.Ctx) error {
+    fmt.Println("Request received:", c.Path())
+    return c.Next()
+})
+
+// Route-specific middleware
+app.Get("/admin", AuthMiddleware, func(c *fiber.Ctx) error {
+    return c.SendString("Admin area")
+})
+
+func AuthMiddleware(c *fiber.Ctx) error {
+    token := c.Get("Authorization")
+    if token == "" {
+        return c.Status(401).JSON(fiber.Map{
+            "error": "Unauthorized",
+        })
+    }
+    return c.Next()
+}
+```
+
+---
+
+## Error Handling
+
+```go
+app.Use(func(c *fiber.Ctx) error {
+    err := c.Next()
+
+    if err != nil {
+        code := fiber.StatusInternalServerError
+        if e, ok := err.(*fiber.Error); ok {
+            code = e.Code
+        }
+
+        return c.Status(code).JSON(fiber.Map{
+            "error": err.Error(),
+        })
+    }
+
+    return nil
+})
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the HTTP method with its purpose"
+  pairs={[
+    { left: "GET", right: "Retrieve data" },
+    { left: "POST", right: "Create new resource" },
+    { left: "PUT", right: "Update existing resource" },
+    { left: "DELETE", right: "Remove resource" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "go run main.go",
+      output:
+        " ┌───────────────────────────────────────────────────┐\n │                   Fiber v2.52.0                   │\n │               http://127.0.0.1:3000               │\n └───────────────────────────────────────────────────┘",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="It's in the name - think speed"
+  sentence="Fiber is built on [BLANK:Fasthttp], which is faster than Go's net/http"
+/>
+
+<Quiz
+  question="What HTTP engine is Fiber built on?"
+  options={["net/http", "Fasthttp", "Gorilla", "Echo"]}
+  correct={1}
+  explanation="Fiber is built on Fasthttp, which is significantly faster than Go's standard net/http library."
+/>
+
+<Quiz
+  question="How do you get a path parameter in Fiber?"
+  options={['c.Get("id")', 'c.Query("id")', 'c.Params("id")', 'c.Param("id")']}
+  correct={2}
+  explanation="Use c.Params() to get path parameters like /users/:id. Use c.Query() for query string parameters."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="go-fiber-basics"
+  title="Go Fiber Checklist"
+  items={[
+    "Initialize Go module with Fiber",
+    "Create basic routes (GET, POST, PUT, DELETE)",
+    "Handle path and query parameters",
+    "Return JSON responses",
+    "Parse request body",
+    "Use middleware",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Fiber Documentation](https://docs.gofiber.io/) and DevHub examples.

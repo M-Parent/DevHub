@@ -14,6 +14,10 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../../components/Quiz.astro";
 import Flashcard from "../../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../../components/MatchPairs.astro";
+import Terminal from "../../../../../components/Terminal.astro";
+import FillBlank from "../../../../../components/FillBlank.astro";
+import FileTree from "../../../../../components/FileTree.astro";
 
 <Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
 
@@ -255,6 +259,43 @@ sudo tail -f /var/log/nginx/access.log
       back: "Tries to serve files in order, returns 404 if none found",
     },
   ]}
+/>
+
+<FileTree
+  title="NGINX Configuration Structure"
+  structure={[
+    { name: "/etc/nginx/", type: "folder" },
+    { name: "  nginx.conf", type: "file" },
+    { name: "  sites-available/", type: "folder" },
+    { name: "    default", type: "file" },
+    { name: "    mysite.conf", type: "file" },
+    { name: "  sites-enabled/", type: "folder" },
+    { name: "    default -> ../sites-available/default", type: "file" },
+  ]}
+/>
+
+<MatchPairs
+  instruction="Match the NGINX directive with its purpose"
+  pairs={[
+    { left: "listen 80", right: "Accept HTTP on port 80" },
+    { left: "server_name", right: "Domain/hostname to match" },
+    { left: "root", right: "Document root directory" },
+    { left: "try_files", right: "File lookup fallback" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "sudo nginx -t && sudo systemctl reload nginx",
+      output: "nginx: configuration file /etc/nginx/nginx.conf syntax is ok",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the path:"
+  sentence="To enable a site, create a symlink: sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/[BLANK:sites-enabled]/mysite"
 />
 
 <Quiz

@@ -1,0 +1,294 @@
+---
+title: "Kubernetes Fundamentals"
+description: "Understanding Kubernetes container orchestration - what it is, why use it, and core concepts."
+sidebar:
+  label: "K8s Fundamentals"
+  order: 1
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Kubernetes" class="kubernetes" />
+
+Kubernetes (K8s) is a container orchestration platform that makes many servers act like one. Released by Google in 2015, it's now maintained by a large community and is the industry standard for container management.
+
+---
+
+## What is Kubernetes?
+
+Kubernetes is a **container orchestrator** that:
+
+- Runs on top of Docker (usually) as a set of APIs in containers
+- Provides API/CLI to manage containers across servers
+- Automates deployment, scaling, and management of containerized applications
+
+### Who Uses It?
+
+- Many cloud providers offer managed Kubernetes (GKE, EKS, AKS)
+- Many vendors make "distributions" of Kubernetes
+- Used by organizations of all sizes
+
+<Flashcard
+  title="What is Kubernetes?"
+  cards={[
+    {
+      front: "What does Kubernetes do?",
+      back: "Kubernetes is a container orchestrator that makes many servers act like one. It automates deployment, scaling, and management of containerized applications across a cluster of machines.",
+    },
+  ]}
+/>
+
+---
+
+## Why Kubernetes?
+
+### When You Need Orchestration
+
+Orchestration becomes valuable when:
+
+- You have many servers
+- Your change rate is high
+- Manual management becomes unsustainable
+
+**Formula:**
+
+```
+Servers + Change Rate = Benefit of Orchestration
+```
+
+<Aside type="note" title="Not Always Needed">
+  Not every solution needs orchestration. For simple applications on a few
+  servers, Docker Compose or Docker Swarm may be sufficient.
+</Aside>
+
+### The Decision Path
+
+1. First, understand **why** you may need orchestration
+2. Then, decide **which** orchestrator (K8s vs Swarm)
+3. If Kubernetes, decide **which distribution**:
+   - Cloud managed (GKE, EKS, AKS)
+   - Self-managed (Rancher, OpenShift, Docker Enterprise)
+
+---
+
+## Kubernetes vs Docker Swarm
+
+| Aspect             | Kubernetes    | Swarm      |
+| ------------------ | ------------- | ---------- |
+| **Ease of Use**    | Complex       | Simpler    |
+| **Features**       | More features | 80/20 rule |
+| **Learning Curve** | Steeper       | Gentler    |
+| **Community**      | Larger        | Smaller    |
+| **Vendor Support** | Extensive     | Limited    |
+
+### Advantages of Swarm
+
+- ✅ Comes built into Docker
+- ✅ Easiest to deploy/manage yourself
+- ✅ Follows 80/20 rule (20% of features for 80% of use cases)
+- ✅ Runs anywhere Docker runs
+- ✅ Secure by default
+- ✅ Easier to troubleshoot
+
+### Advantages of Kubernetes
+
+- ✅ Clouds will deploy/manage it for you
+- ✅ Wide vendor support and distributions
+- ✅ Largest adoption and community
+- ✅ Most flexible, covers widest set of use cases
+- ✅ "Kubernetes first" vendor support
+- ✅ Industry standard (the safe choice)
+
+<Aside type="tip" title="Choosing Between Them">
+  Understand both and know your requirements. Swarm for simplicity, Kubernetes
+  for enterprise features and vendor support.
+</Aside>
+
+---
+
+## Core Components
+
+### System Parts
+
+| Component         | Description                                            |
+| ----------------- | ------------------------------------------------------ |
+| **Kubernetes**    | The whole orchestration system (K8s or "Kube")         |
+| **kubectl**       | CLI to configure K8s and manage apps ("kube-control")  |
+| **Node**          | A server (VM or physical) in the cluster               |
+| **Kubelet**       | Kubernetes agent running on each node                  |
+| **Control Plane** | Containers that manage the cluster (formerly "master") |
+
+### Control Plane Components
+
+```
+┌─────────────────────────────────────────────┐
+│              Control Plane                   │
+├─────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌──────────────────┐     │
+│  │ API Server  │  │ Controller       │     │
+│  │             │  │ Manager          │     │
+│  └─────────────┘  └──────────────────┘     │
+│  ┌─────────────┐  ┌──────────────────┐     │
+│  │ Scheduler   │  │ etcd (database)  │     │
+│  └─────────────┘  └──────────────────┘     │
+└─────────────────────────────────────────────┘
+                    │
+    ┌───────────────┼───────────────┐
+    │               │               │
+┌───┴───┐       ┌───┴───┐       ┌───┴───┐
+│ Node  │       │ Node  │       │ Node  │
+│ + Pod │       │ + Pod │       │ + Pod │
+└───────┘       └───────┘       └───────┘
+```
+
+---
+
+## Key Abstractions
+
+| Abstraction    | Description                                         |
+| -------------- | --------------------------------------------------- |
+| **Pod**        | One or more containers running together on one node |
+| **Controller** | Creates/updates pods (Deployment, ReplicaSet, etc.) |
+| **Service**    | Network endpoint to connect to pods                 |
+| **Namespace**  | Logical grouping of objects in a cluster            |
+
+### Pods
+
+- Basic unit of deployment
+- Containers are **always** in pods
+- Usually one container per pod
+- Pods share network and storage
+
+### Controllers
+
+Common controller types:
+
+- **Deployment** - Manages ReplicaSets and pods
+- **ReplicaSet** - Ensures desired number of pod replicas
+- **DaemonSet** - One pod per node
+- **StatefulSet** - For stateful applications
+- **Job/CronJob** - For batch workloads
+
+<Flashcard
+  title="Pods and Controllers"
+  cards={[
+    {
+      front: "What's the relationship between Pods and Controllers?",
+      back: "Controllers manage pods. A Deployment creates a ReplicaSet, which creates Pods. The controller watches the desired state and makes changes to match it.",
+    },
+  ]}
+/>
+
+---
+
+## Basic Workflow
+
+When you deploy an application:
+
+```
+1. You create a Deployment (kubectl apply -f deployment.yaml)
+        ↓
+2. API Server receives the request
+        ↓
+3. Controller Manager creates a ReplicaSet
+        ↓
+4. Scheduler assigns pods to nodes
+        ↓
+5. Kubelet on each node starts containers
+        ↓
+6. Your app is running!
+```
+
+---
+
+## When to Use Kubernetes
+
+### Good Fit
+
+- ✅ Many microservices
+- ✅ Multiple teams deploying independently
+- ✅ Need for auto-scaling
+- ✅ Complex networking requirements
+- ✅ Cloud-native applications
+
+### Not a Good Fit
+
+- ❌ Single application on few servers
+- ❌ Team unfamiliar with containers
+- ❌ Simple deployment requirements
+- ❌ Limited operations resources
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the Kubernetes concept with its description"
+  pairs={[
+    { left: "Pod", right: "Smallest deployable unit containing containers" },
+    { left: "Kubelet", right: "Agent running on each node" },
+    { left: "Control Plane", right: "Containers that manage the cluster" },
+    { left: "kubectl", right: "CLI to configure and manage Kubernetes" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "kubectl get nodes",
+      output:
+        "NAME             STATUS   ROLES           AGE   VERSION\ndocker-desktop   Ready    control-plane   10d   v1.28.2",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="What does K8s abstract into a cluster?"
+  sentence="Kubernetes makes many [BLANK:servers] act like one."
+/>
+
+<Quiz
+  question="What is the basic unit of deployment in Kubernetes?"
+  options={["Container", "Pod", "Node", "Deployment"]}
+  correct={1}
+  explanation="The Pod is the basic unit of deployment. Containers always run inside pods, never directly on nodes."
+/>
+
+<Quiz
+  question="What component runs on each node and starts containers?"
+  options={["API Server", "Scheduler", "Kubelet", "Controller Manager"]}
+  correct={2}
+  explanation="Kubelet is the agent that runs on each node. It receives pod specifications and ensures the containers are running."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="k8s-fundamentals"
+  title="Kubernetes Fundamentals Checklist"
+  items={[
+    "Understand what Kubernetes is",
+    "Know when to use K8s vs Swarm",
+    "Identify core components",
+    "Understand pods and controllers",
+    "Know the basic deployment workflow",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Kubernetes Documentation](https://kubernetes.io/docs/) and DevHub examples.

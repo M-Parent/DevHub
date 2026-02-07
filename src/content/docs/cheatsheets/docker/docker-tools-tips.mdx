@@ -1,0 +1,434 @@
+---
+title: "Docker Tools & Tips"
+description: "Essential Docker commands, debugging techniques, and best practices in one quick reference."
+sidebar:
+  label: "Tools & Tips"
+  order: 1
+tableOfContents: true
+---
+
+import {
+  Aside,
+  Badge,
+  Card,
+  CardGrid,
+  LinkCard,
+} from "@astrojs/starlight/components";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Cheatsheet" class="quick" />
+
+Quick reference for Docker commands, debugging, and best practices.
+
+---
+
+## Container Lifecycle
+
+```bash
+# Run container
+docker run -d --name app -p 8080:80 nginx
+
+# Stop container
+docker stop app
+
+# Start stopped container
+docker start app
+
+# Restart container
+docker restart app
+
+# Remove container
+docker rm app
+
+# Force remove running container
+docker rm -f app
+```
+
+---
+
+## Viewing Containers
+
+```bash
+# Running containers
+docker ps
+
+# All containers (including stopped)
+docker ps -a
+
+# Only container IDs
+docker ps -q
+
+# With size
+docker ps -s
+
+# Custom format
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+```
+
+---
+
+## Container Debugging
+
+### Logs
+
+```bash
+# View logs
+docker logs app
+
+# Follow logs
+docker logs -f app
+
+# Last 100 lines
+docker logs --tail 100 app
+
+# With timestamps
+docker logs -t app
+
+# Since last 5 minutes
+docker logs --since 5m app
+```
+
+### Execute Commands
+
+```bash
+# Interactive shell
+docker exec -it app /bin/bash
+docker exec -it app sh
+
+# Run single command
+docker exec app cat /etc/nginx/nginx.conf
+
+# Run as root
+docker exec -u root app apt update
+```
+
+### Inspect Container
+
+```bash
+# Full JSON inspection
+docker inspect app
+
+# Get specific field
+docker inspect -f '{{.State.Status}}' app
+docker inspect -f '{{.NetworkSettings.IPAddress}}' app
+
+# Multiple fields
+docker inspect -f '{{.Name}} - {{.State.Status}}' app
+```
+
+---
+
+## Resource Usage
+
+```bash
+# Live stats
+docker stats
+
+# Specific container
+docker stats app
+
+# One-time snapshot
+docker stats --no-stream
+
+# With size
+docker system df
+docker system df -v
+```
+
+---
+
+## Image Management
+
+```bash
+# List images
+docker images
+
+# Pull image
+docker pull nginx:1.25
+
+# Build image
+docker build -t myapp:1.0 .
+docker build -t myapp:1.0 -f Dockerfile.prod .
+
+# Tag image
+docker tag myapp:1.0 myregistry/myapp:1.0
+
+# Push image
+docker push myregistry/myapp:1.0
+
+# Remove image
+docker rmi nginx:1.25
+
+# Remove unused images
+docker image prune
+
+# Remove all unused images
+docker image prune -a
+```
+
+---
+
+## Cleanup Commands
+
+```bash
+# Remove all stopped containers
+docker container prune
+
+# Remove all unused images
+docker image prune -a
+
+# Remove all unused volumes
+docker volume prune
+
+# Remove all unused networks
+docker network prune
+
+# Remove everything unused
+docker system prune
+
+# Nuclear option (removes ALL unused including volumes)
+docker system prune -a --volumes
+```
+
+<Aside type="caution" title="Be Careful with Prune">
+  `docker system prune -a --volumes` removes ALL unused data. Use with caution
+  in production.
+</Aside>
+
+---
+
+## Volume Commands
+
+```bash
+# List volumes
+docker volume ls
+
+# Create volume
+docker volume create mydata
+
+# Inspect volume
+docker volume inspect mydata
+
+# Remove volume
+docker volume rm mydata
+
+# Find volume mount point
+docker volume inspect mydata --format '{{.Mountpoint}}'
+```
+
+---
+
+## Network Commands
+
+```bash
+# List networks
+docker network ls
+
+# Create network
+docker network create mynet
+
+# Connect container to network
+docker network connect mynet app
+
+# Disconnect from network
+docker network disconnect mynet app
+
+# Inspect network
+docker network inspect mynet
+
+# Remove network
+docker network rm mynet
+```
+
+---
+
+## Copy Files
+
+```bash
+# Copy from container to host
+docker cp app:/etc/nginx/nginx.conf ./nginx.conf
+
+# Copy from host to container
+docker cp ./config.json app:/app/config.json
+
+# Copy entire directory
+docker cp app:/var/log/nginx ./logs
+```
+
+---
+
+## Docker Compose Quick Reference
+
+```bash
+# Start services
+docker compose up
+docker compose up -d
+
+# Stop services
+docker compose down
+
+# Stop and remove volumes
+docker compose down -v
+
+# Rebuild and start
+docker compose up --build
+
+# View logs
+docker compose logs
+docker compose logs -f app
+
+# Scale service
+docker compose up -d --scale web=3
+
+# Execute command
+docker compose exec app bash
+
+# List containers
+docker compose ps
+```
+
+---
+
+## Image Size Optimization
+
+### Multi-stage Builds
+
+```dockerfile
+# Build stage
+FROM node:20 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+CMD ["node", "dist/index.js"]
+```
+
+### Size Reduction Tips
+
+1. **Use slim/alpine base images**
+
+   ```dockerfile
+   FROM python:3.11-slim
+   # Instead of: FROM python:3.11
+   ```
+
+2. **Combine RUN commands**
+
+   ```dockerfile
+   RUN apt-get update && \
+       apt-get install -y curl && \
+       rm -rf /var/lib/apt/lists/*
+   ```
+
+3. **Use .dockerignore**
+
+   ```
+   node_modules
+   .git
+   *.md
+   .env
+   ```
+
+4. **Order layers by change frequency**
+   - Least changed → Most changed
+   - Dependencies before source code
+
+---
+
+## Quick Debugging Container
+
+```bash
+# Network debugging
+docker run --rm -it nicolaka/netshoot
+
+# Attach to existing network
+docker run --rm -it --network mynet nicolaka/netshoot
+
+# Minimal busybox
+docker run --rm -it busybox
+
+# Alpine with shell
+docker run --rm -it alpine sh
+```
+
+---
+
+## Environment & Configuration
+
+```bash
+# Pass environment variables
+docker run -e KEY=value app
+docker run --env-file .env app
+
+# Mount config file
+docker run -v ./config.json:/app/config.json:ro app
+
+# Override entrypoint
+docker run --entrypoint /bin/sh app
+
+# Override command
+docker run app /bin/bash
+```
+
+---
+
+## Useful One-liners
+
+```bash
+# Stop all running containers
+docker stop $(docker ps -q)
+
+# Remove all stopped containers
+docker rm $(docker ps -aq)
+
+# Remove all images
+docker rmi $(docker images -q)
+
+# Get container IP
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' app
+
+# Follow logs of last created container
+docker logs -f $(docker ps -lq)
+
+# List containers by size
+docker ps -s --format "table {{.Names}}\t{{.Size}}"
+
+# Export container filesystem
+docker export app > app.tar
+
+# Save image to file
+docker save -o myapp.tar myapp:1.0
+
+# Load image from file
+docker load -i myapp.tar
+```
+
+---
+
+## Related Guides
+
+<CardGrid>
+  <LinkCard
+    title="Docker Fundamentals"
+    href="/guides/docker/docker-fundamentals"
+    description="Core Docker concepts"
+  />
+  <LinkCard
+    title="Docker Compose"
+    href="/guides/docker/docker-compose"
+    description="Multi-container applications"
+  />
+</CardGrid>
+
+---
+
+## Source
+
+Based on [Docker CLI Documentation](https://docs.docker.com/engine/reference/commandline/cli/) and DevHub examples.

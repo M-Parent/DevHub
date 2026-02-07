@@ -24,6 +24,7 @@ import Terminal from "../../../../../components/Terminal.astro";
 import FillBlank from "../../../../../components/FillBlank.astro";
 import ProgressCheck from "../../../../../components/ProgressCheck.astro";
 import FileTree from "../../../../../components/FileTree.astro";
+import MatchPairs from "../../../../../components/MatchPairs.astro";
 
 <Badge text="Linux" class="linux" />
 
@@ -379,6 +380,16 @@ systemctl status ssh  # SSH should be enabled
 ## Knowledge Check
 
 Test your understanding of Ubuntu autoinstall:
+
+<MatchPairs
+  instruction="Match the autoinstall file with its purpose"
+  pairs={[
+    { left: "user-data", right: "Main autoinstall config" },
+    { left: "meta-data", right: "Instance information" },
+    { left: "grub.cfg", right: "Boot loader config" },
+    { left: "md5sum.txt", right: "File integrity check" },
+  ]}
+/>
 
 <Quiz
   question="Where should you place the autoinstall.yaml file in the custom ISO?"

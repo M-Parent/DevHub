@@ -1,0 +1,476 @@
+---
+title: "Building Custom Docker Images"
+description: "Learn how to create optimized Docker images with Dockerfiles, multi-stage builds, and best practices."
+sidebar:
+  label: "Custom Images"
+  order: 7
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import FileTree from "../../../../components/FileTree.astro";
+import DragDrop from "../../../../components/DragDrop.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+
+Custom Docker images let you package your applications with all dependencies. This guide covers Dockerfile syntax, best practices, and optimization techniques.
+
+<Aside type="tip" title="Image Layers">
+  Each Dockerfile instruction creates a layer. Layers are cached and reused,
+  making builds faster. Order instructions from least to most frequently
+  changed.
+</Aside>
+
+---
+
+## Dockerfile Basics
+
+A Dockerfile is a text file with instructions to build an image.
+
+### Minimal Example
+
+```dockerfile
+# Base image
+FROM nginx:alpine
+
+# Copy files
+COPY index.html /usr/share/nginx/html/
+
+# Expose port
+EXPOSE 80
+
+# Start command
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+### Build the Image
+
+```bash
+docker build -t my-nginx .
+```
+
+### Run the Image
+
+```bash
+docker run -d -p 8080:80 my-nginx
+```
+
+---
+
+## Dockerfile Instructions
+
+### FROM - Base Image
+
+Every Dockerfile starts with `FROM`:
+
+```dockerfile
+# Official image
+FROM ubuntu:22.04
+
+# Minimal Alpine (5MB)
+FROM alpine:3.18
+
+# Language-specific
+FROM node:18-alpine
+FROM python:3.11-slim
+
+# Empty image (for static binaries)
+FROM scratch
+```
+
+<Aside type="tip" title="Choose Base Images Wisely">
+  Start with the smallest image that meets your needs. Alpine-based images are
+  often 10x smaller than full distributions.
+</Aside>
+
+### ENV - Environment Variables
+
+```dockerfile
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV APP_HOME=/app
+```
+
+### WORKDIR - Working Directory
+
+```dockerfile
+WORKDIR /app
+
+# Subsequent commands run from /app
+COPY . .
+RUN npm install
+```
+
+Preferred over `RUN cd /app`.
+
+### COPY vs ADD
+
+```dockerfile
+# COPY - simple file copy (preferred)
+COPY package.json .
+COPY src/ ./src/
+
+# ADD - extra features (URLs, auto-extract archives)
+ADD https://example.com/file.tar.gz /tmp/
+ADD archive.tar.gz /app/
+```
+
+Use `COPY` unless you need `ADD`'s features.
+
+### RUN - Execute Commands
+
+```dockerfile
+# Shell form
+RUN apt-get update && apt-get install -y nginx
+
+# Exec form (preferred for CMD/ENTRYPOINT)
+RUN ["apt-get", "update"]
+```
+
+Chain commands to reduce layers:
+
+```dockerfile
+# ✅ Good - single layer
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      nginx \
+      curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# ❌ Bad - multiple layers, cache issues
+RUN apt-get update
+RUN apt-get install -y nginx
+RUN apt-get install -y curl
+```
+
+### EXPOSE - Document Ports
+
+```dockerfile
+EXPOSE 80
+EXPOSE 443
+EXPOSE 3000
+```
+
+Documentation only - still need `-p` when running.
+
+### CMD vs ENTRYPOINT
+
+| Instruction  | Purpose         | Override                          |
+| ------------ | --------------- | --------------------------------- |
+| `CMD`        | Default command | Easy with `docker run ... newcmd` |
+| `ENTRYPOINT` | Fixed command   | Requires `--entrypoint`           |
+
+```dockerfile
+# CMD - easily overridden
+CMD ["nginx", "-g", "daemon off;"]
+
+# ENTRYPOINT - fixed, args appended
+ENTRYPOINT ["python", "app.py"]
+CMD ["--port", "8080"]  # Default args
+```
+
+<Flashcard
+  title="CMD vs ENTRYPOINT"
+  cards={[
+    {
+      front: "What's the difference between CMD and ENTRYPOINT?",
+      back: "CMD provides default command/args that can be easily overridden. ENTRYPOINT sets a fixed command - arguments are appended to it.",
+    },
+  ]}
+/>
+
+---
+
+## Complete Example: Custom Nginx
+
+### Project Structure
+
+```
+my-nginx/
+├── Dockerfile
+├── default.conf
+└── index.html
+```
+
+### Dockerfile
+
+```dockerfile
+FROM alpine:3.18
+
+# Install nginx
+RUN apk update && \
+    apk add --no-cache nginx && \
+    rm -rf /var/cache/apk/*
+
+# Copy configuration
+COPY default.conf /etc/nginx/http.d/default.conf
+COPY index.html /var/www/html/index.html
+
+# Expose port
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+### default.conf
+
+```nginx
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    location / {
+        root   /var/www/html;
+        index  index.html index.htm;
+    }
+}
+```
+
+### index.html
+
+```html
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Our custom nginx container</h1>
+  </body>
+</html>
+```
+
+### Build and Run
+
+```bash
+docker build -t my-custom-nginx .
+docker run -d -p 8080:80 my-custom-nginx
+curl localhost:8080
+```
+
+---
+
+## Image Optimization
+
+### 1. Order Instructions by Change Frequency
+
+```dockerfile
+# ✅ Good - dependencies change less often
+FROM node:18-alpine
+WORKDIR /app
+
+# Dependencies (cached until package.json changes)
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Application code (changes frequently)
+COPY . .
+
+CMD ["node", "server.js"]
+```
+
+### 2. Multi-Stage Builds
+
+Build in one stage, copy only artifacts to final image:
+
+```dockerfile
+# Build stage
+FROM node:18 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+### 3. Use .dockerignore
+
+```bash
+# .dockerignore
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+*.md
+Dockerfile
+docker-compose.yml
+```
+
+### 4. Minimize Layers
+
+```dockerfile
+# ❌ Many layers
+RUN apt-get update
+RUN apt-get install -y curl
+RUN apt-get install -y nginx
+RUN rm -rf /var/lib/apt/lists/*
+
+# ✅ Single layer
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl nginx && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+---
+
+## Managing Images
+
+### List Images
+
+```bash
+docker images
+docker image ls
+```
+
+### View Image History
+
+```bash
+docker image history my-nginx
+```
+
+Shows each layer and its size.
+
+### Tag Images
+
+```bash
+# Add tag
+docker tag my-nginx myregistry/my-nginx:1.0.0
+docker tag my-nginx myregistry/my-nginx:latest
+
+# Tag during build
+docker build -t my-nginx:1.0.0 -t my-nginx:latest .
+```
+
+### Remove Images
+
+```bash
+# Remove specific image
+docker rmi my-nginx
+
+# Remove unused images
+docker image prune
+
+# Remove all unused images
+docker image prune -a
+```
+
+### Check Image Size
+
+```bash
+docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
+
+# Detailed breakdown
+docker system df -v
+```
+
+---
+
+## Security Scanning
+
+Scan images for vulnerabilities before deploying:
+
+```bash
+# Using Trivy
+docker run --rm aquasec/trivy image nginx:1.20.0
+
+# Scan local Dockerfile
+docker run --rm -v $PWD:/app aquasec/trivy config /app/Dockerfile
+```
+
+<Aside type="caution" title="Pin Versions">
+  Always pin specific versions in production: `nginx:1.25.3` not `nginx:latest`.
+  This ensures reproducible builds and security scanning accuracy.
+</Aside>
+
+---
+
+## Knowledge Check
+
+<FileTree
+  title="Docker Build Context"
+  structure={[
+    { name: "Dockerfile", badge: "create" },
+    { name: ".dockerignore", badge: "create" },
+    {
+      name: "src/",
+      type: "folder",
+      children: [{ name: "app.py" }, { name: "requirements.txt" }],
+    },
+    { name: "node_modules/", type: "folder", badge: "delete" },
+    { name: ".git/", type: "folder", badge: "delete" },
+  ]}
+/>
+
+<DragDrop
+  instruction="Order the Dockerfile instructions for optimal caching:"
+  sentence="FROM node:20 - [BLANK] - [BLANK] - [BLANK] - CMD"
+  words={[
+    "WORKDIR /app",
+    "COPY + RUN npm install",
+    "COPY . .",
+    "RUN apt update",
+  ]}
+  correctOrder={[0, 1, 2]}
+/>
+
+<FillBlank
+  instruction="Type the command to build an image:"
+  sentence="docker [BLANK:build] -t myapp:1.0 ."
+/>
+
+<Quiz
+  question="What instruction should you use to copy files in most cases?"
+  options={["ADD", "COPY", "IMPORT", "LOAD"]}
+  correct={1}
+  explanation="COPY is preferred for simple file copying. ADD has extra features (URL download, auto-extract) that are rarely needed."
+/>
+
+<Quiz
+  question="Why order Dockerfile instructions from least to most frequently changed?"
+  options={[
+    "Alphabetical preference",
+    "Smaller image size",
+    "Better layer caching",
+    "Faster downloads",
+  ]}
+  correct={2}
+  explanation="Docker caches layers. Putting stable instructions (like installing dependencies) before frequently changing ones (like copying code) improves build cache efficiency."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="docker-custom-images"
+  title="Custom Images Checklist"
+  items={[
+    "Write basic Dockerfile",
+    "Build and tag images",
+    "Use COPY, RUN, CMD instructions",
+    "Understand layer caching",
+    "Optimize with multi-stage builds",
+    "Create .dockerignore file",
+    "Scan images for vulnerabilities",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Dockerfile Best Practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/) and DevHub examples.

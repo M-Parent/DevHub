@@ -1,0 +1,268 @@
+---
+title: "UX Design Theory"
+description: "Understanding user experience design principles, cognitive psychology, and best practices for creating intuitive interfaces."
+sidebar:
+  label: "UX Design"
+  order: 1
+  badge:
+    text: "Theory"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Aside, Badge } from "@astrojs/starlight/components";
+import Flashcard from "../../../components/Flashcard.astro";
+
+<Badge text="Misc" class="misc" />
+<Badge text="Theory" variant="note" />
+
+UX (User Experience) design focuses on understanding users and creating products that provide meaningful, relevant experiences. This guide covers the fundamental principles of UX design.
+
+---
+
+## What is UX Design?
+
+UX design is about genuinely understanding users of an application. Every click, scroll, page refresh, and survey data point is collected and analyzed to understand their:
+
+- **Wishes** - What they want
+- **Needs** - What they require
+- **Desires** - What they aspire to
+- **Blockers** - What frustrates them
+
+The goal is to improve the overall customer experience.
+
+---
+
+## The UX Process
+
+### Step 1: Understand User Needs
+
+Find or understand user needs through surveys and data collection tools.
+
+### Step 2: Define Problems
+
+From these needs, identify problems and challenges users face.
+
+### Step 3: Find Solutions
+
+Develop solutions through trial and error. Be willing to iterate and go back to previous steps.
+
+<Aside type="tip" title="Iteration is Key">
+  UX design is not linear. You may need to revisit earlier steps as you learn
+  more about your users.
+</Aside>
+
+---
+
+## Criteria for a Successful Experience
+
+| Criterion          | Description                         |
+| ------------------ | ----------------------------------- |
+| **Utility**        | Does it serve a purpose?            |
+| **Efficiency**     | Can users accomplish tasks quickly? |
+| **Ease of Action** | Is it simple to use?                |
+| **Usability**      | Is it intuitive?                    |
+| **Pleasure**       | Is it enjoyable to use?             |
+
+---
+
+## UX Objectives
+
+UX design aims to improve:
+
+- 💰 **Sales** - Increase conversions
+- 🏢 **Brand Image** - Build trust and recognition
+- 💪 **Health** - User wellbeing (for health apps)
+- 📈 **Traffic** - Attract and retain users
+- 🛋️ **Comfort** - Reduce friction and frustration
+
+---
+
+## Cognitive Psychology in UX
+
+Cognitive psychology studies the mental mechanisms behind human behavior.
+
+### Perception
+
+Perception changes based on:
+
+- Current state (tired, focused, rushed)
+- Environment (mobile, desktop, noisy)
+- Objectives (browsing, purchasing, researching)
+
+### Language
+
+Adapt communication to match how users speak and think.
+
+### Memory & Attention
+
+Minimize cognitive load for actions on your interface. Users can only hold 7±2 items in short-term memory.
+
+### Problem Solving
+
+Guide users at every interaction point to prevent frustration.
+
+<Flashcard
+  title="Cognitive Load"
+  cards={[
+    {
+      front: "What is cognitive load in UX?",
+      back: "The mental effort required to use an interface. Good UX minimizes cognitive load by making actions intuitive and reducing the number of decisions users need to make.",
+    },
+  ]}
+/>
+
+---
+
+## Psychological Laws in UX
+
+### Reciprocity
+
+Users like to give back when they receive value. Promotions feel like gifts and encourage engagement.
+
+### Social Proof
+
+Users trust products used and appreciated by many others. Use testimonials, ratings, and reviews.
+
+### Scarcity
+
+Items perceived as rare are more desirable. Limited-time offers create urgency.
+
+### Affordance
+
+Visual characteristics suggest how an object can be used. A button should look clickable.
+
+### Fitts's Law
+
+The time to reach a target is proportional to distance and inversely proportional to target size.
+
+> **Takeaway:** Make important buttons large and easily accessible.
+
+### Hick's Law & Miller's Law
+
+- Humans struggle to retain information (7±2 items)
+- Keep navigation to 7±2 items
+- Offer binary choices when possible to reduce user effort
+
+---
+
+## User Personas
+
+A persona is an aggregate of similar users who will use your application.
+
+Create personas after conducting thorough user research to identify user groups with similar:
+
+- Demographics
+- Goals
+- Behaviors
+- Pain points
+
+**Format:** Create a profile card like a CV with photo, name, bio, goals, and frustrations.
+
+---
+
+## Information Architecture
+
+The goal is to organize information so users can easily find what they're looking for.
+
+Use personas to guide your architecture decisions. Ask: "How would this persona navigate to find X?"
+
+---
+
+## Benchmarking
+
+Benchmarking identifies best practices by studying how others solve similar problems.
+
+### Types of Benchmarking
+
+| Type            | Description                                              |
+| --------------- | -------------------------------------------------------- |
+| **Internal**    | Compare operations within your organization              |
+| **Functional**  | Compare similar functions in non-competing companies     |
+| **Competitive** | Compare against direct competitors                       |
+| **Generic**     | Compare practices across completely different industries |
+
+### Benchmarking Process
+
+1. Explore competitor interfaces
+2. Analyze, compare, identify strengths and weaknesses
+3. Document findings (UX and functional)
+
+---
+
+## Rule 1: Organize Your Pages Well
+
+- Perfect your navigation
+- Organize and rhythm content
+- Request information intelligently
+- Focus on essential content and features
+- Remove unnecessary interactions
+- Respect typography and color standards
+- Practice visual hierarchy
+- Reduce the number of CTAs (Call-to-Action)
+
+---
+
+## Rule 2: Leverage Modern Web/Mobile Patterns
+
+- Capitalize on conventions and standards
+- Consider user's country of origin
+- Help users accomplish tasks faster
+- Limit visible form fields
+- Save form entries for returning users
+
+---
+
+## Rule 3: Always Inform the User
+
+- Identify who you are
+- Show where the user is in the site
+- Provide feedback on what will happen next
+- Inform about availability
+- Convince and reassure
+- Optimize purchase funnels
+- Respect affordance principles
+- Choose appropriate terms and icons
+
+---
+
+## Rule 4: Anticipate Errors
+
+- Protect users from possible errors
+- Help users overcome errors gracefully
+- Mark required fields clearly
+- Label form fields properly
+- Size fields appropriately for content
+- Choose the right input elements
+
+---
+
+## Rule 5: Give Users Control
+
+- Don't be intrusive or impose anything
+- Be flexible while maintaining conventions
+- Let users undo actions
+- Provide clear exit points
+
+---
+
+## Rule 6: Accessibility for Everyone
+
+- Include all users regardless of ability
+- Ensure proper contrast, colors, and font sizes
+- Polish aesthetics
+- Subtitle videos
+- Account for information overload
+- Ensure technical reliability
+- Add social features and micro-interactions
+
+<Aside type="caution" title="Accessibility is Not Optional">
+  Designing for accessibility benefits all users, not just those with
+  disabilities.
+</Aside>
+
+---
+
+## Source
+
+Based on UX design principles and cognitive psychology research.

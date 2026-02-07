@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Terraform" class="terraform" />
 
@@ -310,42 +313,59 @@ variable "num_vms" {
 
 ## Knowledge Check
 
-<Quiz
-  id="terraform-variables-quiz"
-  title="Terraform Variables Quiz"
-  questions={[
+<MatchPairs
+  instruction="Match the variable type with its example"
+  pairs={[
+    { left: "string", right: '"hello"' },
+    { left: "number", right: "42" },
+    { left: "bool", right: "true" },
+    { left: "list", right: '["a", "b", "c"]' },
+  ]}
+/>
+
+<Terminal
+  commands={[
     {
-      question: "What happens if a variable has no default value?",
-      options: [
-        "Terraform uses null",
-        "Terraform prompts the user",
-        "Terraform fails",
-        "Terraform uses empty string",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "Variables without default values must be provided at runtime, either via prompt, -var flag, or .tfvars file.",
-    },
-    {
-      question: "How do you reference a variable in Terraform?",
-      options: ["$variable", "{{variable}}", "var.variable", "${variable}"],
-      correctAnswer: 2,
-      explanation:
-        "Use var.variable_name to reference variables. Inside strings, use ${var.variable_name}.",
-    },
-    {
-      question: "What is the purpose of .tfvars files?",
-      options: [
-        "Store variable definitions",
-        "Store variable values",
-        "Store provider configs",
-        "Store state",
-      ],
-      correctAnswer: 1,
-      explanation:
-        ".tfvars files store variable values, keeping them separate from definitions in variables.tf.",
+      input: "terraform apply -var-file=dev.tfvars",
+      output: "Apply complete! Resources: 2 added, 0 changed, 0 destroyed.",
     },
   ]}
+/>
+
+<FillBlank
+  instruction="The name defined in the variable block"
+  sentence="To reference a variable in Terraform, use: var.[BLANK:variable_name]"
+/>
+
+<Quiz
+  question="What happens if a variable has no default value?"
+  options={[
+    "Terraform uses null",
+    "Terraform prompts the user",
+    "Terraform fails",
+    "Terraform uses empty string",
+  ]}
+  correct={1}
+  explanation="Variables without default values must be provided at runtime, either via prompt, -var flag, or .tfvars file."
+/>
+
+<Quiz
+  question="How do you reference a variable in Terraform?"
+  options={["$variable", "{{variable}}", "var.variable", "${variable}"]}
+  correct={2}
+  explanation="Use var.variable_name to reference variables. Inside strings, use ${var.variable_name}."
+/>
+
+<Quiz
+  question="What is the purpose of .tfvars files?"
+  options={[
+    "Store variable definitions",
+    "Store variable values",
+    "Store provider configs",
+    "Store state",
+  ]}
+  correct={1}
+  explanation=".tfvars files store variable values, keeping them separate from definitions in variables.tf."
 />
 
 ---

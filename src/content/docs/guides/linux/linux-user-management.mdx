@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Question from "../../../../components/Question.astro";
 import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
 
 <Badge text="Linux" class="linux" />
@@ -191,6 +194,33 @@ sudo userdel -r devuser
 ---
 
 ## Knowledge Check
+
+<MatchPairs
+  title="User Management Commands"
+  pairs={[
+    { left: "useradd -m", right: "Create user with home directory" },
+    { left: "usermod -aG", right: "Add user to group (append)" },
+    { left: "passwd", right: "Change user password" },
+    { left: "userdel -r", right: "Delete user and home directory" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    { input: "sudo useradd -m -s /bin/bash newuser", output: "" },
+    {
+      input: "sudo passwd newuser",
+      output:
+        "New password:\nRetype new password:\npasswd: password updated successfully",
+    },
+    { input: "groups newuser", output: "newuser : newuser sudo docker" },
+  ]}
+/>
+
+<FillBlank
+  instruction="Type the command to add user 'bob' to the 'docker' group:"
+  sentence="sudo [BLANK:usermod] -aG docker bob"
+/>
 
 <Flashcard
   title="User Management Commands"

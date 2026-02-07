@@ -1,0 +1,339 @@
+---
+title: "Docker Swarm Basics"
+description: "Introduction to Docker Swarm mode - container orchestration built into Docker Engine."
+sidebar:
+  label: "Swarm Basics"
+  order: 1
+  badge:
+    text: "Adv"
+    variant: "danger"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+<Badge text="Orchestration" class="devops" />
+
+Docker Swarm is Docker's native clustering and orchestration solution. It turns a pool of Docker hosts into a single virtual Docker engine.
+
+---
+
+## What is Docker Swarm?
+
+Docker Swarm mode provides:
+
+- **Cluster Management** - Integrated with Docker Engine
+- **Declarative Services** - Define desired state, Swarm maintains it
+- **Scaling** - Scale services up/down with a single command
+- **Load Balancing** - Built-in internal and external load balancing
+- **Rolling Updates** - Update services with zero downtime
+- **Self-Healing** - Automatically replaces failed containers
+
+<Flashcard
+  title="Swarm Concepts"
+  cards={[
+    {
+      front:
+        "What's the difference between a container and a service in Swarm?",
+      back: "A container is a single instance. A service is a definition of desired state (image, replicas, ports) that Swarm maintains - it can run multiple replica containers across nodes.",
+    },
+  ]}
+/>
+
+---
+
+## Swarm Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    Swarm Cluster                     │
+│                                                      │
+│  ┌──────────────┐   ┌──────────────┐                │
+│  │   Manager 1  │   │   Manager 2  │   (Managers)   │
+│  │   (Leader)   │◀─▶│   (Replica)  │                │
+│  └──────┬───────┘   └──────────────┘                │
+│         │                                            │
+│         │ Raft Consensus                            │
+│         ▼                                            │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ │
+│  │   Worker 1   │ │   Worker 2   │ │   Worker 3   │ │
+│  │  ┌────────┐  │ │  ┌────────┐  │ │  ┌────────┐  │ │
+│  │  │  Task  │  │ │  │  Task  │  │ │  │  Task  │  │ │
+│  │  └────────┘  │ │  └────────┘  │ │  └────────┘  │ │
+│  └──────────────┘ └──────────────┘ └──────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+| Component   | Description                                            |
+| ----------- | ------------------------------------------------------ |
+| **Manager** | Controls the cluster, schedules tasks, maintains state |
+| **Worker**  | Runs containers (tasks), reports to managers           |
+| **Service** | Definition of what to run (image, replicas, config)    |
+| **Task**    | A single container instance within a service           |
+
+---
+
+## Initialize a Swarm
+
+### Single Node Swarm
+
+```bash
+docker swarm init
+```
+
+### Multi-Node Swarm (Specify IP)
+
+```bash
+docker swarm init --advertise-addr 192.168.1.100
+```
+
+Output:
+
+```
+Swarm initialized: current node (abc123) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-xxx 192.168.1.100:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager'
+```
+
+<Aside type="tip" title="Manager Quorum">
+  For production, use 3 or 5 managers for high availability. An odd number
+  prevents split-brain scenarios.
+</Aside>
+
+---
+
+## Node Management
+
+### List Nodes
+
+```bash
+docker node ls
+```
+
+```
+ID             HOSTNAME    STATUS    AVAILABILITY   MANAGER STATUS
+abc123 *       manager1    Ready     Active         Leader
+def456         worker1     Ready     Active
+ghi789         worker2     Ready     Active
+```
+
+### Get Join Tokens
+
+```bash
+# Worker join token
+docker swarm join-token worker
+
+# Manager join token
+docker swarm join-token manager
+```
+
+### Join as Worker
+
+Run on the worker node:
+
+```bash
+docker swarm join --token SWMTKN-1-xxx 192.168.1.100:2377
+```
+
+### Join as Manager
+
+Run on the new manager node:
+
+```bash
+docker swarm join --token SWMTKN-1-manager-xxx 192.168.1.100:2377
+```
+
+---
+
+## Node Roles
+
+### Promote Worker to Manager
+
+```bash
+docker node promote worker1
+```
+
+### Demote Manager to Worker
+
+```bash
+docker node demote manager2
+```
+
+### Drain a Node (Maintenance)
+
+```bash
+# Stop scheduling new tasks, migrate existing
+docker node update --availability drain worker1
+
+# Bring back online
+docker node update --availability active worker1
+```
+
+### Remove a Node
+
+```bash
+# On the node to remove
+docker swarm leave
+
+# If manager, force leave
+docker swarm leave --force
+
+# Remove from cluster (run on manager)
+docker node rm worker1
+```
+
+---
+
+## Inspect Swarm State
+
+### Swarm Info
+
+```bash
+docker info | grep -A 20 "Swarm"
+```
+
+### Inspect a Node
+
+```bash
+docker node inspect worker1 --pretty
+```
+
+### Check Node Resources
+
+```bash
+docker node inspect worker1 --format '{{.Description.Resources}}'
+```
+
+---
+
+## Manager High Availability
+
+For production, deploy multiple managers:
+
+| Managers | Fault Tolerance |
+| -------- | --------------- |
+| 1        | 0 (no HA)       |
+| 3        | 1 failure       |
+| 5        | 2 failures      |
+| 7        | 3 failures      |
+
+```bash
+# On additional manager nodes, join as manager
+docker swarm join --token SWMTKN-1-manager-xxx 192.168.1.100:2377
+```
+
+<Aside type="caution" title="Manager Best Practices">
+  - Never run more than 7 managers (Raft overhead) - Managers can also run
+  workloads (but consider draining in production) - Spread managers across
+  availability zones
+</Aside>
+
+---
+
+## Leaving the Swarm
+
+### Worker Leaves
+
+```bash
+docker swarm leave
+```
+
+### Manager Leaves
+
+```bash
+# Demote first if possible
+docker node demote this-manager
+
+# Force leave
+docker swarm leave --force
+```
+
+### Destroy Entire Swarm
+
+On each node:
+
+```bash
+docker swarm leave --force
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the Swarm component with its role"
+  pairs={[
+    { left: "Manager", right: "Controls cluster and schedules tasks" },
+    { left: "Worker", right: "Runs containers and reports status" },
+    { left: "Service", right: "Definition of desired state" },
+    { left: "Task", right: "Single container instance" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "docker swarm init",
+      output: "Swarm initialized: current node is now a manager.",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the sentence:"
+  sentence="For production, use [BLANK:3] or 5 managers to prevent split-brain scenarios"
+/>
+
+<Quiz
+  question="What command initializes a new Docker Swarm cluster?"
+  options={[
+    "docker cluster init",
+    "docker swarm create",
+    "docker swarm init",
+    "docker init swarm",
+  ]}
+  correct={2}
+  explanation="Use 'docker swarm init' to initialize a new swarm. The node becomes the first manager."
+/>
+
+<Quiz
+  question="How many managers should a production swarm have?"
+  options={["1", "2", "3 or 5 (odd number)", "As many as possible"]}
+  correct={2}
+  explanation="Use 3 or 5 managers for fault tolerance. Odd numbers prevent split-brain in Raft consensus."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="docker-swarm-basics"
+  title="Docker Swarm Basics Checklist"
+  items={[
+    "Understand Swarm architecture",
+    "Initialize a swarm cluster",
+    "Add worker nodes",
+    "Add manager nodes",
+    "Promote/demote nodes",
+    "Drain nodes for maintenance",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Docker Swarm Documentation](https://docs.docker.com/engine/swarm/) and DevHub examples.

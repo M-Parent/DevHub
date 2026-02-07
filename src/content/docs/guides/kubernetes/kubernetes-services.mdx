@@ -1,0 +1,401 @@
+---
+title: "Kubernetes Services & Networking"
+description: "Expose your applications with Kubernetes Services - ClusterIP, NodePort, LoadBalancer, and more."
+sidebar:
+  label: "Services"
+  order: 4
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Kubernetes" class="kubernetes" />
+
+Services provide stable network endpoints to connect to pods. Since pods are ephemeral (they come and go), Services give you a consistent way to access your applications.
+
+---
+
+## Why Services?
+
+Pods have dynamic IPs that change when pods restart. Services solve this by:
+
+- Providing a stable DNS name and IP
+- Load balancing across pod replicas
+- Enabling service discovery
+- Defining access policies
+
+---
+
+## Service Types
+
+| Type             | Description         | Access               |
+| ---------------- | ------------------- | -------------------- |
+| **ClusterIP**    | Internal-only IP    | Within cluster only  |
+| **NodePort**     | Port on every node  | External via node IP |
+| **LoadBalancer** | Cloud load balancer | External via LB IP   |
+| **ExternalName** | DNS alias           | Outbound only        |
+
+---
+
+## ClusterIP (Default)
+
+ClusterIP is the default service type - accessible only within the cluster.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: ClusterIP # Default, can be omitted
+  selector:
+    app: nginx
+  ports:
+    - port: 80 # Service port
+      targetPort: 80 # Container port
+```
+
+### Create Service
+
+```bash
+# Imperative
+kubectl expose deployment nginx --port=80
+
+# Check service
+kubectl get services
+kubectl get svc  # Short form
+```
+
+### ClusterIP Characteristics
+
+- Single internal virtual IP
+- Only reachable within the cluster
+- Pods reach service on the defined port
+- DNS name: `<service-name>.<namespace>.svc.cluster.local`
+
+```bash
+# From another pod
+curl http://nginx-service
+curl http://nginx-service.default.svc.cluster.local
+```
+
+<Flashcard
+  title="ClusterIP"
+  cards={[
+    {
+      front: "When would you use ClusterIP service type?",
+      back: "Use ClusterIP for internal services that only need to be accessed by other pods in the cluster (databases, internal APIs, cache). It's the default and most secure type.",
+    },
+  ]}
+/>
+
+---
+
+## NodePort
+
+NodePort exposes the service on a high port on every node.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080 # Optional: 30000-32767
+```
+
+### NodePort Characteristics
+
+- Port allocated on every node (30000-32767)
+- Access via `<node-ip>:<node-port>`
+- Also creates ClusterIP for internal access
+- Traffic: NodePort → Service → Pods
+
+```bash
+# Create NodePort service
+kubectl expose deployment nginx --type=NodePort --port=80
+
+# Find the assigned port
+kubectl get svc nginx
+
+# Access from outside
+curl http://<node-ip>:30080
+```
+
+<Aside type="note" title="NodePort Range">
+  NodePort range is 30000-32767 by default. You can specify a port or let K8s
+  assign one.
+</Aside>
+
+---
+
+## LoadBalancer
+
+LoadBalancer provisions an external load balancer (cloud environments).
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+```
+
+### LoadBalancer Characteristics
+
+- Works in cloud environments (GKE, EKS, AKS)
+- Provisions cloud load balancer automatically
+- Creates NodePort + ClusterIP internally
+- External IP assigned by cloud provider
+
+```bash
+kubectl expose deployment nginx --type=LoadBalancer --port=80
+
+# Wait for external IP
+kubectl get svc nginx -w
+```
+
+### On Local Clusters
+
+LoadBalancer won't work on Docker Desktop/Minikube without additional setup:
+
+```bash
+# Minikube tunnel
+minikube tunnel
+
+# MetalLB for bare metal clusters
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13/config/manifests/metallb-native.yaml
+```
+
+---
+
+## ExternalName
+
+ExternalName creates a DNS alias to an external service.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-db
+spec:
+  type: ExternalName
+  externalName: database.example.com
+```
+
+Use case: Pods can access `external-db` as if it were an internal service.
+
+---
+
+## Service Discovery
+
+Kubernetes provides built-in DNS for service discovery.
+
+### DNS Format
+
+```
+<service-name>.<namespace>.svc.cluster.local
+
+# Examples:
+nginx.default.svc.cluster.local    # Full FQDN
+nginx.default                       # Short form
+nginx                               # Same namespace
+```
+
+### Environment Variables
+
+Kubernetes also injects environment variables:
+
+```bash
+# Inside a pod
+echo $NGINX_SERVICE_HOST  # Service IP
+echo $NGINX_SERVICE_PORT  # Service port
+```
+
+<Flashcard
+  title="Service Discovery"
+  cards={[
+    {
+      front: "How does a pod find another service in Kubernetes?",
+      back: "K8s provides DNS-based service discovery. Pods can reach services by name (e.g., 'nginx' in same namespace, or 'nginx.default' cross-namespace). K8s also injects service details as environment variables.",
+    },
+  ]}
+/>
+
+---
+
+## Practical Example
+
+<Steps>
+
+1. **Create a Deployment**
+
+   ```bash
+   kubectl create deployment web --image=nginx --replicas=3
+   ```
+
+2. **Expose as ClusterIP**
+
+   ```bash
+   kubectl expose deployment web --port=80
+   kubectl get svc web
+   ```
+
+3. **Test internal access**
+
+   ```bash
+   kubectl run test --rm -it --image=busybox -- wget -qO- http://web
+   ```
+
+4. **Expose as NodePort**
+
+   ```bash
+   kubectl delete svc web
+   kubectl expose deployment web --type=NodePort --port=80
+   kubectl get svc web
+   ```
+
+5. **Access externally**
+
+   ```bash
+   # Get NodePort
+   kubectl get svc web -o jsonpath='{.spec.ports[0].nodePort}'
+
+   # Access
+   curl http://localhost:<nodeport>
+   ```
+
+</Steps>
+
+---
+
+## Ingress (Preview)
+
+Ingress manages external HTTP/HTTPS access to services.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+spec:
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+```
+
+<Aside type="tip" title="Ingress Controllers">
+  Ingress requires an Ingress Controller (nginx-ingress, traefik, etc.) to work.
+</Aside>
+
+---
+
+## Useful Commands
+
+```bash
+# List services
+kubectl get svc
+
+# Describe service
+kubectl describe svc nginx
+
+# Get endpoints (pod IPs)
+kubectl get endpoints nginx
+
+# Port forward for testing
+kubectl port-forward svc/nginx 8080:80
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the service type with its access level"
+  pairs={[
+    { left: "ClusterIP", right: "Internal-only within cluster" },
+    { left: "NodePort", right: "External via node IP and high port" },
+    { left: "LoadBalancer", right: "External via cloud load balancer" },
+    { left: "ExternalName", right: "DNS alias to external service" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "kubectl expose deployment nginx --port=80",
+      output: "service/nginx exposed",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="The upper limit of the NodePort range"
+  sentence="NodePort services use ports in the range 30000 to [BLANK:32767]."
+/>
+
+<Quiz
+  question="Which service type is accessible only within the cluster?"
+  options={["NodePort", "LoadBalancer", "ClusterIP", "ExternalName"]}
+  correct={2}
+  explanation="ClusterIP (the default) provides an internal IP accessible only within the cluster. It's the most secure option for internal services."
+/>
+
+<Quiz
+  question="What port range does NodePort use?"
+  options={["80-443", "1024-65535", "8000-9000", "30000-32767"]}
+  correct={3}
+  explanation="NodePort allocates ports in the range 30000-32767 by default. This range can be configured in the cluster settings."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="k8s-services"
+  title="Kubernetes Services Checklist"
+  items={[
+    "Understand why services are needed",
+    "Create ClusterIP services",
+    "Expose apps with NodePort",
+    "Use LoadBalancer in cloud",
+    "Understand service discovery/DNS",
+    "Port forward for debugging",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Kubernetes Services Documentation](https://kubernetes.io/docs/concepts/services-networking/service/) and DevHub examples.

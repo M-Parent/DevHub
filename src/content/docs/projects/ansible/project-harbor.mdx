@@ -1,0 +1,342 @@
+---
+title: "Project: Deploy Harbor with Ansible"
+description: "Automate Harbor container registry installation using Ansible - convert a bash script to a proper playbook."
+sidebar:
+  label: "Harbor"
+  order: 1
+  badge:
+    text: "Mid"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Ansible" class="ansible" />
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+
+In this project, you'll convert a bash script into an Ansible playbook to deploy Harbor, an open-source container registry with security scanning capabilities.
+
+<Aside type="note" title="Learning Goal">
+  This project teaches you how to translate manual installation scripts into
+  repeatable Ansible automation.
+</Aside>
+
+---
+
+## Project Overview
+
+| Aspect         | Details                                          |
+| -------------- | ------------------------------------------------ |
+| **Goal**       | Deploy Harbor container registry via Ansible     |
+| **Difficulty** | Intermediate                                     |
+| **Time**       | 30-45 minutes                                    |
+| **Skills**     | Ansible playbooks, file manipulation, templating |
+
+---
+
+## The Original Script
+
+Here's the bash script we're converting to Ansible:
+
+```bash
+#!/bin/bash
+# Manual Harbor installation
+
+wget -O harbor.tgz https://github.com/goharbor/harbor/releases/download/v2.5.6/harbor-online-installer-v2.5.6.tgz
+tar xf harbor.tgz
+cp harbor/harbor.yml.tmpl harbor/harbor.yml
+sed -i "s/hostname: .*/hostname: harbor.devhub.local/g" harbor/harbor.yml
+sed -i "s/  certificate: .*/  certificate: \/data\/certs\/harbor.crt/g" harbor/harbor.yml
+sed -i "s/  private_key: .*/  private_key: \/data\/certs\/harbor.key/g" harbor/harbor.yml
+cd harbor && sudo ./install.sh --with-trivy
+```
+
+---
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- Ansible configured with inventory
+- Target server with Docker installed
+- SSL certificates for Harbor (or use self-signed for testing)
+- At least 4GB RAM on target server
+
+---
+
+## Step 1: Define Variables
+
+Create a variable file for Harbor configuration:
+
+**group_vars/all/harbor.yml:**
+
+```yaml
+---
+harbor_version: "2.9.0"
+harbor_hostname: "harbor.devhub.local"
+harbor_install_dir: "/opt/harbor"
+harbor_data_dir: "/data"
+
+# Certificate paths
+harbor_cert_path: "/data/certs/harbor.crt"
+harbor_key_path: "/data/certs/harbor.key"
+
+# Installation options
+harbor_with_trivy: true
+harbor_with_notary: false
+```
+
+---
+
+## Step 2: Create the Playbook
+
+**playbooks/install-harbor.yml:**
+
+```yaml
+---
+- name: Install Harbor Container Registry
+  hosts: harbor
+  become: true
+
+  vars:
+    harbor_version: "2.9.0"
+    harbor_hostname: "harbor.devhub.local"
+    harbor_install_dir: "/opt"
+    harbor_data_dir: "/data"
+    harbor_cert_path: "/data/certs/harbor.crt"
+    harbor_key_path: "/data/certs/harbor.key"
+    harbor_with_trivy: true
+
+  tasks:
+    - name: Ensure required directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ harbor_install_dir }}"
+        - "{{ harbor_data_dir }}"
+        - "{{ harbor_data_dir }}/certs"
+
+    - name: Download Harbor installer
+      ansible.builtin.get_url:
+        url: "https://github.com/goharbor/harbor/releases/download/v{{ harbor_version }}/harbor-online-installer-v{{ harbor_version }}.tgz"
+        dest: "/tmp/harbor.tgz"
+        mode: "0644"
+
+    - name: Extract Harbor archive
+      ansible.builtin.unarchive:
+        src: "/tmp/harbor.tgz"
+        dest: "{{ harbor_install_dir }}"
+        remote_src: true
+
+    - name: Copy Harbor configuration template
+      ansible.builtin.copy:
+        src: "{{ harbor_install_dir }}/harbor/harbor.yml.tmpl"
+        dest: "{{ harbor_install_dir }}/harbor/harbor.yml"
+        remote_src: true
+        mode: "0644"
+
+    - name: Configure hostname
+      ansible.builtin.replace:
+        path: "{{ harbor_install_dir }}/harbor/harbor.yml"
+        regexp: 'hostname:\s*.*'
+        replace: "hostname: {{ harbor_hostname }}"
+
+    - name: Configure certificate path
+      ansible.builtin.replace:
+        path: "{{ harbor_install_dir }}/harbor/harbor.yml"
+        regexp: '^\s*certificate:\s*.*'
+        replace: "  certificate: {{ harbor_cert_path }}"
+
+    - name: Configure private key path
+      ansible.builtin.replace:
+        path: "{{ harbor_install_dir }}/harbor/harbor.yml"
+        regexp: '^\s*private_key:\s*.*'
+        replace: "  private_key: {{ harbor_key_path }}"
+
+    - name: Run Harbor installer
+      ansible.builtin.shell: |
+        cd {{ harbor_install_dir }}/harbor && ./install.sh {% if harbor_with_trivy %}--with-trivy{% endif %}
+      args:
+        creates: "{{ harbor_install_dir }}/harbor/docker-compose.yml"
+      register: harbor_install
+
+    - name: Show installation result
+      ansible.builtin.debug:
+        msg: "Harbor installation completed successfully!"
+      when: harbor_install.changed
+
+    - name: Clean up installer archive
+      ansible.builtin.file:
+        path: "/tmp/harbor.tgz"
+        state: absent
+```
+
+---
+
+## Step 3: Improvements Over the Script
+
+The Ansible playbook offers several advantages:
+
+| Bash Script       | Ansible Playbook              |
+| ----------------- | ----------------------------- |
+| Hardcoded values  | Variables for reusability     |
+| No error handling | Built-in error handling       |
+| No idempotency    | `creates:` ensures no re-runs |
+| Manual execution  | Automated, scheduled runs     |
+| No logging        | Full audit trail              |
+
+### Key Ansible Features Used
+
+1. **`get_url`** - Downloads files with integrity checks
+2. **`unarchive`** - Extracts archives, handles multiple formats
+3. **`copy` with `remote_src`** - Copies files on the remote server
+4. **`replace`** - Regex-based file modifications
+5. **`creates`** - Skip if file already exists (idempotency)
+
+---
+
+## Step 4: Add Certificate Generation (Optional)
+
+For testing, generate self-signed certificates:
+
+```yaml
+- name: Generate self-signed certificate
+  ansible.builtin.command: |
+    openssl req -x509 -nodes -days 365 \
+      -newkey rsa:2048 \
+      -keyout {{ harbor_key_path }} \
+      -out {{ harbor_cert_path }} \
+      -subj "/CN={{ harbor_hostname }}"
+  args:
+    creates: "{{ harbor_cert_path }}"
+  when: harbor_generate_certs | default(false)
+```
+
+---
+
+## Step 5: Run the Playbook
+
+<Steps>
+
+1. **Update inventory with Harbor host**
+
+   ```yaml
+   # inventory/hosts.yml
+   harbor:
+     hosts:
+       harbor-server:
+         ansible_host: 192.168.1.50
+   ```
+
+2. **Run the playbook**
+
+   ```bash
+   ansible-playbook playbooks/install-harbor.yml
+   ```
+
+3. **Verify installation**
+
+   ```bash
+   # SSH to server
+   ssh user@harbor-server
+
+   # Check containers
+   docker ps | grep harbor
+
+   # Access web UI
+   # https://harbor.devhub.local
+   ```
+
+</Steps>
+
+---
+
+## Bonus: Template Approach
+
+For more complex configuration, use a Jinja2 template:
+
+**templates/harbor.yml.j2:**
+
+```yaml
+hostname: { { harbor_hostname } }
+
+http:
+  port: 80
+
+https:
+  port: 443
+  certificate: { { harbor_cert_path } }
+  private_key: { { harbor_key_path } }
+
+harbor_admin_password: { { harbor_admin_password | default('Harbor12345') } }
+
+database:
+  password: { { harbor_db_password | default('root123') } }
+  max_idle_conns: 50
+  max_open_conns: 1000
+
+data_volume: { { harbor_data_dir } }
+
+trivy:
+  ignore_unfixed: false
+  skip_update: false
+  insecure: false
+
+log:
+  level: info
+  local:
+    rotate_count: 50
+    rotate_size: 200M
+    location: /var/log/harbor
+```
+
+Then use the template module:
+
+```yaml
+- name: Deploy Harbor configuration
+  ansible.builtin.template:
+    src: harbor.yml.j2
+    dest: "{{ harbor_install_dir }}/harbor/harbor.yml"
+    mode: "0644"
+```
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="project-harbor"
+  title="Harbor Project Checklist"
+  items={[
+    "Analyze the original bash script",
+    "Create variables for configuration",
+    "Write the Ansible playbook",
+    "Test on a development server",
+    "Verify Harbor is accessible",
+    "Optional: Add certificate generation",
+    "Optional: Convert to template approach",
+  ]}
+/>
+
+---
+
+## Troubleshooting
+
+| Issue              | Solution                              |
+| ------------------ | ------------------------------------- |
+| Download fails     | Check GitHub release URL and version  |
+| Permission denied  | Ensure `become: true` and sudo access |
+| Certificate errors | Verify cert/key paths and permissions |
+| Container errors   | Check `docker logs harbor-core`       |
+| Port conflicts     | Ensure 80/443 are available           |
+
+---
+
+## Source
+
+Based on [Harbor Installation Guide](https://goharbor.io/docs/2.9.0/install-config/) and DevHub examples.

@@ -16,6 +16,8 @@ import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import MatchPairs from "../../../../components/MatchPairs.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Radio" class="radio" />
 
@@ -236,6 +238,30 @@ NVIS aims the signal almost straight up, causing it to bounce back down closer t
 ---
 
 ## Knowledge Check
+
+<MatchPairs
+  instruction="Match the frequency band with its characteristics"
+  pairs={[
+    { left: "HF", right: "Ionospheric skip, long-distance" },
+    { left: "VHF", right: "Line of sight, medium range" },
+    { left: "UHF", right: "Good building penetration" },
+    { left: "AM", right: "Greater distance, more noise" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "rtl_test -t",
+      output: "Found 1 device(s):\n  0:  Realtek, RTL2838UHIDIR",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the acronym:"
+  sentence="[BLANK:BLOS] stands for Beyond Line of Sight communication"
+/>
 
 <Quiz
   question="What is the main advantage of UHF over HF?"

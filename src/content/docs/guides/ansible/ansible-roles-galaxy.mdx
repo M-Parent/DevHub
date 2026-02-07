@@ -1,0 +1,409 @@
+---
+title: "Ansible Roles and Galaxy"
+description: "Learn how to organize playbooks with roles and leverage community content from Ansible Galaxy."
+sidebar:
+  label: "Roles & Galaxy"
+  order: 5
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Ansible" class="ansible" />
+<Badge text="Linux" class="linux" />
+
+Roles are Ansible's way of organizing and reusing automation code. Combined with Ansible Galaxy, you can leverage thousands of community-built roles instead of writing everything from scratch.
+
+<Aside type="tip" title="Don't Reinvent the Wheel">
+  Before writing a role, check Ansible Galaxy. There's likely a well-tested
+  community role for common tasks like installing Docker, Nginx, or PostgreSQL.
+</Aside>
+
+---
+
+## What are Roles?
+
+Roles are a standardized way to package related tasks, variables, files, templates, and handlers. They make your automation:
+
+- **Reusable** - Use the same role across projects
+- **Modular** - Break complex playbooks into manageable pieces
+- **Shareable** - Distribute via Galaxy or Git
+- **Testable** - Test roles independently
+
+---
+
+## Role Directory Structure
+
+A role follows a specific directory layout:
+
+```
+roles/
+  apache/
+    tasks/
+      main.yml       # Main task file
+    handlers/
+      main.yml       # Service handlers
+    templates/
+      httpd.conf.j2  # Jinja2 templates
+    files/
+      index.html     # Static files
+    vars/
+      main.yml       # Role variables
+    defaults/
+      main.yml       # Default variables (lowest priority)
+    meta/
+      main.yml       # Role metadata and dependencies
+```
+
+| Directory    | Purpose                                         |
+| ------------ | ----------------------------------------------- |
+| `tasks/`     | Main list of tasks the role executes            |
+| `handlers/`  | Handlers triggered by tasks (e.g., restart)     |
+| `templates/` | Jinja2 templates processed by the template task |
+| `files/`     | Static files copied to hosts                    |
+| `vars/`      | Variables with high priority                    |
+| `defaults/`  | Default variables (easily overridden)           |
+| `meta/`      | Role dependencies and metadata                  |
+
+---
+
+## Creating a Role
+
+### Method 1: Manual Creation
+
+```bash
+mkdir -p roles/webserver/{tasks,handlers,templates,files,vars,defaults,meta}
+```
+
+### Method 2: Using ansible-galaxy
+
+```bash
+ansible-galaxy role init roles/webserver
+```
+
+This creates the complete directory structure with placeholder files.
+
+---
+
+## Example Role: Apache Web Server
+
+### roles/apache/tasks/main.yml
+
+```yaml
+---
+- name: Install Apache
+  ansible.builtin.apt:
+    name: apache2
+    state: present
+    update_cache: yes
+
+- name: Deploy Apache configuration
+  ansible.builtin.template:
+    src: apache.conf.j2
+    dest: /etc/apache2/sites-available/000-default.conf
+  notify: Restart Apache
+
+- name: Ensure Apache is running
+  ansible.builtin.service:
+    name: apache2
+    state: started
+    enabled: yes
+```
+
+### roles/apache/handlers/main.yml
+
+```yaml
+---
+- name: Restart Apache
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+```
+
+### roles/apache/templates/apache.conf.j2
+
+```apache
+<VirtualHost *:{{ http_port | default(80) }}>
+    ServerName {{ server_name }}
+    DocumentRoot /var/www/html
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+
+### roles/apache/defaults/main.yml
+
+```yaml
+---
+http_port: 80
+server_name: localhost
+```
+
+<Flashcard
+  title="Role Directories"
+  cards={[
+    {
+      front: "What's the difference between vars/ and defaults/ in a role?",
+      back: "defaults/ has lowest priority (easily overridden). vars/ has higher priority. Use defaults/ for values users should customize, vars/ for internal role values.",
+    },
+  ]}
+/>
+
+---
+
+## Using Roles in Playbooks
+
+### Basic Usage
+
+```yaml
+---
+- hosts: webservers
+  become: true
+  roles:
+    - apache
+```
+
+### With Variables
+
+```yaml
+---
+- hosts: webservers
+  become: true
+  roles:
+    - role: apache
+      vars:
+        http_port: 8080
+        server_name: devhub.local
+```
+
+### Multiple Roles
+
+```yaml
+---
+- hosts: webservers
+  become: true
+  roles:
+    - common
+    - apache
+    - firewall
+```
+
+---
+
+## Example Role: Firewall
+
+### roles/firewall/tasks/main.yml
+
+```yaml
+---
+- name: Install UFW
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+
+- name: Allow HTTP traffic
+  community.general.ufw:
+    rule: allow
+    port: "{{ http_port }}"
+    proto: tcp
+
+- name: Allow HTTPS traffic
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+
+- name: Allow SSH
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+    policy: deny
+```
+
+---
+
+## Ansible Galaxy
+
+Ansible Galaxy is a repository of community-contributed roles and collections.
+
+### Searching for Roles
+
+Browse [galaxy.ansible.com](https://galaxy.ansible.com/) or use the CLI:
+
+```bash
+ansible-galaxy search docker
+ansible-galaxy search nginx --author geerlingguy
+```
+
+### Installing Roles
+
+```bash
+# Install a single role
+ansible-galaxy install geerlingguy.docker
+
+# Install with a specific version
+ansible-galaxy install geerlingguy.docker,6.1.0
+
+# Install to a specific path
+ansible-galaxy install geerlingguy.docker -p ./roles
+```
+
+### Using a requirements.yml
+
+For projects with multiple dependencies, create a `requirements.yml`:
+
+```yaml
+---
+roles:
+  - name: geerlingguy.docker
+    version: 6.1.0
+
+  - name: geerlingguy.pip
+    version: 2.2.0
+
+  - name: geerlingguy.nodejs
+    version: 6.0.0
+
+collections:
+  - name: community.general
+    version: ">=7.0.0"
+```
+
+Install all requirements:
+
+```bash
+ansible-galaxy install -r requirements.yml
+```
+
+### Using Galaxy Roles
+
+```yaml
+---
+- hosts: all
+  become: true
+  roles:
+    - geerlingguy.docker
+    - geerlingguy.pip
+```
+
+<Aside type="tip" title="Jeff Geerling's Roles">
+  The `geerlingguy.*` roles are among the most popular on Galaxy. They're
+  well-tested and regularly maintained.
+</Aside>
+
+---
+
+## Collections vs Roles
+
+| Feature   | Roles                    | Collections                         |
+| --------- | ------------------------ | ----------------------------------- |
+| Contents  | Tasks, handlers, files   | Roles, modules, plugins, docs       |
+| Namespace | Simple name              | namespace.collection                |
+| Install   | `ansible-galaxy install` | `ansible-galaxy collection install` |
+| Example   | `geerlingguy.docker`     | `community.general`                 |
+
+Collections are the modern way to distribute Ansible content, containing multiple roles and custom modules.
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the role directory with its purpose"
+  pairs={[
+    { left: "tasks/", right: "Main list of tasks the role executes" },
+    { left: "handlers/", right: "Service handlers triggered by notify" },
+    { left: "defaults/", right: "Default variables (lowest priority)" },
+    { left: "templates/", right: "Jinja2 templates for configuration" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "ansible-galaxy role init roles/webserver",
+      output: "- Role roles/webserver was created successfully",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="This YAML file defines project dependencies"
+  sentence="The [BLANK:requirements.yml] file lists roles and collections to install with ansible-galaxy."
+/>
+
+<Quiz
+  question="What directory contains default role variables that are easily overridden?"
+  options={["vars/", "defaults/", "templates/", "meta/"]}
+  correct={1}
+  explanation="defaults/ contains variables with the lowest priority, making them easy to override."
+/>
+
+<Quiz
+  question="What command creates a new role with the standard directory structure?"
+  options={[
+    "ansible-galaxy role new",
+    "ansible-galaxy role init",
+    "ansible-galaxy create",
+    "ansible init role",
+  ]}
+  correct={1}
+  explanation="Use 'ansible-galaxy role init rolename' to create a new role structure."
+/>
+
+<Quiz
+  question="What file lists role dependencies for a project?"
+  options={["dependencies.yml", "requirements.yml", "roles.yml", "galaxy.yml"]}
+  correct={1}
+  explanation="requirements.yml lists roles and collections to install with ansible-galaxy install -r."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="ansible-roles-galaxy"
+  title="Roles & Galaxy Checklist"
+  items={[
+    "Understand role directory structure",
+    "Create a role with ansible-galaxy init",
+    "Write tasks/main.yml for a role",
+    "Add handlers and templates",
+    "Use roles in a playbook",
+    "Search for roles on Galaxy",
+    "Install roles from Galaxy",
+    "Create requirements.yml",
+  ]}
+/>
+
+---
+
+## Save Your Progress
+
+```bash
+git add .
+git commit -m "Ansible roles and Galaxy configuration"
+git push
+```
+
+---
+
+## Source
+
+Based on [Ansible Roles Documentation](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html) and DevHub examples.

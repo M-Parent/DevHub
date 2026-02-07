@@ -1,0 +1,426 @@
+---
+title: "Docker Networking"
+description: "Understand Docker network types, container communication, and how to create custom networks."
+sidebar:
+  label: "Networking"
+  order: 9
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+
+Docker networking enables containers to communicate with each other and the outside world. Understanding network types is essential for building multi-container applications.
+
+---
+
+## Network Types
+
+Docker provides several network drivers:
+
+```bash
+docker network ls
+```
+
+```
+NETWORK ID     NAME      DRIVER    SCOPE
+180ad842df02   bridge    bridge    local
+442d45aab890   host      host      local
+5f026b68deaf   none      null      local
+```
+
+| Driver    | Description                   | Use Case                            |
+| --------- | ----------------------------- | ----------------------------------- |
+| `bridge`  | Default isolated network      | Single-host container communication |
+| `host`    | Container shares host network | Performance, direct port access     |
+| `none`    | No networking                 | Security, offline processing        |
+| `overlay` | Multi-host networking         | Docker Swarm clusters               |
+| `macvlan` | Container gets MAC address    | Legacy apps needing direct network  |
+| `ipvlan`  | Layer 2/3 network control     | Advanced network requirements       |
+
+---
+
+## Bridge Network (Default)
+
+The default bridge network isolates containers but allows them to communicate via IP.
+
+### Default Bridge Limitations
+
+- Containers communicate by IP only, not name
+- No automatic DNS resolution
+- Less isolation between containers
+
+```bash
+# Containers on default bridge can't use names
+docker run -d --name web nginx
+docker run -it alpine ping web
+# ping: bad address 'web'
+```
+
+---
+
+## Custom Bridge Networks
+
+Custom bridge networks provide better isolation and DNS-based discovery.
+
+### Create a Network
+
+```bash
+docker network create mynetwork
+```
+
+### With Custom Subnet
+
+```bash
+docker network create \
+  --driver=bridge \
+  --subnet=172.28.0.0/16 \
+  --ip-range=172.28.5.0/24 \
+  --gateway=172.28.5.254 \
+  mynetwork
+```
+
+### Connect Containers
+
+```bash
+# Run container on custom network
+docker run -d --name web --network mynetwork nginx
+docker run -d --name db --network mynetwork postgres
+
+# Now they can communicate by name
+docker exec web ping db
+# PING db (172.28.5.2): 56 data bytes
+```
+
+<Flashcard
+  title="Custom Networks"
+  cards={[
+    {
+      front: "Why use custom bridge networks instead of the default?",
+      back: "Custom networks provide automatic DNS resolution (containers can reach each other by name), better isolation, and the ability to connect/disconnect containers at runtime.",
+    },
+  ]}
+/>
+
+---
+
+## Network Commands
+
+### List Networks
+
+```bash
+docker network ls
+```
+
+### Inspect Network
+
+```bash
+docker network inspect mynetwork
+```
+
+### Connect Container to Network
+
+```bash
+# At runtime
+docker network connect mynetwork my-container
+
+# During run
+docker run --network mynetwork nginx
+```
+
+### Disconnect Container
+
+```bash
+docker network disconnect mynetwork my-container
+```
+
+### Remove Network
+
+```bash
+docker network rm mynetwork
+
+# Remove all unused networks
+docker network prune
+```
+
+---
+
+## Host Network
+
+Container shares the host's network stack directly:
+
+```bash
+docker run --network host nginx
+```
+
+- Container ports are directly on host
+- No NAT overhead
+- Can't have port conflicts
+- No isolation from host
+
+<Aside type="caution" title="Host Network Security">
+  Host network provides no isolation. The container can access all host network
+  interfaces.
+</Aside>
+
+---
+
+## Multi-Container Communication
+
+### Example: WordPress Stack
+
+```bash
+# Create network
+docker network create wordpress-net
+
+# Run MySQL (internal only)
+docker run -d \
+  --name wordpress-db \
+  --network wordpress-net \
+  -e MYSQL_ROOT_PASSWORD=secret \
+  -e MYSQL_DATABASE=wordpress \
+  mysql:8.0
+
+# Run WordPress (connects to db by name)
+docker run -d \
+  --name wordpress \
+  --network wordpress-net \
+  -p 8080:80 \
+  -e WORDPRESS_DB_HOST=wordpress-db \
+  -e WORDPRESS_DB_PASSWORD=secret \
+  wordpress
+```
+
+WordPress connects to `wordpress-db:3306` - no IP address needed!
+
+---
+
+## Networks in Docker Compose
+
+Compose automatically creates a network for your services:
+
+```yaml
+version: "3.9"
+services:
+  web:
+    image: nginx
+    networks:
+      - frontend
+
+  api:
+    image: myapi
+    networks:
+      - frontend
+      - backend
+
+  db:
+    image: postgres
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+```
+
+### Using External Networks
+
+```yaml
+networks:
+  existing:
+    external: true
+    name: my-pre-existing-network
+```
+
+### Custom Network Settings in Compose
+
+```yaml
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.5.0/24
+          gateway: 172.28.5.254
+```
+
+---
+
+## Container DNS
+
+### How DNS Works
+
+1. Custom networks provide automatic DNS
+2. Container names become hostnames
+3. Docker's embedded DNS server resolves names
+
+### DNS Aliases
+
+```bash
+docker run -d \
+  --name mydb \
+  --network mynet \
+  --network-alias database \
+  --network-alias db \
+  postgres
+```
+
+Now reachable as `mydb`, `database`, or `db`.
+
+### In Compose
+
+```yaml
+services:
+  db:
+    image: postgres
+    networks:
+      default:
+        aliases:
+          - database
+          - postgres-primary
+```
+
+---
+
+## Inspecting Container Networking
+
+### Get Container IP
+
+```bash
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mycontainer
+```
+
+### View Network Details
+
+```bash
+docker inspect mycontainer --format '{{json .NetworkSettings.Networks}}' | jq
+```
+
+### Test Connectivity
+
+```bash
+# From inside container
+docker exec mycontainer ping other-container
+docker exec mycontainer curl http://api-service:3000
+```
+
+---
+
+## Common Patterns
+
+### Frontend/Backend Isolation
+
+```
+┌─────────────────────────────────────┐
+│           Frontend Network          │
+│  ┌─────────┐        ┌─────────┐    │
+│  │  nginx  │───────▶│   api   │    │
+│  └─────────┘        └────┬────┘    │
+│       ▲                  │         │
+│       │ (port 80)        │         │
+└───────┼──────────────────┼─────────┘
+        │                  │
+        │    ┌─────────────┼─────────┐
+        │    │   Backend Network     │
+        │    │             ▼         │
+        │    │        ┌─────────┐    │
+        │    │        │   db    │    │
+        │    │        └─────────┘    │
+        │    └───────────────────────┘
+   External
+```
+
+### Database Internal Only
+
+Never expose database ports publicly:
+
+```yaml
+services:
+  db:
+    expose: # Internal only
+      - 5432
+    # NOT ports: - "5432:5432"
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  title="Docker Network Drivers"
+  pairs={[
+    { left: "bridge", right: "Default isolated network for containers" },
+    { left: "host", right: "Container uses host's network directly" },
+    { left: "none", right: "No networking, complete isolation" },
+    { left: "overlay", right: "Multi-host networking for Swarm" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "docker network ls",
+      output:
+        "NETWORK ID     NAME      DRIVER    SCOPE\n1234abcd       bridge    bridge    local\n5678efgh       host      host      local",
+    },
+    { input: "docker network create mynet", output: "9abc1234def567890" },
+  ]}
+/>
+
+<Quiz
+  question="What's the main advantage of custom bridge networks?"
+  options={[
+    "Faster performance",
+    "Automatic DNS resolution by container name",
+    "More IP addresses",
+    "Less memory usage",
+  ]}
+  correct={1}
+  explanation="Custom bridge networks provide automatic DNS - containers can reach each other by name instead of IP addresses."
+/>
+
+<Quiz
+  question="How do you make a container accessible only to other containers?"
+  options={[
+    "Use 'ports'",
+    "Use 'expose'",
+    "Use 'host' network",
+    "Use 'none' network",
+  ]}
+  correct={1}
+  explanation="'expose' makes ports available to other containers on the same network without publishing to the host."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="docker-networking"
+  title="Docker Networking Checklist"
+  items={[
+    "Understand network types (bridge, host, none)",
+    "Create custom bridge networks",
+    "Connect containers to networks",
+    "Use container names for communication",
+    "Configure networks in Compose",
+    "Isolate frontend/backend networks",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Docker Network Documentation](https://docs.docker.com/network/) and DevHub examples.

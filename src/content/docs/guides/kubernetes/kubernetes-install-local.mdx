@@ -1,0 +1,368 @@
+---
+title: "Installing Kubernetes Locally"
+description: "Set up a local Kubernetes environment for learning and development using Docker Desktop, Minikube, or MicroK8s."
+sidebar:
+  label: "K8s Local Install"
+  order: 2
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Kubernetes" class="kubernetes" />
+<Badge text="Docker" class="docker" />
+
+Kubernetes is a series of containers, CLIs, and configurations. There are many ways to install it - let's focus on the easiest options for learning.
+
+---
+
+## Installation Options
+
+| Method             | Best For           | Platform            |
+| ------------------ | ------------------ | ------------------- |
+| **Docker Desktop** | Easiest setup      | Windows, Mac        |
+| **Minikube**       | VirtualBox users   | Windows, Mac, Linux |
+| **MicroK8s**       | Native Linux       | Linux               |
+| **Kind**           | CI/CD, lightweight | All platforms       |
+| **k3s**            | Edge, IoT, ARM     | Linux               |
+
+---
+
+## Option 1: Docker Desktop
+
+The easiest way to get started on Windows or Mac.
+
+<Steps>
+
+1. **Install Docker Desktop**
+
+   Download from [docker.com](https://www.docker.com/products/docker-desktop)
+
+2. **Enable Kubernetes**
+   - Open Docker Desktop Settings
+   - Go to **Kubernetes** tab
+   - Check **Enable Kubernetes**
+   - Click **Apply & Restart**
+
+3. **Wait for startup**
+
+   Docker will download and configure Kubernetes. This takes a few minutes.
+
+4. **Verify installation**
+
+   ```bash
+   kubectl version
+   kubectl get nodes
+   ```
+
+</Steps>
+
+### What Docker Desktop Does
+
+- Runs Kubernetes master containers
+- Manages kubectl installation and certificates
+- Easy to enable, disable, and reset from GUI
+
+<Flashcard
+  title="Docker Desktop K8s"
+  cards={[
+    {
+      front: "What makes Docker Desktop the easiest K8s option?",
+      back: "Docker Desktop handles everything: it runs K8s in its existing Linux VM, installs kubectl, manages certificates, and provides a GUI to enable/disable Kubernetes with one click.",
+    },
+  ]}
+/>
+
+---
+
+## Option 2: Minikube
+
+Best for systems using VirtualBox or when you need more control.
+
+<Steps>
+
+1. **Download Minikube**
+
+   ```bash
+   # Windows (PowerShell as Admin)
+   choco install minikube
+
+   # Mac
+   brew install minikube
+
+   # Linux
+   curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+   sudo install minikube-linux-amd64 /usr/local/bin/minikube
+   ```
+
+2. **Start Minikube**
+
+   ```bash
+   minikube start
+   ```
+
+   This creates a VirtualBox VM with Kubernetes installed.
+
+3. **Verify installation**
+
+   ```bash
+   minikube status
+   kubectl get nodes
+   ```
+
+</Steps>
+
+### Minikube Features
+
+- Works like Docker Machine experience
+- Creates a VirtualBox VM with Kubernetes master
+- Doesn't install kubectl (install separately)
+- Supports multiple Kubernetes versions
+
+```bash
+# Install kubectl separately
+# Windows
+choco install kubernetes-cli
+
+# Mac
+brew install kubectl
+
+# Linux
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install kubectl /usr/local/bin/kubectl
+```
+
+---
+
+## Option 3: MicroK8s (Linux)
+
+Native Kubernetes installation on Linux using Snap.
+
+<Steps>
+
+1. **Install MicroK8s**
+
+   ```bash
+   sudo snap install microk8s --classic
+   ```
+
+2. **Add user to group**
+
+   ```bash
+   sudo usermod -a -G microk8s $USER
+   sudo chown -f -R $USER ~/.kube
+   newgrp microk8s
+   ```
+
+3. **Check status**
+
+   ```bash
+   microk8s status --wait-ready
+   ```
+
+4. **Enable add-ons**
+
+   ```bash
+   microk8s enable dns
+   microk8s enable dashboard
+   ```
+
+</Steps>
+
+### MicroK8s Commands
+
+| Command                      | Description          |
+| ---------------------------- | -------------------- |
+| `microk8s status`            | Check cluster status |
+| `microk8s start`             | Start the cluster    |
+| `microk8s stop`              | Stop the cluster     |
+| `microk8s kubectl get nodes` | Run kubectl commands |
+| `microk8s enable <addon>`    | Enable add-ons       |
+
+### Create kubectl Alias
+
+Add to `~/.bashrc` or `~/.zshrc`:
+
+```bash
+alias kubectl='microk8s kubectl'
+```
+
+<Aside type="tip" title="MicroK8s vs Docker">
+  MicroK8s installs Kubernetes without Docker Engine. It uses containerd
+  directly.
+</Aside>
+
+---
+
+## Option 4: Kind (Kubernetes in Docker)
+
+Runs K8s clusters in Docker containers. Great for CI/CD.
+
+```bash
+# Install
+# Mac
+brew install kind
+
+# Windows
+choco install kind
+
+# Linux
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+```
+
+```bash
+# Create cluster
+kind create cluster
+
+# Delete cluster
+kind delete cluster
+```
+
+---
+
+## Browser-Based Options
+
+Learn without installing anything:
+
+| Platform                                                | Description           |
+| ------------------------------------------------------- | --------------------- |
+| [Play with Kubernetes](https://labs.play-with-k8s.com/) | Free K8s playground   |
+| [Katacoda](https://www.katacoda.com/)                   | Interactive scenarios |
+| [Killercoda](https://killercoda.com/)                   | Katacoda successor    |
+
+---
+
+## Verify Your Installation
+
+After installing with any method:
+
+```bash
+# Check kubectl is working
+kubectl version --client
+
+# Check nodes
+kubectl get nodes
+
+# Check all system pods
+kubectl get pods -n kube-system
+```
+
+Expected output:
+
+```
+NAME                 STATUS   ROLES           AGE   VERSION
+docker-desktop       Ready    control-plane   5m    v1.28.0
+```
+
+---
+
+## Common Issues
+
+### kubectl Not Found
+
+```bash
+# Check if in PATH
+which kubectl
+
+# Reinstall kubectl
+# Follow platform-specific instructions above
+```
+
+### Cluster Not Starting
+
+```bash
+# Docker Desktop
+# Reset Kubernetes from Settings
+
+# Minikube
+minikube delete
+minikube start
+
+# MicroK8s
+microk8s stop
+microk8s start
+```
+
+### Permission Denied
+
+```bash
+# Linux - add to docker/microk8s group
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the installation method with its best use case"
+  pairs={[
+    { left: "Docker Desktop", right: "Easiest setup for Windows/Mac" },
+    { left: "Minikube", right: "VirtualBox users needing control" },
+    { left: "MicroK8s", right: "Native Linux installation via Snap" },
+    { left: "Kind", right: "CI/CD and lightweight testing" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "kubectl version --client",
+      output:
+        "Client Version: v1.28.2\nKustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="The package manager used by MicroK8s"
+  sentence="To install MicroK8s on Linux, use: sudo [BLANK:snap] install microk8s --classic"
+/>
+
+<Quiz
+  question="Which local K8s option is easiest for Windows/Mac users?"
+  options={["Minikube", "MicroK8s", "Docker Desktop", "Kind"]}
+  correct={2}
+  explanation="Docker Desktop is the easiest - just enable Kubernetes in settings. It handles all setup automatically."
+/>
+
+<Quiz
+  question="What package manager does MicroK8s use?"
+  options={["apt", "yum", "snap", "brew"]}
+  correct={2}
+  explanation="MicroK8s is installed via Snap, which provides easy updates and a consistent experience across Linux distributions."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="k8s-local-install"
+  title="K8s Local Install Checklist"
+  items={[
+    "Choose installation method for your platform",
+    "Install and start local cluster",
+    "Install kubectl CLI",
+    "Verify with kubectl get nodes",
+    "Understand basic cluster management",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Kubernetes Documentation](https://kubernetes.io/docs/tasks/tools/) and DevHub examples.

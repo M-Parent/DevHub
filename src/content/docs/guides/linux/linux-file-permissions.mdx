@@ -16,6 +16,8 @@ import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import MatchPairs from "../../../../components/MatchPairs.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Linux" class="linux" />
 
@@ -213,6 +215,13 @@ For directories, permissions have slightly different meanings:
     { left: "4", right: "r--" },
     { left: "0", right: "---" },
   ]}
+/>
+
+<Terminal commands={[{ input: "chmod 755 script.sh", output: "" }]} />
+
+<FillBlank
+  instruction="Complete the ownership change command:"
+  sentence="[BLANK:chown] admin:staff filename"
 />
 
 <Quiz

@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Quiz from "../../../../../components/Quiz.astro";
 import Flashcard from "../../../../../components/Flashcard.astro";
 import ProgressCheck from "../../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../../components/MatchPairs.astro";
+import Terminal from "../../../../../components/Terminal.astro";
+import FillBlank from "../../../../../components/FillBlank.astro";
 
 <Badge text="Linux" class="linux" /> <Badge text="Server" class="server" />
 
@@ -255,6 +258,27 @@ Expected output: `devhub-app.crt: OK`
       back: "Copies SAN and other extensions from CSR to the signed certificate",
     },
   ]}
+/>
+
+<MatchPairs
+  instruction="Match the CSR component with its description"
+  pairs={[
+    { left: "CN", right: "Common Name (hostname)" },
+    { left: "SAN", right: "Subject Alternative Names" },
+    { left: "O", right: "Organization" },
+    { left: "OU", right: "Organizational Unit" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    { input: "openssl req -new -key server.key -out server.csr", output: "" },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the SAN entry:"
+  sentence="To add SAN entries, include subjectAltName = DNS:example.com, [BLANK:DNS]:www.example.com in the config"
 />
 
 <Quiz

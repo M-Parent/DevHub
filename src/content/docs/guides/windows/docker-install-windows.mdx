@@ -14,6 +14,9 @@ import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Question from "../../../../components/Question.astro";
 import Quiz from "../../../../components/Quiz.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="Docker" class="docker" />
 
@@ -89,6 +92,30 @@ _Source: Bret Fisher, Agentic DevOps_
 ---
 
 ## Knowledge Check
+
+<MatchPairs
+  instruction="Match the Docker Windows concept with its description"
+  pairs={[
+    { left: "WSL 2", right: "Windows Subsystem for Linux" },
+    { left: "Virtualization", right: "BIOS setting for containers" },
+    { left: "Docker Desktop", right: "GUI application for Docker" },
+    { left: "PowerShell", right: "Terminal for running commands" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "docker version",
+      output: "Client: Docker Engine\n Version: 24.0.7",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the command to enable WSL 2:"
+  sentence="[BLANK:wsl] --install"
+/>
 
 <Quiz
   question="What is required before installing Docker Desktop on Windows?"

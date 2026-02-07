@@ -1,0 +1,260 @@
+---
+title: "Installing Ansible"
+description: "Learn how to install Ansible using pipx on Ubuntu and set up your first automation project."
+sidebar:
+  label: "Installing Ansible"
+  order: 1
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Ansible" class="ansible" />
+<Badge text="Linux" class="linux" />
+
+Ansible is an open-source automation tool that simplifies configuration management, application deployment, and task automation. Unlike other tools, Ansible is agentless - it connects to your nodes via SSH and pushes configurations.
+
+<Aside type="tip" title="Why Ansible?">
+  Ansible uses simple YAML syntax (playbooks) that's easy to read and write. No
+  agents to install on managed nodes, just SSH access.
+</Aside>
+
+---
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- Ubuntu Linux (20.04 or later)
+- `sudo` privileges
+- SSH access to target servers
+- Git installed
+
+---
+
+## Installing Ansible with pipx
+
+The recommended way to install Ansible is with `pip` or `pipx`. Using `pipx` keeps Ansible in an isolated environment, avoiding conflicts with system packages.
+
+<Steps>
+
+1. **Install pipx**
+
+   ```bash
+   sudo apt update
+   sudo apt install pipx
+   pipx ensurepath
+   ```
+
+2. **Install Ansible**
+
+   ```bash
+   pipx install --include-deps ansible
+   ```
+
+3. **Log out and back in**
+
+   This updates your shell's PATH to include the pipx binaries.
+
+4. **Verify installation**
+
+   ```bash
+   ansible --version
+   ```
+
+   You should see output showing the Ansible version and Python interpreter.
+
+</Steps>
+
+<Aside type="note" title="Alternative Installation">
+  You can also install via apt: `sudo apt install ansible`, but this may give
+  you an older version.
+</Aside>
+
+---
+
+## Setting Up Your Ansible Project
+
+### Create a Git Repository
+
+It's best practice to version control your Ansible configurations. This ensures you can track changes, collaborate, and recover from mistakes.
+
+<Steps>
+
+1. **Create a project directory**
+
+   ```bash
+   mkdir ansible-project
+   cd ansible-project
+   ```
+
+2. **Initialize Git**
+
+   ```bash
+   git init
+   ```
+
+3. **Create a .gitignore file**
+
+   ```bash
+   cat > .gitignore << 'EOF'
+   # Ansible
+   *.retry
+   .vault_password
+   *.log
+
+   # Python
+   __pycache__/
+   *.pyc
+   .venv/
+
+   # Sensitive files
+   *.pem
+   *.key
+   credentials.yml
+   EOF
+   ```
+
+4. **Create basic folder structure**
+
+   ```bash
+   mkdir -p inventory roles group_vars host_vars files templates
+   ```
+
+5. **Connect to remote repository**
+
+   ```bash
+   git add .
+   git commit -m "Initial Ansible project setup"
+   git remote add origin <your-repository-url>
+   git push -u origin main
+   ```
+
+</Steps>
+
+---
+
+## Project Structure
+
+A well-organized Ansible project follows this structure:
+
+```
+ansible-project/
+├── ansible.cfg           # Ansible configuration
+├── inventory/
+│   └── hosts.yml         # Inventory file
+├── group_vars/
+│   └── all.yml           # Variables for all hosts
+├── host_vars/            # Per-host variables
+├── roles/                # Reusable roles
+├── files/                # Static files to copy
+├── templates/            # Jinja2 templates
+└── playbooks/            # Your playbooks
+```
+
+### Create ansible.cfg
+
+Create a project-level configuration file:
+
+```ini
+[defaults]
+inventory = inventory
+host_key_checking = False
+retry_files_enabled = False
+
+[privilege_escalation]
+become = True
+become_method = sudo
+```
+
+<Aside type="caution" title="Security Note">
+  Setting `host_key_checking = False` is convenient for labs but not recommended
+  for production. In production, verify host keys properly.
+</Aside>
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the Ansible concept with its description"
+  pairs={[
+    { left: "pipx", right: "Isolated Python package installer" },
+    { left: "ansible.cfg", right: "Project-level configuration file" },
+    { left: "inventory/", right: "Directory containing host definitions" },
+    { left: "SSH", right: "Protocol used to connect to managed nodes" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "ansible --version",
+      output:
+        "ansible [core 2.15.0]\n  config file = /etc/ansible/ansible.cfg\n  python version = 3.10.12\n  jinja version = 3.1.2",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Describes the architecture where no client software is needed"
+  sentence="Ansible is [BLANK:agentless] - it doesn't require agents installed on managed nodes."
+/>
+
+<Quiz
+  question="What is the recommended way to install Ansible?"
+  options={[
+    "apt install ansible",
+    "pipx install ansible",
+    "snap install ansible",
+    "Download binary",
+  ]}
+  correct={1}
+  explanation="Using pipx (or pip) is recommended as it gives you the latest version in an isolated environment."
+/>
+
+<Quiz
+  question="What protocol does Ansible use to connect to managed nodes?"
+  options={["HTTP", "HTTPS", "SSH", "WinRM"]}
+  correct={2}
+  explanation="Ansible connects to Linux/Unix nodes via SSH. For Windows nodes, it uses WinRM."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="ansible-install"
+  title="Ansible Installation Checklist"
+  items={[
+    "Install pipx on Ubuntu",
+    "Install Ansible with pipx",
+    "Verify Ansible installation",
+    "Create project directory structure",
+    "Initialize Git repository",
+  ]}
+/>
+
+---
+
+## What's Next?
+
+Now that you have Ansible installed, continue with:
+
+- **Inventory Management** - Define your hosts and groups
+- **Basic Playbooks** - Write your first automation
+
+---
+
+## Source
+
+Based on [Ansible Documentation](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) and DevHub examples.

@@ -1,0 +1,337 @@
+---
+title: "Docker vs Virtual Machines"
+description: "Understand the key differences between Docker containers and Virtual Machines - when to use each technology."
+sidebar:
+  label: "Docker vs VMs"
+  order: 11
+  badge:
+    text: "Theory"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Aside, Badge } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="VM" class="vm" />
+<Badge text="Theory" variant="note" />
+
+When it comes to running applications in isolated environments, you have two popular choices: **Docker containers** and **Virtual Machines (VMs)**. While both help separate apps from the host system, they work very differently.
+
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/eyNBf1sqdBQ"
+  title="Virtual Machines vs Containers"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+_Source: PowerCert Animated Videos_
+
+---
+
+## Overview
+
+| Aspect      | Virtual Machine       | Docker Container      |
+| ----------- | --------------------- | --------------------- |
+| Virtualizes | Hardware              | Application           |
+| Runs        | Full OS on hypervisor | Shares host OS kernel |
+| Isolation   | Strong                | Moderate              |
+| Overhead    | High                  | Low                   |
+
+<Flashcard
+  title="Core Difference"
+  cards={[
+    {
+      front: "What's the fundamental difference between VMs and containers?",
+      back: "VMs virtualize the hardware (running a full OS on top of a hypervisor), while containers virtualize at the application level (sharing the host OS kernel). This makes containers much lighter and faster.",
+    },
+  ]}
+/>
+
+---
+
+## Virtual Machines (VMs)
+
+VMs provide **full system virtualization** - each VM runs a complete operating system on top of a hypervisor.
+
+### Architecture
+
+```
+┌─────────────────────────────────────┐
+│            Host OS                  │
+└───────────────┬─────────────────────┘
+                │
+┌───────────────┴─────────────────────┐
+│           Hypervisor                │
+└───────┬───────────────────┬─────────┘
+        │                   │
+┌───────┴───────┐   ┌───────┴───────┐
+│     VM 1      │   │     VM 2      │
+│  Full OS      │   │  Full OS      │
+│  + App        │   │  + App        │
+└───────────────┘   └───────────────┘
+```
+
+### Characteristics
+
+- **Heavyweight** - Needs more disk space, CPU, and memory
+- **Boot Time** - Slower, because the entire OS must start
+- **Isolation** - Strong, since each VM is a separate OS
+- **Flexibility** - Can run different operating systems
+
+### Use Cases
+
+- Running multiple different OSes on one physical machine
+- Legacy applications requiring a full OS environment
+- Maximum isolation between workloads
+- Windows applications on Linux hosts (and vice versa)
+
+### Pros & Cons
+
+| ✅ Pros                   | ⚠️ Cons                 |
+| ------------------------- | ----------------------- |
+| Complete isolation        | Resource-heavy          |
+| Flexible OS choice        | Slower boot times       |
+| Hardware-level separation | Larger disk footprint   |
+| Proven technology         | More complex management |
+
+<Aside type="tip" title="When to Choose VMs">
+  Choose VMs when you need strong isolation or must run multiple different
+  operating systems on the same hardware.
+</Aside>
+
+---
+
+## Docker Containers
+
+Containers provide **lightweight virtualization** - they share the host OS kernel while isolating the application and its dependencies.
+
+### Architecture
+
+```
+┌─────────────────────────────────────┐
+│            Host OS                  │
+└───────────────┬─────────────────────┘
+                │
+┌───────────────┴─────────────────────┐
+│         Docker Engine               │
+└───────┬───────────────────┬─────────┘
+        │                   │
+┌───────┴───────┐   ┌───────┴───────┐
+│  Container 1  │   │  Container 2  │
+│  App + Deps   │   │  App + Deps   │
+└───────────────┘   └───────────────┘
+```
+
+### Characteristics
+
+- **Lightweight** - Smaller size, less resource usage
+- **Boot Time** - Almost instant (only app and dependencies start)
+- **Isolation** - Sufficient for most apps, but weaker than VMs
+- **Portability** - Run the same container anywhere
+
+### Use Cases
+
+- Packaging applications with dependencies
+- Microservices architecture
+- CI/CD pipelines
+- Rapid development and testing
+- Scaling applications horizontally
+
+### Pros & Cons
+
+| ✅ Pros             | ⚠️ Cons                          |
+| ------------------- | -------------------------------- |
+| Fast startup        | Shares host OS kernel            |
+| Efficient resources | Slightly less isolation          |
+| Highly portable     | Same kernel as host              |
+| Easy to scale       | Linux containers need Linux host |
+
+<Aside type="tip" title="When to Choose Docker">
+  Choose Docker for modern software development, especially for microservices
+  and CI/CD pipelines where efficiency and portability matter most.
+</Aside>
+
+---
+
+## Side-by-Side Comparison
+
+| Feature             | Virtual Machine         | Docker Container         |
+| ------------------- | ----------------------- | ------------------------ |
+| **OS per instance** | Full OS                 | Shares host OS           |
+| **Size**            | Gigabytes               | Megabytes                |
+| **Startup time**    | Minutes                 | Seconds                  |
+| **Isolation**       | Strong (hardware-level) | Moderate (process-level) |
+| **Resource usage**  | High                    | Low                      |
+| **Density**         | 10s per host            | 100s per host            |
+| **Performance**     | Near-native             | Native                   |
+| **Use case**        | Multi-OS, legacy apps   | Microservices, CI/CD     |
+
+---
+
+## Isolation Comparison
+
+### VM Isolation
+
+- Separate kernel per VM
+- Hardware-level separation via hypervisor
+- One VM crash doesn't affect others
+- Complete file system isolation
+
+### Container Isolation
+
+- Shared kernel with namespaces
+- Process-level isolation
+- cgroups limit resource usage
+- Layered file system
+
+<Flashcard
+  title="Isolation Trade-offs"
+  cards={[
+    {
+      front:
+        "Why might you choose VMs over containers for security-sensitive workloads?",
+      back: "VMs provide stronger isolation because each VM has its own kernel. A kernel vulnerability in a container environment could potentially affect all containers, while VMs are isolated at the hardware level.",
+    },
+  ]}
+/>
+
+---
+
+## Resource Efficiency
+
+### Virtual Machines
+
+```
+VM 1: 2 GB RAM + 20 GB disk + Full OS
+VM 2: 2 GB RAM + 20 GB disk + Full OS
+VM 3: 2 GB RAM + 20 GB disk + Full OS
+─────────────────────────────────────
+Total: 6 GB RAM + 60 GB disk + 3x OS overhead
+```
+
+### Docker Containers
+
+```
+Container 1: 256 MB RAM + shared base image
+Container 2: 256 MB RAM + shared base image
+Container 3: 256 MB RAM + shared base image
+─────────────────────────────────────
+Total: 768 MB RAM + ~500 MB shared image
+```
+
+---
+
+## When to Use Each
+
+### Use Virtual Machines When:
+
+- ✅ Running different operating systems
+- ✅ Maximum isolation is required
+- ✅ Running legacy applications
+- ✅ Regulatory compliance requires VM isolation
+- ✅ Running untrusted workloads
+
+### Use Docker Containers When:
+
+- ✅ Building microservices
+- ✅ Need fast deployment and scaling
+- ✅ Running stateless applications
+- ✅ CI/CD pipelines
+- ✅ Development and testing
+- ✅ Resource efficiency is important
+
+---
+
+## Hybrid Approach
+
+Many organizations use both:
+
+```
+┌─────────────────────────────────────────────────┐
+│                Physical Server                   │
+├─────────────────────────────────────────────────┤
+│  ┌──────────────┐     ┌──────────────┐         │
+│  │    VM 1      │     │    VM 2      │         │
+│  │  (Windows)   │     │   (Linux)    │         │
+│  │              │     │ ┌──────────┐ │         │
+│  │  Legacy App  │     │ │Container1│ │         │
+│  │              │     │ │Container2│ │         │
+│  │              │     │ │Container3│ │         │
+│  └──────────────┘     └──────────────┘         │
+└─────────────────────────────────────────────────┘
+```
+
+- VMs for different OS requirements and legacy apps
+- Containers inside VMs for microservices
+- Best of both worlds
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="What does Docker share with the host that VMs don't?"
+  options={[
+    "Disk space",
+    "Operating system kernel",
+    "Network interface",
+    "CPU cores",
+  ]}
+  correct={1}
+  explanation="Docker containers share the host OS kernel, making them lightweight. VMs run their own full OS kernel on top of a hypervisor."
+/>
+
+<Quiz
+  question="When would you choose a VM over Docker?"
+  options={[
+    "For microservices",
+    "For CI/CD pipelines",
+    "When running Windows apps on Linux",
+    "For rapid scaling",
+  ]}
+  correct={2}
+  explanation="VMs are needed when running a different OS than the host. Docker containers share the host kernel, so you can't run Windows containers on a Linux host (natively)."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="docker-vs-vm"
+  title="Docker vs VMs Checklist"
+  items={[
+    "Understand VM architecture (hypervisor, full OS)",
+    "Understand container architecture (shared kernel)",
+    "Know isolation differences",
+    "Compare resource efficiency",
+    "Identify use cases for each",
+  ]}
+/>
+
+---
+
+## Summary
+
+| Technology      | Best For                                           |
+| --------------- | -------------------------------------------------- |
+| **VMs** 🖥️🐢    | Complete OS isolation, legacy apps, different OSes |
+| **Docker** 🐳⚡ | Lightweight, fast, portable, microservices         |
+
+**Rule of Thumb:**
+
+- Use **VMs** when you need full OS isolation
+- Use **Docker** for efficiency, speed, and easy app packaging
+
+---
+
+## Source
+
+Based on Docker and virtualization concepts. Video reference: [PowerCert Animated Videos](https://www.youtube.com/watch?v=eyNBf1sqdBQ).

@@ -16,6 +16,8 @@ import Quiz from "../../../../components/Quiz.astro";
 import Flashcard from "../../../../components/Flashcard.astro";
 import MatchPairs from "../../../../components/MatchPairs.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 
 <Badge text="ARR-Stack" class="arr-stack" />
 <Badge text="Homelab" class="homelab" />
@@ -144,6 +146,31 @@ Prowlarr (Indexers) ──▶ Radarr (Movies) ───┘
 ---
 
 ## Knowledge Check
+
+<MatchPairs
+  instruction="Match the ARR tool with its function"
+  pairs={[
+    { left: "Prowlarr", right: "Indexer Manager" },
+    { left: "Sonarr", right: "TV Show Automation" },
+    { left: "Radarr", right: "Movie Automation" },
+    { left: "Bazarr", right: "Subtitle Downloads" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "docker compose up -d",
+      output:
+        "[+] Running 5/5\n ✔ Container prowlarr  Started\n ✔ Container sonarr    Started",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the sentence:"
+  sentence="[BLANK:Prowlarr] is the indexer manager that provides search sources to all ARR apps"
+/>
 
 <Quiz
   question="What does the 'A' in ARR stand for?"

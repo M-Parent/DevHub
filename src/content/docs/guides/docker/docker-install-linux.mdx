@@ -13,6 +13,9 @@ tableOfContents: true
 import { Aside, Badge, Steps } from "@astrojs/starlight/components";
 import Question from "../../../../components/Question.astro";
 import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
 import ProgressCheck from "../../../../components/ProgressCheck.astro";
 
 <Badge text="Docker" class="docker" /> <Badge text="Linux" class="linux" />
@@ -111,6 +114,44 @@ _Source: Bret Fisher, Agentic DevOps_
 ---
 
 ## Knowledge Check
+
+<Flashcard
+  title="Docker Installation Concepts"
+  cards={[
+    {
+      front: "What is Docker Engine?",
+      back: "The core Docker daemon and CLI that runs containers on Linux systems.",
+    },
+    {
+      front: "Why add user to docker group?",
+      back: "To run Docker commands without sudo - avoids needing root privileges for every command.",
+    },
+    {
+      front: "What is containerd?",
+      back: "The container runtime that Docker uses under the hood to manage container lifecycle.",
+    },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "docker version",
+      output:
+        "Client: Docker Engine - Community\n Version: 24.0.7\nServer: Docker Engine - Community\n Version: 24.0.7",
+    },
+    {
+      input: "docker run hello-world",
+      output:
+        "Hello from Docker!\nThis message shows that your installation appears to be working correctly.",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the command to add your user to the docker group:"
+  sentence="sudo usermod -aG [BLANK:docker] $USER"
+/>
 
 <Quiz
   question="What command installs Docker Engine on Ubuntu?"

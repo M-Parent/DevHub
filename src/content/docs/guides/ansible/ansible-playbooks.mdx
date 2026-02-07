@@ -1,0 +1,416 @@
+---
+title: "Writing Your First Playbook"
+description: "Learn how to write, run, and debug Ansible playbooks with variables, loops, and best practices."
+sidebar:
+  label: "Basic Playbooks"
+  order: 3
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Ansible" class="ansible" />
+<Badge text="Linux" class="linux" />
+
+Playbooks are Ansible's configuration, deployment, and orchestration language. They describe the desired state of your systems in YAML format, making them human-readable and version-controllable.
+
+<Aside type="tip" title="Playbooks vs Ad-hoc Commands">
+  While ad-hoc commands are great for one-off tasks, playbooks let you define
+  complex, repeatable automation that you can share and version control.
+</Aside>
+
+---
+
+## Your First Playbook
+
+Let's create a simple playbook that runs a command on all hosts.
+
+### Basic Structure
+
+Create a file called `first-playbook.yml`:
+
+```yaml
+---
+- hosts: all
+  tasks:
+    - name: Echo a message
+      command: echo "Hello from Ansible!"
+```
+
+### Run the Playbook
+
+```bash
+ansible-playbook first-playbook.yml
+```
+
+You'll see output showing the task executed, but not what it actually did. Let's fix that.
+
+---
+
+## Debugging Output
+
+### Method 1: Verbose Mode
+
+Add `-v` flags for more detail:
+
+```bash
+# Basic verbose
+ansible-playbook -v first-playbook.yml
+
+# More verbose (shows task results)
+ansible-playbook -vv first-playbook.yml
+
+# Very verbose (shows connection details)
+ansible-playbook -vvv first-playbook.yml
+```
+
+### Method 2: Register and Debug
+
+Capture task output and display it:
+
+```yaml
+---
+- hosts: all
+  tasks:
+    - name: Echo a message
+      command: echo "Hello from Ansible!"
+      register: echo_result
+
+    - name: Show the variable contents
+      debug:
+        var: echo_result
+
+    - name: Show just the stdout
+      debug:
+        msg: "Command output: {{ echo_result.stdout }}"
+```
+
+The `register` keyword captures the task output into a variable, which you can then display with `debug`.
+
+<Flashcard
+  title="Register and Debug"
+  cards={[
+    {
+      front: "How do you capture the output of an Ansible task?",
+      back: "Use the 'register' keyword to save output to a variable, then use the 'debug' module to display it.",
+    },
+  ]}
+/>
+
+---
+
+## Using Variables
+
+Variables make your playbooks dynamic and reusable.
+
+### Defining Variables in Playbooks
+
+```yaml
+---
+- hosts: all
+  vars:
+    greeting: "Hello from DevHub!"
+    environment: production
+  tasks:
+    - name: Echo the greeting
+      command: 'echo "{{ greeting }}"'
+      register: result
+
+    - name: Show result
+      debug:
+        msg: "{{ result.stdout }}"
+```
+
+### Variable Precedence
+
+Variables can come from many sources (highest to lowest precedence):
+
+1. Extra vars (`-e` flag)
+2. Task vars
+3. Block vars
+4. Role vars
+5. Play vars
+6. Host vars
+7. Group vars
+8. Inventory vars
+9. Role defaults
+
+---
+
+## Loops
+
+Iterate over lists of items using `loop`:
+
+### Simple Loop
+
+```yaml
+---
+- hosts: all
+  vars:
+    packages:
+      - htop
+      - vim
+      - curl
+  tasks:
+    - name: Install packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages }}"
+      become: true
+```
+
+### Inline Loop
+
+```yaml
+---
+- hosts: all
+  tasks:
+    - name: Create users
+      user:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - alice
+        - bob
+        - charlie
+      become: true
+```
+
+<Aside type="note" title="Legacy Syntax">
+  In older Ansible versions, you may see `with_items` instead of `loop`. While
+  still supported, `loop` is the modern syntax.
+</Aside>
+
+---
+
+## Best Practices: Fully Qualified Collection Names
+
+Modern Ansible recommends using fully qualified collection names (FQCN) to avoid module name conflicts:
+
+```yaml
+---
+- hosts: all
+  vars:
+    messages:
+      - one
+      - two
+      - three
+  tasks:
+    - name: Echo with variable
+      ansible.builtin.command:
+        cmd: 'echo "{{ item }}"'
+      register: echo_result
+      loop: "{{ messages }}"
+
+    - name: Show results
+      ansible.builtin.debug:
+        var: echo_result
+
+    - name: Echo inline list
+      ansible.builtin.command:
+        cmd: 'echo "{{ item }}"'
+      loop:
+        - four
+        - five
+        - six
+```
+
+### Common Built-in Modules
+
+| Module                     | Description                  |
+| -------------------------- | ---------------------------- |
+| `ansible.builtin.command`  | Run commands                 |
+| `ansible.builtin.shell`    | Run shell commands           |
+| `ansible.builtin.copy`     | Copy files to hosts          |
+| `ansible.builtin.template` | Process Jinja2 templates     |
+| `ansible.builtin.apt`      | Manage apt packages          |
+| `ansible.builtin.yum`      | Manage yum packages          |
+| `ansible.builtin.service`  | Manage services              |
+| `ansible.builtin.user`     | Manage users                 |
+| `ansible.builtin.file`     | Manage files and directories |
+| `ansible.builtin.debug`    | Print debug messages         |
+
+---
+
+## Moving Variables to Inventory
+
+For better organization, define variables in your inventory file:
+
+### inventory/hosts.yml
+
+```yaml
+nginx:
+  hosts:
+    server1:
+
+ubuntu:
+  hosts:
+    server1:
+      ansible_host: 192.168.1.10
+      messages:
+        - one
+        - two
+        - three
+    server2:
+      ansible_host: 192.168.1.11
+      messages:
+        - four
+        - five
+        - six
+  vars:
+    ansible_user: ubuntu
+```
+
+### Simplified Playbook
+
+```yaml
+---
+- hosts: all
+  tasks:
+    - name: Echo messages
+      ansible.builtin.command:
+        cmd: 'echo "{{ item }}"'
+      register: echo_result
+      loop: "{{ messages }}"
+
+    - name: Show results
+      ansible.builtin.debug:
+        var: echo_result
+```
+
+---
+
+## Complete Example: System Update Playbook
+
+Here's a practical playbook that updates systems:
+
+```yaml
+---
+- name: Update and upgrade Ubuntu servers
+  hosts: ubuntu
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+      register: upgrade_result
+
+    - name: Show upgrade results
+      ansible.builtin.debug:
+        msg: "Packages upgraded: {{ upgrade_result.stdout_lines | default([]) | length }}"
+
+    - name: Check if reboot is required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+
+    - name: Notify about reboot
+      ansible.builtin.debug:
+        msg: "REBOOT REQUIRED on {{ inventory_hostname }}"
+      when: reboot_required.stat.exists
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the playbook keyword with its purpose"
+  pairs={[
+    { left: "register", right: "Capture task output into a variable" },
+    { left: "loop", right: "Iterate over a list of items" },
+    { left: "debug", right: "Display variable contents or messages" },
+    { left: "become", right: "Escalate privileges (sudo)" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "ansible-playbook -v first-playbook.yml",
+      output:
+        "PLAY [Configure webservers] ****\n\nTASK [Gathering Facts] ****\nok: [web1]\n\nTASK [Install nginx] ****\nchanged: [web1]\n\nPLAY RECAP ****\nweb1: ok=2 changed=1",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="This keyword captures command results"
+  sentence="Use the [BLANK:register] keyword to save task output to a variable for later use."
+/>
+
+<Quiz
+  question="What keyword captures task output into a variable?"
+  options={["save", "capture", "register", "store"]}
+  correct={2}
+  explanation="The 'register' keyword saves task output to a variable that can be used later."
+/>
+
+<Quiz
+  question="What is the modern way to loop in Ansible?"
+  options={["with_items", "foreach", "loop", "iterate"]}
+  correct={2}
+  explanation="The 'loop' keyword is the modern syntax. 'with_items' is legacy but still works."
+/>
+
+<Quiz
+  question="Why use fully qualified collection names (FQCN)?"
+  options={[
+    "They run faster",
+    "To avoid module name conflicts",
+    "They are required",
+    "For better logging",
+  ]}
+  correct={1}
+  explanation="FQCN prevents conflicts when multiple collections have modules with the same name."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="ansible-playbooks"
+  title="Playbook Basics Checklist"
+  items={[
+    "Create your first playbook",
+    "Run playbook with verbose mode",
+    "Use register and debug for output",
+    "Add variables to playbooks",
+    "Use loops with the loop keyword",
+    "Convert to FQCN module names",
+    "Move variables to inventory",
+  ]}
+/>
+
+---
+
+## Save Your Progress
+
+```bash
+git add .
+git commit -m "Ansible playbooks - basics complete"
+git push
+```
+
+---
+
+## Source
+
+Based on [Ansible Playbook Documentation](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html) and DevHub examples.

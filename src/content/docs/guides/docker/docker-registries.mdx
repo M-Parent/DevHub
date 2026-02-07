@@ -1,0 +1,351 @@
+---
+title: "Docker Registries"
+description: "Learn how to work with Docker registries, push/pull images, and handle offline scenarios."
+sidebar:
+  label: "Registries"
+  order: 10
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+
+Docker registries store and distribute container images. Understanding how to work with public and private registries is essential for any Docker workflow.
+
+---
+
+## Registry Types
+
+| Registry          | Description                          |
+| ----------------- | ------------------------------------ |
+| Docker Hub        | Default public registry              |
+| Harbor            | CNCF open-source enterprise registry |
+| Amazon ECR        | AWS container registry               |
+| Google GCR        | Google Cloud registry                |
+| Azure ACR         | Azure container registry             |
+| GitHub GHCR       | GitHub container registry            |
+| Quay              | Red Hat registry                     |
+| JFrog Artifactory | Universal artifact repository        |
+
+---
+
+## Docker Hub
+
+Docker Hub is the default registry. When you run `docker pull nginx`, it pulls from `hub.docker.com`.
+
+### Login
+
+```bash
+docker login
+# Enter username and password
+```
+
+### Push an Image
+
+```bash
+# Tag with your username
+docker tag myapp:latest username/myapp:1.0.0
+
+# Push to Docker Hub
+docker push username/myapp:1.0.0
+```
+
+### Pull an Image
+
+```bash
+docker pull nginx:1.25
+docker pull username/myapp:1.0.0
+```
+
+---
+
+## Private Registries
+
+### Using a Private Registry
+
+Prefix image names with the registry FQDN:
+
+```bash
+# Pull from private registry
+docker pull registry.devhub.local/myproject/myapp:1.0.0
+
+# Run from private registry
+docker run registry.devhub.local/myproject/nginx:latest
+```
+
+### Login to Private Registry
+
+```bash
+docker login registry.devhub.local
+# Enter credentials
+```
+
+### Push to Private Registry
+
+<Steps>
+
+1. **Tag the image with registry path**
+
+   ```bash
+   docker tag nginx:latest registry.devhub.local/myproject/nginx:1.25.3
+   ```
+
+2. **Push the image**
+
+   ```bash
+   docker push registry.devhub.local/myproject/nginx:1.25.3
+   ```
+
+3. **Set the latest tag**
+
+   ```bash
+   docker tag registry.devhub.local/myproject/nginx:1.25.3 registry.devhub.local/myproject/nginx:latest
+   docker push registry.devhub.local/myproject/nginx:latest
+   ```
+
+</Steps>
+
+<Aside type="tip" title="Always Use Version Tags">
+  Don't rely on `latest` alone. Always push with a specific version tag, then
+  optionally update `latest`.
+</Aside>
+
+---
+
+## Why Use Private Registries?
+
+| Reason                  | Description                          |
+| ----------------------- | ------------------------------------ |
+| Air-gapped environments | Local mirror without internet access |
+| Security                | Curated list of approved images      |
+| Performance             | Local cache, faster pulls            |
+| Custom applications     | Store proprietary images             |
+| Compliance              | Control over image sources           |
+
+---
+
+## Image Tagging Best Practices
+
+### Use Semantic Versioning
+
+```bash
+# Specific versions
+docker tag myapp:latest myregistry/myapp:1.2.3
+docker tag myapp:latest myregistry/myapp:1.2
+docker tag myapp:latest myregistry/myapp:1
+docker tag myapp:latest myregistry/myapp:latest
+```
+
+### Include Build Information
+
+```bash
+docker tag myapp:latest myregistry/myapp:1.2.3-abc123
+# abc123 = git commit hash
+```
+
+### Environment Tags
+
+```bash
+docker tag myapp:latest myregistry/myapp:staging
+docker tag myapp:1.2.3 myregistry/myapp:production
+```
+
+<Flashcard
+  title="Image Tagging"
+  cards={[
+    {
+      front:
+        "Why should you always use specific version tags instead of just 'latest'?",
+      back: "Specific versions ensure reproducible deployments, easier rollbacks, proper security scanning, and avoid unexpected changes when 'latest' is updated.",
+    },
+  ]}
+/>
+
+---
+
+## Offline Images
+
+For air-gapped environments, save and load images as tar files.
+
+### Save Image to File
+
+```bash
+# Save single image
+docker save nginx:1.25 -o nginx.tar
+
+# Save multiple images
+docker save nginx:1.25 redis:7 postgres:15 -o stack.tar
+
+# Compress
+docker save nginx:1.25 | gzip > nginx.tar.gz
+```
+
+### Load Image from File
+
+```bash
+# Load tar file
+docker load -i nginx.tar
+
+# Load compressed
+gunzip -c nginx.tar.gz | docker load
+```
+
+### Transfer to Air-Gapped System
+
+```bash
+# On connected machine
+docker pull nginx:1.25
+docker save nginx:1.25 -o nginx.tar
+
+# Copy to USB/network share
+cp nginx.tar /media/usb/
+
+# On air-gapped machine
+docker load -i /media/usb/nginx.tar
+docker images | grep nginx
+```
+
+---
+
+## Security Scanning
+
+Always scan images before pushing to production:
+
+### Using Trivy
+
+```bash
+# Scan an image
+docker run --rm aquasec/trivy image nginx:1.25
+
+# Scan with severity filter
+docker run --rm aquasec/trivy image --severity HIGH,CRITICAL nginx:1.25
+
+# Scan local image
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+  aquasec/trivy image myapp:latest
+```
+
+### Download Images with Verification
+
+```bash
+# Check image digest
+docker pull nginx@sha256:abc123...
+
+# Verify after pull
+docker inspect nginx:1.25 --format '{{.RepoDigests}}'
+```
+
+<Aside type="caution" title="Security First">
+  Never deploy images without scanning. A vulnerable base image can compromise
+  your entire infrastructure.
+</Aside>
+
+---
+
+## Registry in Docker Compose
+
+```yaml
+version: "3.9"
+services:
+  app:
+    image: registry.devhub.local/myproject/app:1.2.3
+
+  db:
+    image: registry.devhub.local/myproject/postgres:15
+
+  # Or build and push
+  api:
+    build: ./api
+    image: registry.devhub.local/myproject/api:${VERSION:-latest}
+```
+
+```bash
+# Build and push
+docker compose build
+docker compose push
+```
+
+---
+
+## Running Your Own Registry
+
+### Simple Local Registry
+
+```bash
+docker run -d \
+  --name registry \
+  -p 5000:5000 \
+  -v registry_data:/var/lib/registry \
+  registry:2
+```
+
+### Push to Local Registry
+
+```bash
+docker tag myapp:latest localhost:5000/myapp:1.0.0
+docker push localhost:5000/myapp:1.0.0
+```
+
+### For Production: Use Harbor
+
+Harbor provides:
+
+- Web UI
+- RBAC
+- Vulnerability scanning
+- Image replication
+- Audit logs
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="How do you save a Docker image for transfer to an offline system?"
+  options={["docker export", "docker save", "docker backup", "docker copy"]}
+  correct={1}
+  explanation="Use 'docker save -o file.tar image:tag' to create a tar archive that can be loaded on another system."
+/>
+
+<Quiz
+  question="What prefix indicates a private registry?"
+  options={[
+    "private/image",
+    "registry-url/image",
+    "local/image",
+    "No prefix needed",
+  ]}
+  correct={1}
+  explanation="Private registry images use the registry URL as prefix: registry.example.com/project/image:tag"
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="docker-registries"
+  title="Docker Registries Checklist"
+  items={[
+    "Login to Docker Hub",
+    "Push images to registry",
+    "Pull from private registry",
+    "Tag images with versions",
+    "Save/load images for offline use",
+    "Scan images for vulnerabilities",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Docker Registry Documentation](https://docs.docker.com/registry/) and DevHub examples.

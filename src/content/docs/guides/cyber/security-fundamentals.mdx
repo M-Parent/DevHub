@@ -1,0 +1,324 @@
+---
+title: "Security Fundamentals"
+description: "Introduction to information security concepts, frameworks, and the CIA triad."
+sidebar:
+  label: "Security Basics"
+  order: 1
+  badge:
+    text: "Theory"
+    variant: "note"
+tableOfContents: true
+---
+
+import { Aside, Badge } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Cyber" class="cyber" />
+<Badge text="Theory" variant="note" />
+
+Information security is the practice of protecting information by mitigating risks. This guide covers the fundamental concepts every IT professional should understand.
+
+---
+
+## The CIA Triad
+
+The three pillars of information security:
+
+| Principle           | Description                                                              |
+| ------------------- | ------------------------------------------------------------------------ |
+| **Confidentiality** | Information should only be read by authorized persons                    |
+| **Integrity**       | Data is stored and transferred as intended, modifications are authorized |
+| **Availability**    | Information is accessible to those authorized to view or modify it       |
+
+### Non-Repudiation
+
+A fourth principle often added:
+
+- **Non-Repudiation** - Persons cannot deny having created or modified data
+
+<Flashcard
+  title="CIA Triad"
+  cards={[
+    {
+      front: "What are the three pillars of the CIA Triad?",
+      back: "Confidentiality (only authorized access), Integrity (data is unaltered), and Availability (accessible when needed). Non-repudiation is often added as a fourth principle.",
+    },
+  ]}
+/>
+
+---
+
+## Security Frameworks
+
+### Why Use Frameworks?
+
+- Provide a **legal framework** for compliance
+- Ensure **standardization** across the organization
+- Enable consistent security practices
+- Help with audits and assessments
+
+### Common Frameworks
+
+| Framework    | Focus                             |
+| ------------ | --------------------------------- |
+| NIST         | Comprehensive security guidelines |
+| ISO 27001    | Information security management   |
+| CIS Controls | Prioritized security actions      |
+| COBIT        | IT governance and management      |
+
+---
+
+## Access Control
+
+Access control determines who can access what resources.
+
+### Key Concept: Identification
+
+Users must prove their identity before accessing resources.
+
+### The AAA Model
+
+| Component          | Description                            |
+| ------------------ | -------------------------------------- |
+| **Authentication** | Verify identity (password, biometrics) |
+| **Authorization**  | Determine permissions                  |
+| **Accounting**     | Track actions and access               |
+
+---
+
+## Security Control Categories
+
+| Category        | Description                                        |
+| --------------- | -------------------------------------------------- |
+| **Managerial**  | Policies and procedures that oversee the system    |
+| **Operational** | Depends on people for implementation               |
+| **Technical**   | Implemented in OS, software, and security devices  |
+| **Physical**    | Devices regulating access to premises and hardware |
+
+---
+
+## Functional Security Controls
+
+| Type             | Purpose                            | Example                      |
+| ---------------- | ---------------------------------- | ---------------------------- |
+| **Preventive**   | Stop incidents before they occur   | Firewalls, encryption        |
+| **Detective**    | Identify incidents when they occur | IDS, log monitoring          |
+| **Corrective**   | Fix issues after they occur        | Patches, backups             |
+| **Directive**    | Guide behavior                     | Policies, training           |
+| **Deterrent**    | Discourage attackers               | Warning signs, legal notices |
+| **Compensating** | Alternative when primary fails     | Manual review                |
+
+---
+
+## Roles and Responsibilities
+
+### Organizational Levels
+
+| Level           | Focus                                      |
+| --------------- | ------------------------------------------ |
+| **Strategic**   | Long-term vision, policies, risk appetite  |
+| **Tactical**    | Medium-term planning, projects, procedures |
+| **Operational** | Day-to-day security operations             |
+
+### Key Roles
+
+| Role                       | Responsibility                         |
+| -------------------------- | -------------------------------------- |
+| **Overall Responsibility** | Executive accountability               |
+| **Manager**                | Team oversight and resource allocation |
+| **Technical**              | Implementation and maintenance         |
+| **Non-Technical**          | Policy compliance and awareness        |
+
+### Due Care & Liability
+
+Organizations must demonstrate **due care** - reasonable steps to protect information. Failure can result in liability.
+
+---
+
+## Security Business Units
+
+### Security Operations Center (SOC)
+
+- 24/7 monitoring of security events
+- Incident detection and response
+- Log analysis and correlation
+
+### DevSecOps
+
+- Integrates security into development lifecycle
+- Automated security testing
+- Shift-left security approach
+
+### Incident Response
+
+- Handles security incidents
+- Containment and recovery
+- Post-incident analysis
+
+---
+
+## Threat Actors
+
+### Attributes
+
+| Attribute         | Description                            |
+| ----------------- | -------------------------------------- |
+| Internal/External | Inside or outside the organization     |
+| Sophistication    | Skill level and capabilities           |
+| Resources         | Access to funding, tools, intelligence |
+| Motivation        | Financial, political, ideological      |
+
+### Motivations
+
+| Type            | Examples                        |
+| --------------- | ------------------------------- |
+| **Financial**   | Ransomware, theft, fraud        |
+| **Political**   | Nation-state attacks, espionage |
+| **Chaotic**     | Destruction, disruption         |
+| **Ideological** | Hacktivism, activism            |
+
+---
+
+## Types of Threat Actors
+
+### External Threats
+
+| Actor               | Description                                |
+| ------------------- | ------------------------------------------ |
+| **Lone Hacker**     | Individual with varying skill levels       |
+| **Script Kiddies**  | Unskilled, using pre-made tools            |
+| **Hacker Teams**    | Organized groups, hacktivists              |
+| **Nation-State**    | Government-sponsored, highly sophisticated |
+| **Organized Crime** | Financially motivated, professional        |
+
+### Internal Threats
+
+| Type                      | Description                            |
+| ------------------------- | -------------------------------------- |
+| **Malicious Insider**     | Intentionally causes harm              |
+| **Unintentional Insider** | Accidentally causes security incidents |
+
+<Aside type="caution" title="Insider Threat">
+  Insider threats are often more dangerous than external attacks because
+  insiders already have access and knowledge of systems.
+</Aside>
+
+---
+
+## Attack Vectors
+
+### Software Vectors
+
+- Vulnerable software with unpatched flaws
+- Unsupported systems and applications
+- Client-based vs agentless vulnerabilities
+
+### Network Vectors
+
+- Remote vs local exploitation techniques
+- Unsecured networks
+- Man-in-the-middle attacks
+
+### Lure-Based Vectors
+
+Baits designed to tempt targets:
+
+- Removable devices (USB)
+- Executable files
+- Document files (macros)
+- Image files (steganography)
+
+### Message-Based Vectors
+
+| Vector            | Examples                      |
+| ----------------- | ----------------------------- |
+| Email             | Phishing, malware attachments |
+| SMS               | Smishing                      |
+| Instant Messaging | Malicious links               |
+| Social Media      | Fake profiles, scams          |
+| Voice Calls       | Vishing                       |
+
+<Flashcard
+  title="Attack Vectors"
+  cards={[
+    {
+      front: "What's the difference between phishing and vishing?",
+      back: "Phishing uses email or messages to trick users into revealing information. Vishing (voice phishing) uses phone calls to manipulate victims into giving up sensitive data.",
+    },
+  ]}
+/>
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the security concept with its description"
+  pairs={[
+    { left: "Confidentiality", right: "Only authorized users can access" },
+    { left: "Integrity", right: "Data is unaltered and authentic" },
+    { left: "Availability", right: "Resources accessible when needed" },
+    { left: "Non-Repudiation", right: "Cannot deny actions taken" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "nmap -sV target.local",
+      output:
+        "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for target.local (192.168.1.10)\nPORT    STATE SERVICE VERSION\n22/tcp  open  ssh     OpenSSH 8.9\n80/tcp  open  http    Apache 2.4.52",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Think about the three-letter acronym for access control"
+  sentence="The [BLANK:AAA] model includes Authentication, Authorization, and Accounting"
+/>
+
+<Quiz
+  question="What does 'Confidentiality' in the CIA triad mean?"
+  options={[
+    "Data is always available",
+    "Data cannot be modified",
+    "Only authorized users can access data",
+    "Data is backed up",
+  ]}
+  correct={2}
+  explanation="Confidentiality ensures that information is only accessible to those who are authorized to view it."
+/>
+
+<Quiz
+  question="Which security control type aims to stop incidents before they happen?"
+  options={["Detective", "Corrective", "Preventive", "Compensating"]}
+  correct={2}
+  explanation="Preventive controls stop incidents before they occur (e.g., firewalls, encryption). Detective controls identify incidents when they happen."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="security-fundamentals"
+  title="Security Fundamentals Checklist"
+  items={[
+    "Understand the CIA Triad",
+    "Know security control categories",
+    "Understand roles and responsibilities",
+    "Identify threat actors and motivations",
+    "Recognize common attack vectors",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on security fundamentals and CompTIA Security+ concepts.

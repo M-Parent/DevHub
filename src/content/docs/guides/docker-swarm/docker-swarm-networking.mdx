@@ -1,0 +1,425 @@
+---
+title: "Swarm Networking"
+description: "Master Docker Swarm networking with overlay networks, routing mesh, and service discovery."
+sidebar:
+  label: "Swarm Networking"
+  order: 3
+  badge:
+    text: "Adv"
+    variant: "danger"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import MatchPairs from "../../../../components/MatchPairs.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Docker" class="docker" />
+<Badge text="Linux" class="linux" />
+<Badge text="Orchestration" class="devops" />
+
+Docker Swarm networking enables containers across multiple nodes to communicate seamlessly. Overlay networks and the routing mesh are the key concepts.
+
+---
+
+## Swarm Network Types
+
+| Network             | Description                      | Use Case                            |
+| ------------------- | -------------------------------- | ----------------------------------- |
+| **Overlay**         | Multi-host networking            | Services communicating across nodes |
+| **Ingress**         | Special overlay for routing mesh | External traffic to services        |
+| **docker_gwbridge** | Bridge to external networks      | Outbound from overlay               |
+| **Bridge**          | Single-host                      | Local containers (not Swarm)        |
+
+When you initialize a swarm, Docker creates:
+
+- `ingress` - Overlay network for routing mesh
+- `docker_gwbridge` - Bridge to external networks
+
+```bash
+docker network ls
+```
+
+```
+NETWORK ID     NAME              DRIVER    SCOPE
+abc123         bridge            bridge    local
+def456         docker_gwbridge   bridge    local
+ghi789         ingress           overlay   swarm
+```
+
+---
+
+## Overlay Networks
+
+Overlay networks span multiple Docker hosts, allowing containers on different nodes to communicate.
+
+### Create Overlay Network
+
+```bash
+docker network create \
+  --driver overlay \
+  --attachable \
+  myoverlay
+```
+
+| Flag               | Description                                               |
+| ------------------ | --------------------------------------------------------- |
+| `--driver overlay` | Use overlay driver for multi-host                         |
+| `--attachable`     | Allow standalone containers to attach (not just services) |
+
+### Create with Subnet
+
+```bash
+docker network create \
+  --driver overlay \
+  --subnet 10.10.0.0/16 \
+  --gateway 10.10.0.1 \
+  myoverlay
+```
+
+<Flashcard
+  title="Overlay Networks"
+  cards={[
+    {
+      front: "How do overlay networks work across multiple Docker hosts?",
+      back: "Overlay networks use VXLAN encapsulation to tunnel layer 2 traffic over layer 3 (IP). Docker handles the VXLAN tunnels automatically, making containers on different hosts appear on the same network.",
+    },
+  ]}
+/>
+
+---
+
+## Using Overlay Networks
+
+### Create Service on Overlay
+
+```bash
+docker service create \
+  --name api \
+  --network myoverlay \
+  --replicas 3 \
+  myapi:1.0
+```
+
+### Connect Service to Multiple Networks
+
+```bash
+docker service create \
+  --name api \
+  --network frontend \
+  --network backend \
+  myapi:1.0
+```
+
+### In Stack File
+
+```yaml
+version: "3.9"
+services:
+  web:
+    image: nginx
+    networks:
+      - frontend
+
+  api:
+    image: myapi
+    networks:
+      - frontend
+      - backend
+
+  db:
+    image: postgres
+    networks:
+      - backend
+
+networks:
+  frontend:
+    driver: overlay
+  backend:
+    driver: overlay
+    internal: true # No external access
+```
+
+---
+
+## Service Discovery
+
+Swarm provides built-in DNS for service discovery.
+
+### Services Resolve by Name
+
+```bash
+# Create services on same network
+docker network create --driver overlay mynet
+
+docker service create --name api --network mynet myapi
+docker service create --name db --network mynet postgres
+
+# Inside api container:
+# Can reach database as 'db' or 'db.mynet'
+ping db
+# db resolves to VIP (load-balanced address)
+```
+
+### VIP vs DNSRR
+
+**VIP (Virtual IP)** - Default
+
+- Single IP for the service
+- Built-in load balancing
+- `curl http://api` → VIP → any replica
+
+**DNSRR (DNS Round Robin)**
+
+- Returns all replica IPs
+- Client chooses which to connect
+- Use when you need to reach specific replicas
+
+```bash
+docker service create \
+  --name api \
+  --endpoint-mode dnsrr \
+  myapi
+```
+
+---
+
+## Routing Mesh
+
+The routing mesh routes incoming traffic on published ports to service replicas across all nodes.
+
+### How It Works
+
+```
+                    ┌─────────────────────────────────┐
+                    │       Routing Mesh (Ingress)    │
+                    └─────────────────────────────────┘
+                                    │
+        ┌───────────────────────────┼───────────────────────────┐
+        ▼                           ▼                           ▼
+┌───────────────┐         ┌───────────────┐          ┌───────────────┐
+│    Node 1     │         │    Node 2     │          │    Node 3     │
+│  Port 8080    │         │  Port 8080    │          │  Port 8080    │
+│               │         │               │          │               │
+│  ┌─────────┐  │         │  ┌─────────┐  │          │               │
+│  │ web.1   │  │         │  │ web.2   │  │          │  (no replica) │
+│  └─────────┘  │         │  └─────────┘  │          │               │
+└───────────────┘         └───────────────┘          └───────────────┘
+       ▲                         ▲                          ▲
+       │                         │                          │
+       └─────────────────────────┼──────────────────────────┘
+                                 │
+                            Any node
+                          accepts traffic
+```
+
+Traffic to **any node** on port 8080 reaches the service - even Node 3 which has no replica!
+
+### Publish Ports
+
+```bash
+docker service create \
+  --name web \
+  --publish 8080:80 \
+  --replicas 2 \
+  nginx
+```
+
+<Aside type="tip" title="Routing Mesh Benefits">
+  External load balancers can point to any/all Swarm nodes. No need to track
+  which node runs which service.
+</Aside>
+
+---
+
+## Bypass Routing Mesh
+
+For performance or when you need client IP:
+
+```bash
+docker service create \
+  --name web \
+  --publish mode=host,target=80,published=8080 \
+  --mode global \
+  nginx
+```
+
+| Mode           | Description                                |
+| -------------- | ------------------------------------------ |
+| `mode=ingress` | Default, uses routing mesh                 |
+| `mode=host`    | Bypass routing mesh, bind directly to node |
+
+With `mode=host`:
+
+- Port bound only on nodes running the service
+- Client IP preserved
+- No automatic load balancing across nodes
+
+---
+
+## Encrypted Overlay Networks
+
+Encrypt traffic between nodes:
+
+```bash
+docker network create \
+  --driver overlay \
+  --opt encrypted \
+  secure-overlay
+```
+
+<Aside type="caution" title="Encryption Overhead">
+  IPsec encryption adds CPU overhead. Test performance in your environment.
+</Aside>
+
+---
+
+## Network Troubleshooting
+
+### Inspect Network
+
+```bash
+docker network inspect myoverlay
+```
+
+### List Network Services
+
+```bash
+docker network inspect myoverlay \
+  --format '{{range .Containers}}{{.Name}} {{end}}'
+```
+
+### Test Connectivity
+
+```bash
+# Create debug container on overlay
+docker service create \
+  --name debug \
+  --network myoverlay \
+  nicolaka/netshoot sleep 3600
+
+# Exec into it
+docker exec -it $(docker ps -q -f name=debug) sh
+
+# Test from inside
+nslookup api
+ping api
+curl http://api:3000/health
+```
+
+### Check Overlay Port Requirements
+
+Ensure these ports are open between nodes:
+
+| Port | Protocol | Purpose                 |
+| ---- | -------- | ----------------------- |
+| 2377 | TCP      | Cluster management      |
+| 7946 | TCP/UDP  | Node communication      |
+| 4789 | UDP      | Overlay network (VXLAN) |
+
+---
+
+## Network Security
+
+### Internal Networks
+
+Prevent external access:
+
+```yaml
+networks:
+  backend:
+    driver: overlay
+    internal: true
+```
+
+### Network Isolation
+
+```yaml
+services:
+  web:
+    networks:
+      - frontend
+
+  api:
+    networks:
+      - frontend
+      - backend
+
+  db:
+    networks:
+      - backend # Only accessible from backend network
+```
+
+---
+
+## Knowledge Check
+
+<MatchPairs
+  instruction="Match the network type with its purpose"
+  pairs={[
+    { left: "Overlay", right: "Multi-host container networking" },
+    { left: "Ingress", right: "Routing mesh for external traffic" },
+    { left: "Bridge", right: "Single-host local containers" },
+    { left: "docker_gwbridge", right: "Connect to external networks" },
+  ]}
+/>
+
+<Terminal
+  commands={[
+    {
+      input: "docker network create --driver overlay myoverlay",
+      output: "network_id_hash",
+    },
+  ]}
+/>
+
+<FillBlank
+  instruction="Complete the sentence:"
+  sentence="Overlay networks use [BLANK:VXLAN] encapsulation to tunnel layer 2 traffic over IP"
+/>
+
+<Quiz
+  question="What type of network allows containers on different Docker hosts to communicate?"
+  options={["Bridge", "Host", "Overlay", "Macvlan"]}
+  correct={2}
+  explanation="Overlay networks span multiple Docker hosts, using VXLAN to enable cross-node container communication in Swarm."
+/>
+
+<Quiz
+  question="What does the routing mesh do?"
+  options={[
+    "Encrypts network traffic",
+    "Routes traffic to services on any node",
+    "Creates virtual networks",
+    "Provides DNS resolution",
+  ]}
+  correct={1}
+  explanation="The routing mesh routes incoming traffic on published ports to available service replicas, regardless of which node receives the request."
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="swarm-networking"
+  title="Swarm Networking Checklist"
+  items={[
+    "Create overlay networks",
+    "Connect services to overlay networks",
+    "Understand routing mesh",
+    "Use service discovery (DNS)",
+    "Configure internal-only networks",
+    "Debug network connectivity",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Docker Swarm Networking Documentation](https://docs.docker.com/engine/swarm/networking/) and DevHub examples.
