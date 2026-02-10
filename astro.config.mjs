@@ -16,6 +16,7 @@ export default defineConfig({
     starlight({
       title: "DevHub",
       favicon: "favicon.png",
+
       customCss: ["./src/styles/custom.css"],
       // Désactiver le toggle de thème - forcer le dark mode
       components: {
