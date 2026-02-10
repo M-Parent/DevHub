@@ -2,72 +2,98 @@
 
 This file contains templates for creating new content in DevHub using the n8n/Gemini automation pipeline.
 
+You will always reply with this exact format:
+
+===FILE_PATH===
+<path/to/the/file.mdx>
+
+===FILE_CONTENT===
+<all the content of the file .mdx>
+
+===ROADMAP_PATH===
+<path/to/roadmap/to/update.mdx>
+
+===ROADMAP_SNIPPET===
+<only the MDX block to add in the roadmap, e.g. the LinkCard>
+
 ---
+
+Path rule: All content file paths must be rooted at "src/content/docs/".
+
+- When returning `FILE_PATH`, always start with: src/content/docs/
+- If the agent receives or builds a path that begins with "src/content/" but misses "docs", insert "docs" after "content". Example incorrect: src/content/cheatsheets/linux/foo.mdx. Correct: src/content/docs/cheatsheets/linux/foo.mdx
+- If the user specifies a different target root, confirm explicitly in your response before writing files.
+
+Important: the agent should attempt to match the provided `title` to existing filenames using fuzzy matching and contextual analysis, not only exact equality.
+
+Matching and creation policy:
+
+- Normalize the title to a candidate filename first (see normalization rules below).
+- Compute a similarity score between the normalized candidate filename and existing filenames in the target directory (use a standard string similarity algorithm; e.g., token overlap, Jaro-Winkler, or normalized Levenshtein).
+- If the highest similarity score is greater than or equal to 90%:
+  - Perform a contextual check to decide whether the new content fits into the matched file. This check should consider metadata, categories, badges, and a short semantic comparison between the new content and the existing file content.
+  - If context indicates the notes belong in the existing file, append or merge the `FILE_CONTENT` into that file (prefer appending under a clear section header such as "Notes - YYYY-MM-DD"). Return the existing `FILE_PATH`.
+  - If context indicates the new content is not a fit despite the string similarity, create a new file as described below and return the new `FILE_PATH`.
+- If no existing filename reaches the 90% threshold, create a new file using the normalized filename and write `FILE_CONTENT` into it. Return the new `FILE_PATH`.
+
+Filename normalization rules (apply before matching/creating):
+
+- Lowercase the title
+- Replace spaces and slashes with hyphens
+- Remove characters other than letters, numbers, hyphens, and underscores
+- Trim repeated hyphens to a single hyphen
+- Append ".mdx" if missing
+
+Example: Title "Docker Install Guide" -> normalized filename "docker-install-guide.mdx"
 
 ## 📁 Folder Structure
 
 ```
 src/content/docs/
 ├── guides/
-│   ├── linux/
-│   │   ├── ssh-fundamentals.mdx
-│   │   ├── linux-user-management.mdx
-│   │   ├── linux-file-permissions.mdx
-│   │   ├── linux-distributions.mdx
-│   │   ├── openvpn-setup.mdx
-│   │   └── ubuntu/
-│   │       ├── sudoers-configuration.mdx
-│   │       ├── create-certificate-authority.mdx
-│   │       ├── create-csr-certificate.mdx
-│   │       ├── pkcs12-conversion.mdx
-│   │       ├── verify-ssl-certificates.mdx
-│   │       ├── nginx-setup.mdx
-│   │       └── custom-ubuntu-iso.mdx
-│   ├── windows/
-│   │   └── docker-install-windows.mdx
-│   ├── docker/
-│   │   ├── docker-fundamentals.mdx
-│   │   └── docker-install-linux.mdx
-│   ├── terraform/
-│   │   ├── terraform-fundamentals.mdx
-│   │   ├── terraform-state.mdx
-│   │   ├── terraform-variables.mdx
-│   │   └── terraform-modules.mdx
-│   ├── networking/
-│   │   └── dns-theory.mdx
-│   ├── radio/
-│   │   └── radio-fundamentals.mdx
+│   ├── ansible/
+│   ├── arr-stack/
 │   ├── coding/
-│   │   └── (empty - for future content)
-│   └── arr-stack/
-│       └── arr-stack-theory.mdx
-├── cheatsheets/
+│   ├── cyber/
+│   ├── docker/
+│   ├── docker-swarm/
+│   ├── kubernetes/
 │   ├── linux/
-│   │   ├── ssh-cheatsheet.mdx
-│   │   └── openvpn-cheatsheet.mdx
+│   │   ├── ubuntu-debian/
+│   │   └── ssh-fundamentals.mdx
+│   ├── networking/
 │   ├── radio/
-│   │   └── radio-theory.mdx
-│   └── arr-stack/
-│       └── arr-stack.mdx
+│   ├── terraform/
+│   └── windows/
+├── cheatsheets/
+│   ├── ansible/
+│   ├── arr-stack/
+│   ├── coding/
+│   ├── cyber/
+│   ├── docker/
+│   ├── docker-swarm/
+│   ├── go/
+│   ├── kubernetes/
+│   ├── linux/
+│   ├── networking/
+│   ├── radio/
+│   ├── terraform/
+│   └── windows/
 ├── projects/
-│   └── linux/
-│       └── scribbler-game.mdx
-├── misc/                          # Orphan articles - NOT in any roadmap
-│   ├── ux-design-theory.mdx
-│   └── microservices-theory.mdx
+├── misc/
 └── roadmaps/
-    ├── linux-learning-path.mdx
-    ├── server-learning-path.mdx
-    ├── windows-learning-path.mdx
-    ├── docker-learning-path.mdx
-    ├── terraform-learning-path.mdx
-    ├── networking-learning-path.mdx
-    ├── radio-learning-path.mdx
-    ├── arr-stack-learning-path.mdx
-    ├── coding-learning-path.mdx
-    ├── kubernetes-learning-path.mdx
-    ├── ansible-learning-path.mdx
-    └── cyber-learning-path.mdx
+  ├── ansible-learning-path.mdx
+  ├── arr-stack-learning-path.mdx
+  ├── coding-learning-path.mdx
+  ├── cyber-learning-path.mdx
+  ├── docker-learning-path.mdx
+  ├── kubernetes-learning-path.mdx
+  ├── linux-learning-path.mdx
+  ├── networking-learning-path.mdx
+  ├── radio-learning-path.mdx
+  ├── server-learning-path.mdx
+  ├── terraform-learning-path.mdx
+  └── windows-learning-path.mdx
 ```
 
 ---

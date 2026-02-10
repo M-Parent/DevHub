@@ -5,6 +5,13 @@ import starlight from "@astrojs/starlight";
 // https://astro.build/config
 export default defineConfig({
   site: "https://devhub.mpmk.app",
+  vite: {
+    server: {
+      // expose dev server on network interfaces so the site is reachable via the machine IP
+      host: "0.0.0.0",
+      port: 4321,
+    },
+  },
   integrations: [
     starlight({
       title: "DevHub",

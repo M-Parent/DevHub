@@ -1,0 +1,19 @@
+
+> home-parent-desktop-devhub@0.0.1 dev
+> astro dev --host
+
+18:23:40 [types] Generated 0ms
+18:23:40 [content] Syncing content
+[InvalidContentEntryDataError] docs → roadmaps/linux-learning-path data does not match collection schema.
+
+  title**: **title: Required
+
+  Hint:
+    See https://docs.astro.build/en/guides/content-collections/ for more information on content schemas.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/invalid-content-entry-data-error/
+  Location:
+    /home/parent/Desktop/DevHub/src/content/docs/roadmaps/linux-learning-path.mdx:0:0
+  Stack trace:
+    at getEntryDataAndImages (file:///home/parent/Desktop/DevHub/node_modules/astro/dist/content/utils.js:168:26)
+    at async syncData (/home/parent/Desktop/DevHub/node_modules/astro/dist/content/loaders/glob.js:97:28)
