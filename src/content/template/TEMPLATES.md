@@ -726,3 +726,72 @@ Always use full paths from root:
 - [ ] Added to relevant roadmap(s)
 - [ ] Multi-category articles in ALL roadmaps
 - [ ] Source attribution included
+
+---
+
+## 🛠️ DevHub AI Agent Prompts
+
+- When using the FillBlank component, always provide the required prop `sentence` using the `[BLANK:answer]` syntax. Example:
+
+  ```mdx
+  <FillBlank
+    instruction="Type the command to reload your bash configuration after adding an alias:"
+    sentence="Type the command to reload your bash configuration after adding an alias: [BLANK:source ~/.bashrc]"
+    hint="Starts with 's' and targets the hidden bash config file"
+  />
+  ```
+
+- Do NOT use `answer` as a prop for FillBlank. Only `sentence` is required for blanks to work.
+- Always check component props in `/src/components/` before using them in new content.
+
+---
+
+## 🌐 Example Sources by Category
+
+When writing the `Source` section, always include at least one real, useful, and verifiable resource. Here are recommended links for each main category:
+
+- **Linux:**
+  - [GNU Bash Manual](https://www.gnu.org/software/bash/manual/)
+  - [Arch Wiki](https://wiki.archlinux.org/)
+  - [Linuxize Tutorials](https://linuxize.com/)
+- **Docker:**
+  - [Docker Official Docs](https://docs.docker.com/)
+  - [Play with Docker](https://labs.play-with-docker.com/)
+- **Kubernetes:**
+  - [Kubernetes Official Docs](https://kubernetes.io/docs/)
+  - [Learn Kubernetes](https://www.learnk8s.io/)
+- **Networking:**
+  - [Cisco Networking Basics](https://www.cisco.com/c/en/us/solutions/enterprise-networks/what-is-networking.html)
+  - [NetworkLessons.com](https://networklessons.com/)
+- **Cybersecurity:**
+  - [OWASP Top Ten](https://owasp.org/www-project-top-ten/)
+  - [Kali Linux Tools](https://tools.kali.org/tools-listing)
+- **Radio:**
+  - [ARRL (Amateur Radio Relay League)](http://www.arrl.org/)
+  - [RTL-SDR Blog](https://www.rtl-sdr.com/)
+- **Windows:**
+  - [Microsoft Docs](https://docs.microsoft.com/en-us/windows/)
+  - [SS64 Windows Commands](https://ss64.com/nt/)
+- **Ansible:**
+  - [Ansible Docs](https://docs.ansible.com/)
+- **Terraform:**
+  - [Terraform Docs](https://developer.hashicorp.com/terraform/docs)
+- **Go:**
+  - [Go by Example](https://gobyexample.com/)
+  - [Go Official Docs](https://go.dev/doc/)
+- **Python:**
+  - [Python Official Docs](https://docs.python.org/3/)
+  - [Real Python](https://realpython.com/)
+- **JavaScript/TypeScript:**
+  - [MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+  - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- **SQL:**
+  - [SQLBolt](https://sqlbolt.com/)
+  - [PostgreSQL Docs](https://www.postgresql.org/docs/)
+- **General DevOps:**
+  - [DevOps Handbook](https://itrevolution.com/products/devops-handbook)
+  - [Awesome DevOps](https://github.com/ligurio/awesome-devops)
+
+Always prefer official documentation, reputable tutorials, or well-known community resources. Add more as needed for new categories.
+
+---

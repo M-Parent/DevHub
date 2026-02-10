@@ -1,0 +1,134 @@
+---
+title: "Linux Script Tips & Tricks"
+description: "Useful bash aliases and functions for a more productive terminal experience."
+sidebar:
+  label: "Script Tips & Tricks"
+  order: 10
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Badge, Aside } from "@astrojs/starlight/components";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Linux" class="linux" />
+
+Enhance your terminal productivity by adding custom aliases and functions to your shell configuration. These snippets help automate repetitive tasks like Git commands, directory navigation, and file extraction.
+
+## Configuration
+
+To add these, edit your bash configuration file:
+
+```bash
+nano ~/.bashrc
+```
+
+Paste your shortcuts at the end of the file, save, and exit.
+
+---
+
+## Useful Aliases
+
+### Git Shortcuts
+Speed up your Git workflow with these simple aliases.
+
+```bash
+# Add and commit in one command
+alias ac='git add . && git commit -m'
+
+# Push to main branch
+alias gp='git push origin main'
+```
+
+### Navigation
+Stop typing `cd ..` repeatedly.
+
+```bash
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+```
+
+---
+
+## Powerful Functions
+
+Functions allow you to pass arguments, making them more flexible than standard aliases.
+
+### Create and Enter Directory
+Instead of `mkdir folder && cd folder`, use one command.
+
+```bash
+mkcd () {
+  mkdir -p "$1" && cd "$1"
+}
+```
+
+### Universal Extractor
+Never struggle with `tar` or `unzip` flags again. This function handles almost any compressed format.
+
+```bash
+extract () {
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1     ;;
+      *.tar.gz)    tar xzf $1     ;;
+      *.bz2)       bunzip2 $1     ;;
+      *.rar)       unrar x $1     ;;
+      *.gz)        gunzip $1      ;;
+      *.tar)       tar xf $1      ;;
+      *.tbz2)      tar xjf $1     ;;
+      *.tgz)       tar xzf $1     ;;
+      *.zip)       unzip $1       ;;
+      *.Z)         uncompress $1  ;;
+      *.7z)        7z x $1        ;;
+      *)           echo "'$1' can't be extract via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+```
+
+---
+
+## Applying Changes
+
+After saving `~/.bashrc`, you must reload the file for the changes to take effect in your current session.
+
+<Aside type="tip">
+  You only need to do this once per terminal session after editing the file.
+</Aside>
+
+<FillBlank
+  instruction="Type the command to reload your bash configuration after adding an alias:"
+  sentence="To apply changes: [BLANK:source ~/.bashrc]"
+  hint="Starts with 's' and targets the hidden bash config file in home"
+/>
+
+---
+
+## Usage Examples
+
+```bash
+# Git: Add, commit, and push
+ac "docs: add script tips"
+gp
+
+# Navigation: Go up 3 levels
+...
+
+# Directory: Create 'test' and enter it
+mkcd test
+
+# Extract: Unpack a zip or tarball
+extract archive.tar.gz
+```
+
+---
+
+## Source
+Based on community Linux patterns and the [GNU Bash Manual](https://www.gnu.org/software/bash/manual/).
