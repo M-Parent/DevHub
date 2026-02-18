@@ -63,6 +63,7 @@ src/content/docs/
 │   │   └── ssh-fundamentals.mdx
 │   ├── networking/
 │   ├── radio/
+│   ├── server/
 │   ├── terraform/
 │   └── windows/
 ├── cheatsheets/

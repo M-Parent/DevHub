@@ -1,0 +1,198 @@
+---
+title: "Setting Up Maestro UI Testing on Windows"
+description: "A step-by-step guide to installing Maestro, Java, and ADB for mobile UI automation on Windows."
+sidebar:
+  label: "Maestro UI Testing"
+  order: 10
+  badge:
+    text: "Novice"
+    variant: "tip"
+tableOfContents: true
+---
+
+import { Aside, Badge, Steps, LinkCard } from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FillBlank from "../../../../components/FillBlank.astro";
+
+<Badge text="Windows" class="windows" />
+<Badge text="Productivity" class="productivity" />
+
+Mobile automation testing used to be a headache. **Maestro** changes that. It is the simplest, most effective UI testing framework for Android and iOS, relying on simple YAML files instead of complex code.
+
+While Maestro has native support for macOS, setting it up on Windows requires a few manual steps involving Java and the Android Debug Bridge (ADB).
+
+---
+
+## 🛠️ Prerequisites
+
+Before installing Maestro, we need two essential dependencies: Java and ADB.
+
+### 1. Install Java (JDK 17+)
+
+Maestro runs on the Java Virtual Machine (JVM). We recommend the **Eclipse Temurin** distribution.
+
+1. Go to [Adoptium.net](https://adoptium.net).
+2. Click **Latest LTS Release** (Download JDK 17 or 21).
+3. Run the installer.
+4. <Aside type="danger" title="Crucial Step">
+     When asked about custom setup, ensure you select **"Set JAVA_HOME
+     variable"** (change the red X icon to "Will be installed on local hard
+     drive").
+   </Aside>
+5. Finish the installation.
+
+### 2. Install ADB (Android Debug Bridge)
+
+This tool allows your PC to communicate with your Android device or emulator.
+
+<Steps>
+  1. Download the [SDK Platform-Tools for
+  Windows](https://developer.android.com/tools/releases/platform-tools). 2.
+  Extract the zip file to `C:\platform-tools`. 3. Open your **Command Prompt**
+  (search "cmd" in the start menu). 4. Run the following command to add ADB to
+  your system path: ```cmd setx PATH "%PATH%;C:\platform-tools" ```
+</Steps>
+
+<Terminal
+  commands={[
+    {
+      input: "adb version",
+      output: "Android Debug Bridge version 1.0.41\nVersion 34.0.4-10411341",
+    },
+  ]}
+/>
+
+---
+
+## 🚀 Installing Maestro
+
+Since Windows support is currently a manual process, we will perform a "Download & Path" setup.
+
+### Step 1: Download & Extract
+
+1. Download the latest Windows release: [maestro.zip](https://github.com/mobile-dev-inc/maestro/releases/latest/download/maestro.zip)
+2. Extract the zip file to your user folder.
+   - **Target Location:** `C:\Users\YOUR_USERNAME\maestro`
+
+<Aside type="note">
+  Make sure the `bin` folder is inside. The path should look like:
+  `C:\Users\YOUR_USERNAME\maestro\maestro\bin`
+</Aside>
+
+### Step 2: Update System Path
+
+We need to tell Windows where to find the `maestro` command.
+
+<FillBlank
+  instruction="Complete the command to add Maestro to your User Path (using the %USERPROFILE% variable):"
+  sentence="setx PATH [BLANK:%PATH%;%USERPROFILE%\maestro\maestro\bin]"
+  hint="The path ends with \\maestro\\bin"
+/>
+
+### Step 3: Verification
+
+Close your current Command Prompt and open a fresh one to reload the environment variables.
+
+<Terminal commands={[{ input: "maestro --version", output: "1.39.0" }]} />
+
+---
+
+## 📱 Your First Test
+
+Let's run a test on the Android **Settings** app.
+
+1. **Connect Device:** Plug in your Android phone (with USB debugging enabled) or launch an Emulator.
+2. **Verify Connection:** Run `adb devices` to ensure your device is listed.
+3. **Create Flow:** Create a file named `flow.yaml` on your desktop and paste the following:
+
+```yaml
+appId: com.android.settings
+---
+- launchApp
+- tapOn: "Battery"
+- assertVisible: "Battery usage" # Verifies this text exists on screen
+```
+
+4. **Run the Test:**
+
+```bash
+cd Desktop
+maestro test flow.yaml
+```
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="Which Java version is minimum-required for Maestro?"
+  options={["JDK 8", "JDK 11", "JDK 17", "JDK 21"]}
+  correct={2}
+  explanation="Maestro requires JDK 17 or higher to function correctly."
+/>
+
+<Quiz
+  question="Which configuration is essential during Java installation for Maestro?"
+  options={[
+    "Installing Source Code",
+    "Setting JAVA_HOME variable",
+    "Installing Public JRE",
+    "Adding to Registry",
+  ]}
+  correct={1}
+  explanation="Setting the JAVA_HOME variable is crucial for the JVM tools to locate the Java installation."
+/>
+
+<Quiz
+  question="What file format does Maestro use for defining test flows?"
+  options={["JSON", "XML", "YAML", "JavaScript"]}
+  correct={2}
+  explanation="Maestro uses YAML files for its simple, declarative syntax."
+/>
+
+---
+
+## Concepts Review
+
+<Flashcard
+  title="Maestro Terminology"
+  cards={[
+    {
+      front: "What is Maestro?",
+      back: "A UI testing framework for mobile (iOS/Android) using declarative YAML flows.",
+    },
+    {
+      front: "What is ADB?",
+      back: "Android Debug Bridge: a command-line tool that lets you communicate with a device.",
+    },
+    {
+      front: "What does 'assertVisible' do?",
+      back: "It stops the test if the specified text or element is NOT found on the screen.",
+    },
+  ]}
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="maestro-install-checklist"
+  title="Setup Completion"
+  items={[
+    "Installed JDK 17+ and set JAVA_HOME",
+    "Added ADB to System Path",
+    "Extracted Maestro to User folder",
+    "Verified 'maestro --version' in terminal",
+    "Executed a sample flow.yaml successfully",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on the [Official Maestro Documentation](https://maestro.mobile.dev/) and Windows installation workarounds.

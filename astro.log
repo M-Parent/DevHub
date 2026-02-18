@@ -2,1116 +2,186 @@
 > home-parent-desktop-devhub@0.0.1 dev
 > astro dev --host
 
-00:17:04 [types] Generated 0ms
-00:17:05 [content] Syncing content
-00:17:05 [content] Synced content
+00:17:49 [types] Generated 0ms
+00:17:50 [content] Syncing content
+00:17:50 [content] Synced content
+00:17:50 [vite] Port 4321 is in use, trying another one...
 
- astro  v5.17.1 ready in 1078 ms
+ astro  v5.17.1 ready in 1390 ms
 
-┃ Local    http://localhost:4321/
-┃ Network  http://10.0.20.20:4321/
-           http://172.21.0.1:4321/
-
-00:17:05 watching for file changes...
-07:15:18 [200] / 263ms
-07:15:18 [200] /_image 88ms
-07:15:24 [200] /roadmaps/docker-learning-path/ 112ms
-07:15:24 [200] /roadmaps/docker-learning-path/ 24ms
-07:15:26 [200] /roadmaps/windows-learning-path/ 53ms
-07:15:27 [200] /roadmaps/windows-learning-path/ 21ms
-07:15:37 [200] /guides/windows/windows-11-admin-password-recovery/ 135ms
-07:15:37 [200] /guides/windows/windows-11-admin-password-recovery/ 25ms
-07:20:10 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:20:10 [200] /guides/windows/windows-11-admin-password-recovery/ 198ms
-07:20:10 [ERROR] [AstroUserError] The `<Steps>` component expects its content to be a single ordered list (`<ol>`) but found multiple child elements: `<ol>`, `<div>`, `<div>`, `<script>`, `<ol>`.
+┃ Local    http://localhost:4322/
+┃ Network  http://10.0.20.20:4322/
+           http14:55:48 [200] / 241ms
+14:55:50 [200] /_image 90ms
+14:55:5115:04:23 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:04:41 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:04:50 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:07:01 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:07:11 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:07:46 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:08:06 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:08:10 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:09:24 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:09:25 [ERROR] [UnknownFilesystemError] 
   Hint:
-    To learn more about the `<Steps>` component, see https://starlight.astro.build/components/steps/
-    
-    Full HTML passed to `<Steps>`:
-    
-    <ol>
-      <li>
-        <p><strong>Boot from USB:</strong> Insert a Windows 11 Installation USB. Restart your PC and tap the boot menu key (F12, F10, or ESC) to boot from the USB.</p>
-      </li>
-      <li>
-        <p><strong>Open Command Prompt:</strong> At the initial setup screen, press <code dir="auto">Shift + F10</code>.</p>
-      </li>
-      <li>
-        <p><strong>Replace Utility Manager:</strong> Navigate to your Windows drive (usually <code dir="auto">C:</code>) and run the following:</p>
-      </li>
-    </ol>
-    <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css">
-      <script type="module" src="/_astro/ec.0vx5m.js"></script>
-      <figure class="frame is-terminal not-content">
-        <figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption>
-        <pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">move</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe.bak</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">copy</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">cmd.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span></div></div></code></pre>
-        <div class="copy">
-          <div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="move c:\\windows\\system32\\utilman.exe c:\\windows\\system32\\utilman.exe.bakcopy c:\\windows\\system32\\cmd.exe c:\\windows\\system32\\utilman.exe"><div></div></button>
-        </div>
-      </figure>
-    </div>
-    <div class="terminal-container astro-eqg5l7fp" data-id="terminal-9v23kwmyo" data-commands="[{&#x22;input&#x22;:&#x22;&#x22;,&#x22;output&#x22;:&#x22;1 file(s) moved.&#x22;},{&#x22;input&#x22;:&#x22;&#x22;,&#x22;output&#x22;:&#x22;1 file(s) copied.&#x22;}]" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="17:87">
-      <div class="terminal-header astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="18:32">
-        <div class="terminal-buttons astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="19:35"><span class="btn close astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="20:8"></span><span class="btn minimize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="21:8"></span><span class="btn maximize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="22:8"></span></div><span class="terminal-title astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="24:34">Terminal</span>
-      </div>
-      <div class="terminal-body astro-eqg5l7fp" id="body-terminal-9v23kwmyo" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="27:48">
-        <div class="terminal-output astro-eqg5l7fp" id="output-terminal-9v23kwmyo" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="28:6"></div>
-        <div class="terminal-input-line astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="29:38"><span class="prompt astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="30:28">$ </span><input type="text" class="terminal-input astro-eqg5l7fp" id="input-terminal-9v23kwmyo" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command..." data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="31:8"></div>
-      </div>
-      <div class="terminal-hint astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="44:30">💡 Try:<code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38"></code><code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38"></code></div>
-    </div>
-    <script>(function(){const id = "terminal-9v23kwmyo";
-    
-      document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector(`[data-id="${id}"]`);
-        const input = document.getElementById(`input-${id}`);
-        const output = document.getElementById(`output-${id}`);
-        const commands = JSON.parse(container.dataset.commands);
-        const history = [];
-        let historyIndex = -1;
-    
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-    
-            // Add to history
-            history.unshift(cmd);
-            historyIndex = -1;
-    
-            // Display input
-            const inputLine = document.createElement('div');
-            inputLine.className = 'output-line input-echo';
-            inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
-            output.appendChild(inputLine);
-    
-            // Find matching command
-            const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
-            
-            // Display output
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output-line';
-            
-            if (match) {
-              outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
-              outputLine.classList.add('success');
-            } else {
-              outputLine.textContent = `Command not found: ${cmd}`;
-              outputLine.classList.add('error');
-            }
-            
-            output.appendChild(outputLine);
-            
-            // Clear input and scroll
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-              historyIndex++;
-              input.value = history[historyIndex];
-            }
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-              historyIndex--;
-              input.value = history[historyIndex];
-            } else {
-              historyIndex = -1;
-              input.value = '';
-            }
-          } else if (e.key === 'l' && e.ctrlKey) {
-            e.preventDefault();
-            output.innerHTML = '';
-          }
-        });
-    
-        // Focus on click
-        container.addEventListener('click', () => input.focus());
-      });
-    })();</script>
-    <ol start="4">
-      <li>
-        <p><strong>Restart:</strong> Remove the USB and restart your computer normally.</p>
-      </li>
-      <li>
-        <p><strong>Trigger CMD:</strong> At the login screen, click the <strong>Accessibility icon</strong> (bottom right). A Command Prompt window will open with System privileges.</p>
-      </li>
-      <li>
-        <p><strong>Reset Password:</strong> Run the following command:</p>
-        <div class="terminal-container astro-eqg5l7fp" data-id="terminal-qfblyf9nq" data-commands="[{&#x22;input&#x22;:&#x22;net user [YourUsername] [NewPassword]&#x22;,&#x22;output&#x22;:&#x22;The command completed successfully.&#x22;}]" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="17:87">
-          <div class="terminal-header astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="18:32">
-            <div class="terminal-buttons astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="19:35"><span class="btn close astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="20:8"></span><span class="btn minimize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="21:8"></span><span class="btn maximize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="22:8"></span></div><span class="terminal-title astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="24:34">Terminal</span>
-          </div>
-          <div class="terminal-body astro-eqg5l7fp" id="body-terminal-qfblyf9nq" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="27:48">
-            <div class="terminal-output astro-eqg5l7fp" id="output-terminal-qfblyf9nq" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="28:6"></div>
-            <div class="terminal-input-line astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="29:38"><span class="prompt astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="30:28">$ </span><input type="text" class="terminal-input astro-eqg5l7fp" id="input-terminal-qfblyf9nq" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command..." data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="31:8"></div>
-          </div>
-          <div class="terminal-hint astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="44:30">💡 Try: <code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38">net user [YourUsername] [NewPassword]</code></div>
-        </div>
-        <script>(function(){const id = "terminal-qfblyf9nq";
-    
-      document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector(`[data-id="${id}"]`);
-        const input = document.getElementById(`input-${id}`);
-        const output = document.getElementById(`output-${id}`);
-        const commands = JSON.parse(container.dataset.commands);
-        const history = [];
-        let historyIndex = -1;
-    
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-    
-            // Add to history
-            history.unshift(cmd);
-            historyIndex = -1;
-    
-            // Display input
-            const inputLine = document.createElement('div');
-            inputLine.className = 'output-line input-echo';
-            inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
-            output.appendChild(inputLine);
-    
-            // Find matching command
-            const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
-            
-            // Display output
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output-line';
-            
-            if (match) {
-              outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
-              outputLine.classList.add('success');
-            } else {
-              outputLine.textContent = `Command not found: ${cmd}`;
-              outputLine.classList.add('error');
-            }
-            
-            output.appendChild(outputLine);
-            
-            // Clear input and scroll
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-              historyIndex++;
-              input.value = history[historyIndex];
-            }
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-              historyIndex--;
-              input.value = history[historyIndex];
-            } else {
-              historyIndex = -1;
-              input.value = '';
-            }
-          } else if (e.key === 'l' && e.ctrlKey) {
-            e.preventDefault();
-            output.innerHTML = '';
-          }
-        });
-    
-        // Focus on click
-        container.addEventListener('click', () => input.focus());
-      });
-    })();</script>
-      </li>
-    </ol>
-    
+    It can be caused by many things, eg. missing permissions or a file not existing we attempt to read. Check the error cause for more details.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/unknown-filesystem-error/
   Stack trace:
-    at /home/parent/Desktop/DevHub/node_modules/@astrojs/starlight/user-components/rehype-steps.ts:23:11
-    [...] See full stack trace in the browser, or rerun with --verbose.
-07:20:14 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:20:14 [200] /guides/windows/windows-11-admin-password-recovery/ 90ms
-07:20:14 [ERROR] [AstroUserError] The `<Steps>` component expects its content to be a single ordered list (`<ol>`) but found multiple child elements: `<ol>`, `<div>`, `<ol>`.
-  Hint:
-    To learn more about the `<Steps>` component, see https://starlight.astro.build/components/steps/
-    
-    Full HTML passed to `<Steps>`:
-    
-    <ol>
-      <li>
-        <p><strong>Boot from USB:</strong> Insert a Windows 11 Installation USB. Restart your PC and tap the boot menu key (F12, F10, or ESC) to boot from the USB.</p>
-      </li>
-      <li>
-        <p><strong>Open Command Prompt:</strong> At the initial setup screen, press <code dir="auto">Shift + F10</code>.</p>
-      </li>
-      <li>
-        <p><strong>Replace Utility Manager:</strong> Navigate to your Windows drive (usually <code dir="auto">C:</code>) and run the following:</p>
-      </li>
-    </ol>
-    <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css">
-      <script type="module" src="/_astro/ec.0vx5m.js"></script>
-      <figure class="frame is-terminal not-content">
-        <figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption>
-        <pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">move</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe.bak</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">copy</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">cmd.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span></div></div></code></pre>
-        <div class="copy">
-          <div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="move c:\\windows\\system32\\utilman.exe c:\\windows\\system32\\utilman.exe.bakcopy c:\\windows\\system32\\cmd.exe c:\\windows\\system32\\utilman.exe"><div></div></button>
-        </div>
-      </figure>
-    </div>
-    <ol start="4">
-      <li>
-        <p><strong>Restart:</strong> Remove the USB and restart your computer normally.</p>
-      </li>
-      <li>
-        <p><strong>Trigger CMD:</strong> At the login screen, click the <strong>Accessibility icon</strong> (bottom right). A Command Prompt window will open with System privileges.</p>
-      </li>
-      <li>
-        <p><strong>Reset Password:</strong> Run the following command:</p>
-        <div class="terminal-container astro-eqg5l7fp" data-id="terminal-6ejx3dbe0" data-commands="[{&#x22;input&#x22;:&#x22;net user [YourUsername] [NewPassword]&#x22;,&#x22;output&#x22;:&#x22;The command completed successfully.&#x22;}]" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="17:87">
-          <div class="terminal-header astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="18:32">
-            <div class="terminal-buttons astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="19:35"><span class="btn close astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="20:8"></span><span class="btn minimize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="21:8"></span><span class="btn maximize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="22:8"></span></div><span class="terminal-title astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="24:34">Terminal</span>
-          </div>
-          <div class="terminal-body astro-eqg5l7fp" id="body-terminal-6ejx3dbe0" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="27:48">
-            <div class="terminal-output astro-eqg5l7fp" id="output-terminal-6ejx3dbe0" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="28:6"></div>
-            <div class="terminal-input-line astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="29:38"><span class="prompt astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="30:28">$ </span><input type="text" class="terminal-input astro-eqg5l7fp" id="input-terminal-6ejx3dbe0" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command..." data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="31:8"></div>
-          </div>
-          <div class="terminal-hint astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="44:30">💡 Try: <code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38">net user [YourUsername] [NewPassword]</code></div>
-        </div>
-        <script>(function(){const id = "terminal-6ejx3dbe0";
-    
-      document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector(`[data-id="${id}"]`);
-        const input = document.getElementById(`input-${id}`);
-        const output = document.getElementById(`output-${id}`);
-        const commands = JSON.parse(container.dataset.commands);
-        const history = [];
-        let historyIndex = -1;
-    
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-    
-            // Add to history
-            history.unshift(cmd);
-            historyIndex = -1;
-    
-            // Display input
-            const inputLine = document.createElement('div');
-            inputLine.className = 'output-line input-echo';
-            inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
-            output.appendChild(inputLine);
-    
-            // Find matching command
-            const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
-            
-            // Display output
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output-line';
-            
-            if (match) {
-              outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
-              outputLine.classList.add('success');
-            } else {
-              outputLine.textContent = `Command not found: ${cmd}`;
-              outputLine.classList.add('error');
-            }
-            
-            output.appendChild(outputLine);
-            
-            // Clear input and scroll
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-              historyIndex++;
-              input.value = history[historyIndex];
-            }
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-              historyIndex--;
-              input.value = history[historyIndex];
-            } else {
-              historyIndex = -1;
-              input.value = '';
-            }
-          } else if (e.key === 'l' && e.ctrlKey) {
-            e.preventDefault();
-            output.innerHTML = '';
-          }
-        });
-    
-        // Focus on click
-        container.addEventListener('click', () => input.focus());
-      });
-    })();</script>
-      </li>
-    </ol>
-    
-  Stack trace:
-    at /home/parent/Desktop/DevHub/node_modules/@astrojs/starlight/user-components/rehype-steps.ts:23:11
-    [...] See full stack trace in the browser, or rerun with --verbose.
-07:20:14 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:20:15 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:20:15 [200] /guides/windows/windows-11-admin-password-recovery/ 100ms
-07:20:15 [ERROR] [AstroUserError] The `<Steps>` component expects its content to be a single ordered list (`<ol>`) but found multiple child elements: `<ol>`, `<div>`, `<ol>`.
-  Hint:
-    To learn more about the `<Steps>` component, see https://starlight.astro.build/components/steps/
-    
-    Full HTML passed to `<Steps>`:
-    
-    <ol>
-      <li>
-        <p><strong>Boot from USB:</strong> Insert a Windows 11 Installation USB. Restart your PC and tap the boot menu key (F12, F10, or ESC) to boot from the USB.</p>
-      </li>
-      <li>
-        <p><strong>Open Command Prompt:</strong> At the initial setup screen, press <code dir="auto">Shift + F10</code>.</p>
-      </li>
-      <li>
-        <p><strong>Replace Utility Manager:</strong> Navigate to your Windows drive (usually <code dir="auto">C:</code>) and run the following:</p>
-      </li>
-    </ol>
-    <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css">
-      <script type="module" src="/_astro/ec.0vx5m.js"></script>
-      <figure class="frame is-terminal not-content">
-        <figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption>
-        <pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">move</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe.bak</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">copy</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">cmd.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span></div></div></code></pre>
-        <div class="copy">
-          <div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="move c:\\windows\\system32\\utilman.exe c:\\windows\\system32\\utilman.exe.bakcopy c:\\windows\\system32\\cmd.exe c:\\windows\\system32\\utilman.exe"><div></div></button>
-        </div>
-      </figure>
-    </div>
-    <ol start="4">
-      <li>
-        <p><strong>Restart:</strong> Remove the USB and restart your computer normally.</p>
-      </li>
-      <li>
-        <p><strong>Trigger CMD:</strong> At the login screen, click the <strong>Accessibility icon</strong> (bottom right). A Command Prompt window will open with System privileges.</p>
-      </li>
-      <li>
-        <p><strong>Reset Password:</strong> Run the following command:</p>
-        <div class="terminal-container astro-eqg5l7fp" data-id="terminal-uqnkjj10j" data-commands="[{&#x22;input&#x22;:&#x22;net user [YourUsername] [NewPassword]&#x22;,&#x22;output&#x22;:&#x22;The command completed successfully.&#x22;}]" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="17:87">
-          <div class="terminal-header astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="18:32">
-            <div class="terminal-buttons astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="19:35"><span class="btn close astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="20:8"></span><span class="btn minimize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="21:8"></span><span class="btn maximize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="22:8"></span></div><span class="terminal-title astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="24:34">Terminal</span>
-          </div>
-          <div class="terminal-body astro-eqg5l7fp" id="body-terminal-uqnkjj10j" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="27:48">
-            <div class="terminal-output astro-eqg5l7fp" id="output-terminal-uqnkjj10j" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="28:6"></div>
-            <div class="terminal-input-line astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="29:38"><span class="prompt astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="30:28">$ </span><input type="text" class="terminal-input astro-eqg5l7fp" id="input-terminal-uqnkjj10j" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command..." data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="31:8"></div>
-          </div>
-          <div class="terminal-hint astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="44:30">💡 Try: <code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38">net user [YourUsername] [NewPassword]</code></div>
-        </div>
-        <script>(function(){const id = "terminal-uqnkjj10j";
-    
-      document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector(`[data-id="${id}"]`);
-        const input = document.getElementById(`input-${id}`);
-        const output = document.getElementById(`output-${id}`);
-        const commands = JSON.parse(container.dataset.commands);
-        const history = [];
-        let historyIndex = -1;
-    
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-    
-            // Add to history
-            history.unshift(cmd);
-            historyIndex = -1;
-    
-            // Display input
-            const inputLine = document.createElement('div');
-            inputLine.className = 'output-line input-echo';
-            inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
-            output.appendChild(inputLine);
-    
-            // Find matching command
-            const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
-            
-            // Display output
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output-line';
-            
-            if (match) {
-              outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
-              outputLine.classList.add('success');
-            } else {
-              outputLine.textContent = `Command not found: ${cmd}`;
-              outputLine.classList.add('error');
-            }
-            
-            output.appendChild(outputLine);
-            
-            // Clear input and scroll
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-              historyIndex++;
-              input.value = history[historyIndex];
-            }
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-              historyIndex--;
-              input.value = history[historyIndex];
-            } else {
-              historyIndex = -1;
-              input.value = '';
-            }
-          } else if (e.key === 'l' && e.ctrlKey) {
-            e.preventDefault();
-            output.innerHTML = '';
-          }
-        });
-    
-        // Focus on click
-        container.addEventListener('click', () => input.focus());
-      });
-    })();</script>
-      </li>
-    </ol>
-    
-  Stack trace:
-    at /home/parent/Desktop/DevHub/node_modules/@astrojs/starlight/user-components/rehype-steps.ts:23:11
-    [...] See full stack trace in the browser, or rerun with --verbose.
-07:20:15 [200] /guides/windows/windows-11-admin-password-recovery/ 30ms
-07:20:15 [ERROR] [AstroUserError] The `<Steps>` component expects its content to be a single ordered list (`<ol>`) but found multiple child elements: `<ol>`, `<div>`, `<ol>`.
-  Hint:
-    To learn more about the `<Steps>` component, see https://starlight.astro.build/components/steps/
-    
-    Full HTML passed to `<Steps>`:
-    
-    <ol>
-      <li>
-        <p><strong>Boot from USB:</strong> Insert a Windows 11 Installation USB. Restart your PC and tap the boot menu key (F12, F10, or ESC) to boot from the USB.</p>
-      </li>
-      <li>
-        <p><strong>Open Command Prompt:</strong> At the initial setup screen, press <code dir="auto">Shift + F10</code>.</p>
-      </li>
-      <li>
-        <p><strong>Replace Utility Manager:</strong> Navigate to your Windows drive (usually <code dir="auto">C:</code>) and run the following:</p>
-      </li>
-    </ol>
-    <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css">
-      <script type="module" src="/_astro/ec.0vx5m.js"></script>
-      <figure class="frame is-terminal not-content">
-        <figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption>
-        <pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">move</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe.bak</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">copy</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">cmd.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span></div></div></code></pre>
-        <div class="copy">
-          <div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="move c:\\windows\\system32\\utilman.exe c:\\windows\\system32\\utilman.exe.bakcopy c:\\windows\\system32\\cmd.exe c:\\windows\\system32\\utilman.exe"><div></div></button>
-        </div>
-      </figure>
-    </div>
-    <ol start="4">
-      <li>
-        <p><strong>Restart:</strong> Remove the USB and restart your computer normally.</p>
-      </li>
-      <li>
-        <p><strong>Trigger CMD:</strong> At the login screen, click the <strong>Accessibility icon</strong> (bottom right). A Command Prompt window will open with System privileges.</p>
-      </li>
-      <li>
-        <p><strong>Reset Password:</strong> Run the following command:</p>
-        <div class="terminal-container astro-eqg5l7fp" data-id="terminal-i840f1rv2" data-commands="[{&#x22;input&#x22;:&#x22;net user [YourUsername] [NewPassword]&#x22;,&#x22;output&#x22;:&#x22;The command completed successfully.&#x22;}]" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="17:87">
-          <div class="terminal-header astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="18:32">
-            <div class="terminal-buttons astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="19:35"><span class="btn close astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="20:8"></span><span class="btn minimize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="21:8"></span><span class="btn maximize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="22:8"></span></div><span class="terminal-title astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="24:34">Terminal</span>
-          </div>
-          <div class="terminal-body astro-eqg5l7fp" id="body-terminal-i840f1rv2" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="27:48">
-            <div class="terminal-output astro-eqg5l7fp" id="output-terminal-i840f1rv2" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="28:6"></div>
-            <div class="terminal-input-line astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="29:38"><span class="prompt astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="30:28">$ </span><input type="text" class="terminal-input astro-eqg5l7fp" id="input-terminal-i840f1rv2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command..." data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="31:8"></div>
-          </div>
-          <div class="terminal-hint astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="44:30">💡 Try: <code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38">net user [YourUsername] [NewPassword]</code></div>
-        </div>
-        <script>(function(){const id = "terminal-i840f1rv2";
-    
-      document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector(`[data-id="${id}"]`);
-        const input = document.getElementById(`input-${id}`);
-        const output = document.getElementById(`output-${id}`);
-        const commands = JSON.parse(container.dataset.commands);
-        const history = [];
-        let historyIndex = -1;
-    
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-    
-            // Add to history
-            history.unshift(cmd);
-            historyIndex = -1;
-    
-            // Display input
-            const inputLine = document.createElement('div');
-            inputLine.className = 'output-line input-echo';
-            inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
-            output.appendChild(inputLine);
-    
-            // Find matching command
-            const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
-            
-            // Display output
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output-line';
-            
-            if (match) {
-              outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
-              outputLine.classList.add('success');
-            } else {
-              outputLine.textContent = `Command not found: ${cmd}`;
-              outputLine.classList.add('error');
-            }
-            
-            output.appendChild(outputLine);
-            
-            // Clear input and scroll
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-              historyIndex++;
-              input.value = history[historyIndex];
-            }
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-              historyIndex--;
-              input.value = history[historyIndex];
-            } else {
-              historyIndex = -1;
-              input.value = '';
-            }
-          } else if (e.key === 'l' && e.ctrlKey) {
-            e.preventDefault();
-            output.innerHTML = '';
-          }
-        });
-    
-        // Focus on click
-        container.addEventListener('click', () => input.focus());
-      });
-    })();</script>
-      </li>
-    </ol>
-    
-  Stack trace:
-    at /home/parent/Desktop/DevHub/node_modules/@astrojs/starlight/user-components/rehype-steps.ts:23:11
-    [...] See full stack trace in the browser, or rerun with --verbose.
-07:20:15 [200] /guides/windows/windows-11-admin-password-recovery/ 25ms
-07:20:15 [ERROR] [AstroUserError] The `<Steps>` component expects its content to be a single ordered list (`<ol>`) but found multiple child elements: `<ol>`, `<div>`, `<ol>`.
-  Hint:
-    To learn more about the `<Steps>` component, see https://starlight.astro.build/components/steps/
-    
-    Full HTML passed to `<Steps>`:
-    
-    <ol>
-      <li>
-        <p><strong>Boot from USB:</strong> Insert a Windows 11 Installation USB. Restart your PC and tap the boot menu key (F12, F10, or ESC) to boot from the USB.</p>
-      </li>
-      <li>
-        <p><strong>Open Command Prompt:</strong> At the initial setup screen, press <code dir="auto">Shift + F10</code>.</p>
-      </li>
-      <li>
-        <p><strong>Replace Utility Manager:</strong> Navigate to your Windows drive (usually <code dir="auto">C:</code>) and run the following:</p>
-      </li>
-    </ol>
-    <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css">
-      <script type="module" src="/_astro/ec.0vx5m.js"></script>
-      <figure class="frame is-terminal not-content">
-        <figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption>
-        <pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">move</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe.bak</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">copy</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">cmd.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span></div></div></code></pre>
-        <div class="copy">
-          <div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="move c:\\windows\\system32\\utilman.exe c:\\windows\\system32\\utilman.exe.bakcopy c:\\windows\\system32\\cmd.exe c:\\windows\\system32\\utilman.exe"><div></div></button>
-        </div>
-      </figure>
-    </div>
-    <ol start="4">
-      <li>
-        <p><strong>Restart:</strong> Remove the USB and restart your computer normally.</p>
-      </li>
-      <li>
-        <p><strong>Trigger CMD:</strong> At the login screen, click the <strong>Accessibility icon</strong> (bottom right). A Command Prompt window will open with System privileges.</p>
-      </li>
-      <li>
-        <p><strong>Reset Password:</strong> Run the following command:</p>
-        <div class="terminal-container astro-eqg5l7fp" data-id="terminal-lnw3ncxhc" data-commands="[{&#x22;input&#x22;:&#x22;net user [YourUsername] [NewPassword]&#x22;,&#x22;output&#x22;:&#x22;The command completed successfully.&#x22;}]" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="17:87">
-          <div class="terminal-header astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="18:32">
-            <div class="terminal-buttons astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="19:35"><span class="btn close astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="20:8"></span><span class="btn minimize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="21:8"></span><span class="btn maximize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="22:8"></span></div><span class="terminal-title astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="24:34">Terminal</span>
-          </div>
-          <div class="terminal-body astro-eqg5l7fp" id="body-terminal-lnw3ncxhc" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="27:48">
-            <div class="terminal-output astro-eqg5l7fp" id="output-terminal-lnw3ncxhc" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="28:6"></div>
-            <div class="terminal-input-line astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="29:38"><span class="prompt astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="30:28">$ </span><input type="text" class="terminal-input astro-eqg5l7fp" id="input-terminal-lnw3ncxhc" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command..." data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="31:8"></div>
-          </div>
-          <div class="terminal-hint astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="44:30">💡 Try: <code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38">net user [YourUsername] [NewPassword]</code></div>
-        </div>
-        <script>(function(){const id = "terminal-lnw3ncxhc";
-    
-      document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector(`[data-id="${id}"]`);
-        const input = document.getElementById(`input-${id}`);
-        const output = document.getElementById(`output-${id}`);
-        const commands = JSON.parse(container.dataset.commands);
-        const history = [];
-        let historyIndex = -1;
-    
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-    
-            // Add to history
-            history.unshift(cmd);
-            historyIndex = -1;
-    
-            // Display input
-            const inputLine = document.createElement('div');
-            inputLine.className = 'output-line input-echo';
-            inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
-            output.appendChild(inputLine);
-    
-            // Find matching command
-            const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
-            
-            // Display output
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output-line';
-            
-            if (match) {
-              outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
-              outputLine.classList.add('success');
-            } else {
-              outputLine.textContent = `Command not found: ${cmd}`;
-              outputLine.classList.add('error');
-            }
-            
-            output.appendChild(outputLine);
-            
-            // Clear input and scroll
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-              historyIndex++;
-              input.value = history[historyIndex];
-            }
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-              historyIndex--;
-              input.value = history[historyIndex];
-            } else {
-              historyIndex = -1;
-              input.value = '';
-            }
-          } else if (e.key === 'l' && e.ctrlKey) {
-            e.preventDefault();
-            output.innerHTML = '';
-          }
-        });
-    
-        // Focus on click
-        container.addEventListener('click', () => input.focus());
-      });
-    })();</script>
-      </li>
-    </ol>
-    
-  Stack trace:
-    at /home/parent/Desktop/DevHub/node_modules/@astrojs/starlight/user-components/rehype-steps.ts:23:11
-    [...] See full stack trace in the browser, or rerun with --verbose.
-07:20:23 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:20:23 [200] /guides/windows/windows-11-admin-password-recovery/ 74ms
-07:20:23 [ERROR] [AstroUserError] The `<Steps>` component expects its content to be a single ordered list (`<ol>`) but found multiple child elements: `<ol>`, `<div>`, `<ol>`.
-  Hint:
-    To learn more about the `<Steps>` component, see https://starlight.astro.build/components/steps/
-    
-    Full HTML passed to `<Steps>`:
-    
-    <ol>
-      <li>
-        <p><strong>Boot from USB:</strong> Insert a Windows 11 Installation USB. Restart your PC and tap the boot menu key (F12, F10, or ESC) to boot from the USB.</p>
-      </li>
-      <li>
-        <p><strong>Open Command Prompt:</strong> At the initial setup screen, press <code dir="auto">Shift + F10</code>.</p>
-      </li>
-      <li>
-        <p><strong>Replace Utility Manager:</strong> Navigate to your Windows drive (usually <code dir="auto">C:</code>) and run the following:</p>
-      </li>
-    </ol>
-    <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css">
-      <script type="module" src="/_astro/ec.0vx5m.js"></script>
-      <figure class="frame is-terminal not-content">
-        <figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption>
-        <pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">move</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe.bak</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">copy</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">cmd.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">windows</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">system32</span><span style="--0:#F78C6C;--1:#AA0982">\\</span><span style="--0:#ECC48D;--1:#3B61B0">utilman.exe</span></div></div></code></pre>
-        <div class="copy">
-          <div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="move c:\\windows\\system32\\utilman.exe c:\\windows\\system32\\utilman.exe.bakcopy c:\\windows\\system32\\cmd.exe c:\\windows\\system32\\utilman.exe"><div></div></button>
-        </div>
-      </figure>
-    </div>
-    <ol start="4">
-      <li>
-        <p><strong>Restart:</strong> Remove the USB and restart your computer normally.</p>
-      </li>
-      <li>
-        <p><strong>Trigger CMD:</strong> At the login screen, click the <strong>Accessibility icon</strong> (bottom right). A Command Prompt window will open with System privileges.</p>
-      </li>
-      <li>
-        <p><strong>Reset Password:</strong> Run the following command:</p>
-        <div class="terminal-container astro-eqg5l7fp" data-id="terminal-5pihd2qqa" data-commands="[{&#x22;input&#x22;:&#x22;net user [YourUsername] [NewPassword]&#x22;,&#x22;output&#x22;:&#x22;The command completed successfully.&#x22;}]" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="17:87">
-          <div class="terminal-header astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="18:32">
-            <div class="terminal-buttons astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="19:35"><span class="btn close astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="20:8"></span><span class="btn minimize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="21:8"></span><span class="btn maximize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="22:8"></span></div><span class="terminal-title astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="24:34">Terminal</span>
-          </div>
-          <div class="terminal-body astro-eqg5l7fp" id="body-terminal-5pihd2qqa" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="27:48">
-            <div class="terminal-output astro-eqg5l7fp" id="output-terminal-5pihd2qqa" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="28:6"></div>
-            <div class="terminal-input-line astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="29:38"><span class="prompt astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="30:28">$ </span><input type="text" class="terminal-input astro-eqg5l7fp" id="input-terminal-5pihd2qqa" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command..." data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="31:8"></div>
-          </div>
-          <div class="terminal-hint astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="44:30">💡 Try: <code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38">net user [YourUsername] [NewPassword]</code></div>
-        </div>
-        <script>(function(){const id = "terminal-5pihd2qqa";
-    
-      document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector(`[data-id="${id}"]`);
-        const input = document.getElementById(`input-${id}`);
-        const output = document.getElementById(`output-${id}`);
-        const commands = JSON.parse(container.dataset.commands);
-        const history = [];
-        let historyIndex = -1;
-    
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-    
-            // Add to history
-            history.unshift(cmd);
-            historyIndex = -1;
-    
-            // Display input
-            const inputLine = document.createElement('div');
-            inputLine.className = 'output-line input-echo';
-            inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
-            output.appendChild(inputLine);
-    
-            // Find matching command
-            const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
-            
-            // Display output
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output-line';
-            
-            if (match) {
-              outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
-              outputLine.classList.add('success');
-            } else {
-              outputLine.textContent = `Command not found: ${cmd}`;
-              outputLine.classList.add('error');
-            }
-            
-            output.appendChild(outputLine);
-            
-            // Clear input and scroll
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-              historyIndex++;
-              input.value = history[historyIndex];
-            }
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-              historyIndex--;
-              input.value = history[historyIndex];
-            } else {
-              historyIndex = -1;
-              input.value = '';
-            }
-          } else if (e.key === 'l' && e.ctrlKey) {
-            e.preventDefault();
-            output.innerHTML = '';
-          }
-        });
-    
-        // Focus on click
-        container.addEventListener('click', () => input.focus());
-      });
-    })();</script>
-      </li>
-    </ol>
-    
-  Stack trace:
-    at /home/parent/Desktop/DevHub/node_modules/@astrojs/starlight/user-components/rehype-steps.ts:23:11
-    [...] See full stack trace in the browser, or rerun with --verbose.
-07:20:49 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:20:49 [200] /guides/windows/windows-11-admin-password-recovery/ 62ms
-07:21:00 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:21:00 [200] /guides/windows/windows-11-admin-password-recovery/ 116ms
-07:21:26 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:21:26 [200] /guides/windows/windows-11-admin-password-recovery/ 75ms
-07:21:50 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:21:50 [200] /guides/windows/windows-11-admin-password-recovery/ 100ms
-07:22:34 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:22:34 [200] /guides/windows/windows-11-admin-password-recovery/ 149ms
-07:22:34 [ERROR] [AstroUserError] The `<Steps>` component expects its content to be a single ordered list (`<ol>`) but found multiple child elements: `<ol>`, `<div>`, `<div>`, `<script>`, `<ol>`.
-  Hint:
-    To learn more about the `<Steps>` component, see https://starlight.astro.build/components/steps/
-    
-    Full HTML passed to `<Steps>`:
-    
-    <ol>
-      <li>
-        <p><strong>Boot from USB:</strong> Insert a Windows 11 Installation USB. Restart your PC and tap the boot menu key (F12, F10, or ESC) to boot from the USB.</p>
-      </li>
-      <li>
-        <p><strong>Open Command Prompt:</strong> At the initial setup screen, press <code dir="auto">Shift + F10</code>.</p>
-      </li>
-      <li>
-        <p><strong>Replace Utility Manager:</strong> Navigate to your Windows drive (usually <code dir="auto">C:</code>) and run the following:</p>
-      </li>
-    </ol>
-    <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css">
-      <script type="module" src="/_astro/ec.0vx5m.js"></script>
-      <figure class="frame is-terminal not-content">
-        <figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption>
-        <pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">move</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\w</span><span style="--0:#ECC48D;--1:#3B61B0">indows</span><span style="--0:#F78C6C;--1:#AA0982">\s</span><span style="--0:#ECC48D;--1:#3B61B0">ystem32</span><span style="--0:#F78C6C;--1:#AA0982">\u</span><span style="--0:#ECC48D;--1:#3B61B0">tilman.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\w</span><span style="--0:#ECC48D;--1:#3B61B0">indows</span><span style="--0:#F78C6C;--1:#AA0982">\s</span><span style="--0:#ECC48D;--1:#3B61B0">ystem32</span><span style="--0:#F78C6C;--1:#AA0982">\u</span><span style="--0:#ECC48D;--1:#3B61B0">tilman.exe.bak</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">copy</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\w</span><span style="--0:#ECC48D;--1:#3B61B0">indows</span><span style="--0:#F78C6C;--1:#AA0982">\s</span><span style="--0:#ECC48D;--1:#3B61B0">ystem32</span><span style="--0:#F78C6C;--1:#AA0982">\c</span><span style="--0:#ECC48D;--1:#3B61B0">md.exe</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">c:</span><span style="--0:#F78C6C;--1:#AA0982">\w</span><span style="--0:#ECC48D;--1:#3B61B0">indows</span><span style="--0:#F78C6C;--1:#AA0982">\s</span><span style="--0:#ECC48D;--1:#3B61B0">ystem32</span><span style="--0:#F78C6C;--1:#AA0982">\u</span><span style="--0:#ECC48D;--1:#3B61B0">tilman.exe</span></div></div></code></pre>
-        <div class="copy">
-          <div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="move c:\windows\system32\utilman.exe c:\windows\system32\utilman.exe.bakcopy c:\windows\system32\cmd.exe c:\windows\system32\utilman.exe"><div></div></button>
-        </div>
-      </figure>
-    </div>
-    <div class="terminal-container astro-eqg5l7fp" data-id="terminal-8ro353r5e" data-commands="[{&#x22;input&#x22;:&#x22;move c:\\windows\\system32\\utilman.exe c:\\windows\\system32\\utilman.exe.bak&#x22;,&#x22;output&#x22;:&#x22;1 file(s) moved.&#x22;},{&#x22;input&#x22;:&#x22;copy c:\\windows\\system32\\cmd.exe c:\\windows\\system32\\utilman.exe&#x22;,&#x22;output&#x22;:&#x22;1 file(s) copied.&#x22;}]" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="17:87">
-      <div class="terminal-header astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="18:32">
-        <div class="terminal-buttons astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="19:35"><span class="btn close astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="20:8"></span><span class="btn minimize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="21:8"></span><span class="btn maximize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="22:8"></span></div><span class="terminal-title astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="24:34">Terminal</span>
-      </div>
-      <div class="terminal-body astro-eqg5l7fp" id="body-terminal-8ro353r5e" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="27:48">
-        <div class="terminal-output astro-eqg5l7fp" id="output-terminal-8ro353r5e" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="28:6"></div>
-        <div class="terminal-input-line astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="29:38"><span class="prompt astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="30:28">$ </span><input type="text" class="terminal-input astro-eqg5l7fp" id="input-terminal-8ro353r5e" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command..." data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="31:8"></div>
-      </div>
-      <div class="terminal-hint astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="44:30">💡 Try: <code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38">move c:\windows\system32\utilman.exe c:\windows\system32\utilman.exe.bak</code><code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38">copy c:\windows\system32\cmd.exe c:\windows\system32\utilman.exe</code></div>
-    </div>
-    <script>(function(){const id = "terminal-8ro353r5e";
-    
-      document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector(`[data-id="${id}"]`);
-        const input = document.getElementById(`input-${id}`);
-        const output = document.getElementById(`output-${id}`);
-        const commands = JSON.parse(container.dataset.commands);
-        const history = [];
-        let historyIndex = -1;
-    
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-    
-            // Add to history
-            history.unshift(cmd);
-            historyIndex = -1;
-    
-            // Display input
-            const inputLine = document.createElement('div');
-            inputLine.className = 'output-line input-echo';
-            inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
-            output.appendChild(inputLine);
-    
-            // Find matching command
-            const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
-            
-            // Display output
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output-line';
-            
-            if (match) {
-              outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
-              outputLine.classList.add('success');
-            } else {
-              outputLine.textContent = `Command not found: ${cmd}`;
-              outputLine.classList.add('error');
-            }
-            
-            output.appendChild(outputLine);
-            
-            // Clear input and scroll
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-              historyIndex++;
-              input.value = history[historyIndex];
-            }
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-              historyIndex--;
-              input.value = history[historyIndex];
-            } else {
-              historyIndex = -1;
-              input.value = '';
-            }
-          } else if (e.key === 'l' && e.ctrlKey) {
-            e.preventDefault();
-            output.innerHTML = '';
-          }
-        });
-    
-        // Focus on click
-        container.addEventListener('click', () => input.focus());
-      });
-    })();</script>
-    <ol start="4">
-      <li>
-        <p><strong>Restart:</strong> Remove the USB and restart your computer normally.</p>
-      </li>
-      <li>
-        <p><strong>Trigger CMD:</strong> At the login screen, click the <strong>Accessibility icon</strong> (bottom right). A Command Prompt window will open with System privileges.</p>
-      </li>
-      <li>
-        <p><strong>Reset Password:</strong> Run the following command:</p>
-        <div class="terminal-container astro-eqg5l7fp" data-id="terminal-otzsfg73q" data-commands="[{&#x22;input&#x22;:&#x22;net user [YourUsername] [NewPassword]&#x22;,&#x22;output&#x22;:&#x22;The command completed successfully.&#x22;}]" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="17:87">
-          <div class="terminal-header astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="18:32">
-            <div class="terminal-buttons astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="19:35"><span class="btn close astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="20:8"></span><span class="btn minimize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="21:8"></span><span class="btn maximize astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="22:8"></span></div><span class="terminal-title astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="24:34">Terminal</span>
-          </div>
-          <div class="terminal-body astro-eqg5l7fp" id="body-terminal-otzsfg73q" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="27:48">
-            <div class="terminal-output astro-eqg5l7fp" id="output-terminal-otzsfg73q" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="28:6"></div>
-            <div class="terminal-input-line astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="29:38"><span class="prompt astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="30:28">$ </span><input type="text" class="terminal-input astro-eqg5l7fp" id="input-terminal-otzsfg73q" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command..." data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="31:8"></div>
-          </div>
-          <div class="terminal-hint astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="44:30">💡 Try: <code class="astro-eqg5l7fp" data-astro-source-file="/home/parent/Desktop/DevHub/src/components/Terminal.astro" data-astro-source-loc="45:38">net user [YourUsername] [NewPassword]</code></div>
-        </div>
-        <script>(function(){const id = "terminal-otzsfg73q";
-    
-      document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector(`[data-id="${id}"]`);
-        const input = document.getElementById(`input-${id}`);
-        const output = document.getElementById(`output-${id}`);
-        const commands = JSON.parse(container.dataset.commands);
-        const history = [];
-        let historyIndex = -1;
-    
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-    
-            // Add to history
-            history.unshift(cmd);
-            historyIndex = -1;
-    
-            // Display input
-            const inputLine = document.createElement('div');
-            inputLine.className = 'output-line input-echo';
-            inputLine.innerHTML = `<span class="prompt">$ </span>${cmd}`;
-            output.appendChild(inputLine);
-    
-            // Find matching command
-            const match = commands.find(c => c.input.toLowerCase() === cmd.toLowerCase());
-            
-            // Display output
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output-line';
-            
-            if (match) {
-              outputLine.innerHTML = match.output.replace(/\n/g, '<br>');
-              outputLine.classList.add('success');
-            } else {
-              outputLine.textContent = `Command not found: ${cmd}`;
-              outputLine.classList.add('error');
-            }
-            
-            output.appendChild(outputLine);
-            
-            // Clear input and scroll
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-              historyIndex++;
-              input.value = history[historyIndex];
-            }
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-              historyIndex--;
-              input.value = history[historyIndex];
-            } else {
-              historyIndex = -1;
-              input.value = '';
-            }
-          } else if (e.key === 'l' && e.ctrlKey) {
-            e.preventDefault();
-            output.innerHTML = '';
-          }
-        });
-    
-        // Focus on click
-        container.addEventListener('click', () => input.focus());
-      });
-    })();</script>
-      </li>
-    </ol>
-    
-  Stack trace:
-    at /home/parent/Desktop/DevHub/node_modules/@astrojs/starlight/user-components/rehype-steps.ts:23:11
-    [...] See full stack trace in the browser, or rerun with --verbose.
-07:22:41 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:22:41 [200] /guides/windows/windows-11-admin-password-recovery/ 94ms
-07:23:31 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:23:32 [200] /guides/windows/windows-11-admin-password-recovery/ 63ms
-07:27:25 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:27:25 [ERROR] Could not parse expression with acorn
-  Stack trace:
-    at /home/parent/Desktop/DevHub/src/content/docs/guides/windows/windows-11-admin-password-recovery.mdx:116:69
+    at /home/parent/Desktop/DevHub/node_modules/astro/dist/content/mutable-data-store.js:337:13
     [...] See full stack trace in the browser, or rerun with --verbose.
   Caused by:
-  Bad character escape sequence
-    at pp$4.raise (file:///home/parent/Desktop/DevHub/node_modules/acorn/dist/acorn.mjs:3731:13)
+  ENOENT: no such file or directory, rename '/home/parent/Desktop/DevHub/.astro/data-store.json.tmp' -> '/home/parent/Desktop/DevHub/.astro/data-store.json'
+    at async Object.rename (node:internal/fs/promises:781:10)
     [...] See full stack trace in the browser, or rerun with --verbose.
-07:27:25 [WARN] [router] A `getStaticPaths()` route pattern was matched, but no matching static path was found for requested path `/favicon.ico`.
+15:09:40 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:10:31 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:11:48 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:12:27 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:12:29 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+tribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:00:22 [200] /roadmaps/windows-learning-path/ 22ms
+15:00:22 [200] /roadmaps/windows-learning-path/ 21ms
+15:00:25 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:00:25 [200] /roadmaps/windows-learning-path/ 18ms
+15:00:29 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:00:29 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:00:30 [200] /roadmaps/windows-learning-path/ 16ms
+15:00:31 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:00:32 [WARN] [router] A `getStaticPaths()` route pattern was matched, but no matching static path was found for requested path `/favicon.ico`.
 
 Possible dynamic routes being matched: node_modules/@astrojs/starlight/routes/static/index.astro.
 Entry docs → 404 was not found.
-07:27:25 [ERROR] Could not parse expression with acorn
+15:04:23 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:04:23 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
   Stack trace:
-    at /home/parent/Desktop/DevHub/src/content/docs/guides/windows/windows-11-admin-password-recovery.mdx:116:69
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:04:41 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:04:42 [ERROR] [UnknownFilesystemError] 
+  Hint:
+    It can be caused by many things, eg. missing permissions or a file not existing we attempt to read. Check the error cause for more details.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/unknown-filesystem-error/
+  Stack trace:
+    at /home/parent/Desktop/DevHub/node_modules/astro/dist/content/mutable-data-store.js:337:13
     [...] See full stack trace in the browser, or rerun with --verbose.
   Caused by:
-  Bad character escape sequence
-    at pp$4.raise (file:///home/parent/Desktop/DevHub/node_modules/acorn/dist/acorn.mjs:3731:13)
+  ENOENT: no such file or directory, rename '/home/parent/Desktop/DevHub/.astro/data-store.json.tmp' -> '/home/parent/Desktop/DevHub/.astro/data-store.json'
+    at async Object.rename (node:internal/fs/promises:781:10)
     [...] See full stack trace in the browser, or rerun with --verbose.
-07:27:40 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:27:40 [ERROR] Could not parse expression with acorn
+15:04:43 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
   Stack trace:
-    at /home/parent/Desktop/DevHub/src/content/docs/guides/windows/windows-11-admin-password-recovery.mdx:116:69
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:04:50 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:04:51 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:07:01 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:07:01 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:07:11 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:07:12 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:07:46 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:07:46 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:08:06 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:08:07 [ERROR] [UnknownFilesystemError] 
+  Hint:
+    It can be caused by many things, eg. missing permissions or a file not existing we attempt to read. Check the error cause for more details.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/unknown-filesystem-error/
+  Stack trace:
+    at /home/parent/Desktop/DevHub/node_modules/astro/dist/content/mutable-data-store.js:337:13
     [...] See full stack trace in the browser, or rerun with --verbose.
   Caused by:
-  Bad character escape sequence
-    at pp$4.raise (file:///home/parent/Desktop/DevHub/node_modules/acorn/dist/acorn.mjs:3731:13)
+  ENOENT: no such file or directory, rename '/home/parent/Desktop/DevHub/.astro/data-store.json.tmp' -> '/home/parent/Desktop/DevHub/.astro/data-store.json'
+    at async Object.rename (node:internal/fs/promises:781:10)
     [...] See full stack trace in the browser, or rerun with --verbose.
-07:27:41 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:27:41 [ERROR] Could not parse expression with acorn
+15:08:07 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
   Stack trace:
-    at /home/parent/Desktop/DevHub/src/content/docs/guides/windows/windows-11-admin-password-recovery.mdx:116:69
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
     [...] See full stack trace in the browser, or rerun with --verbose.
-  Caused by:
-  Bad character escape sequence
-    at pp$4.raise (file:///home/parent/Desktop/DevHub/node_modules/acorn/dist/acorn.mjs:3731:13)
-    [...] See full stack trace in the browser, or rerun with --verbose.
-07:27:43 [ERROR] Could not parse expression with acorn
+15:08:10 [starlight-docs-loader] Reloaded data from projects/server/proxmox-terraform-setup.mdx
+15:08:11 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
   Stack trace:
-    at /home/parent/Desktop/DevHub/src/content/docs/guides/windows/windows-11-admin-password-recovery.mdx:116:69
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
     [...] See full stack trace in the browser, or rerun with --verbose.
-  Caused by:
-  Bad character escape sequence
-    at pp$4.raise (file:///home/parent/Desktop/DevHub/node_modules/acorn/dist/acorn.mjs:3731:13)
+15:08:33 [ERROR] Unexpected character `%` (U+0025) before attribute name, expected a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag
+  Stack trace:
+    at TransformPluginContext.transform (file:///home/parent/Desktop/DevHub/node_modules/@astrojs/mdx/dist/vite-plugin-mdx.js:62:15)
     [...] See full stack trace in the browser, or rerun with --verbose.
-07:27:57 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:27:58 [200] /guides/windows/windows-11-admin-password-recovery/ 68ms
-07:28:47 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:28:47 [200] /guides/windows/windows-11-admin-password-recovery/ 123ms
-07:29:03 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:29:03 [200] /guides/windows/windows-11-admin-password-recovery/ 96ms
-07:29:16 [starlight-docs-loader] Reloaded data from guides/windows/windows-11-admin-password-recovery.mdx
-07:29:16 [200] /guides/windows/windows-11-admin-password-recovery/ 80ms
+15:09:24 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:09:25 [200] /guides/windows/maestro-windows-setup/ 134ms
+15:09:25 [ERROR] Cannot read properties of undefined (reading 'map')
+  Hint:
+    This issue often occurs when your MDX component encounters runtime errors.
+  Stack trace:
+    at /home/parent/Desktop/DevHub/src/components/Quiz.astro:25:14
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:09:40 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:09:40 [200] /guides/windows/maestro-windows-setup/ 97ms
+15:09:40 [ERROR] Cannot read properties of undefined (reading 'map')
+  Hint:
+    This issue often occurs when your MDX component encounters runtime errors.
+  Stack trace:
+    at /home/parent/Desktop/DevHub/src/components/Quiz.astro:25:14
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:09:47 [200] /guides/windows/maestro-windows-setup/ 18ms
+15:09:47 [ERROR] Cannot read properties of undefined (reading 'map')
+  Hint:
+    This issue often occurs when your MDX component encounters runtime errors.
+  Stack trace:
+    at /home/parent/Desktop/DevHub/src/components/Quiz.astro:25:14
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:10:31 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:10:33 [200] /guides/windows/maestro-windows-setup/ 98ms
+15:10:33 [ERROR] Cannot read properties of undefined (reading 'map')
+  Hint:
+    This issue often occurs when your MDX component encounters runtime errors.
+  Stack trace:
+    at /home/parent/Desktop/DevHub/src/components/Quiz.astro:25:14
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:11:44 [200] /guides/windows/maestro-windows-setup/ 29ms
+15:11:44 [ERROR] Cannot read properties of undefined (reading 'map')
+  Hint:
+    This issue often occurs when your MDX component encounters runtime errors.
+  Stack trace:
+    at /home/parent/Desktop/DevHub/src/components/Quiz.astro:25:14
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:11:48 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:11:48 [200] /guides/windows/maestro-windows-setup/ 84ms
+15:11:48 [ERROR] Cannot read properties of undefined (reading 'map')
+  Hint:
+    This issue often occurs when your MDX component encounters runtime errors.
+  Stack trace:
+    at /home/parent/Desktop/DevHub/src/components/Quiz.astro:25:14
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:12:27 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:12:28 [200] /guides/windows/maestro-windows-setup/ 123ms
+15:12:29 [starlight-docs-loader] Reloaded data from guides/windows/maestro-windows-setup.mdx
+15:12:33 [200] /guides/windows/maestro-windows-setup/ 75ms

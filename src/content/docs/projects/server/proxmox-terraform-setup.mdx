@@ -1,0 +1,221 @@
+---
+title: "Proxmox Terraform Setup: Initializing Ubuntu Clones"
+description: "Prepare your Proxmox VE node for Terraform integration, configure cloud-init snippets, and automate Ubuntu image templates."
+sidebar:
+  label: "Proxmox Terraform Setup"
+  order: 5
+  badge:
+    text: "Mid"
+    variant: "caution"
+tableOfContents: true
+---
+
+import {
+  Aside,
+  Badge,
+  CardGrid,
+  LinkCard,
+} from "@astrojs/starlight/components";
+import Quiz from "../../../../components/Quiz.astro";
+import Flashcard from "../../../../components/Flashcard.astro";
+import ProgressCheck from "../../../../components/ProgressCheck.astro";
+import Terminal from "../../../../components/Terminal.astro";
+import FileTree from "../../../../components/FileTree.astro";
+
+<Badge text="Server" class="server" />
+<Badge text="Terraform" class="terraform" />
+
+This project guides you through the initial setup required to connect **Terraform** to **Proxmox**. You will learn how to configure cloud-init snippets, automate the creation of Ubuntu templates, and set up the necessary API permissions for secure automation.
+
+<Aside type="note" title="Project Overview">
+  **Difficulty**: Mid **Time**: ~45 minutes **Skills**: Linux CLI, Proxmox API,
+  Cloud-Init, Infrastructure as Code (IaC)
+</Aside>
+
+---
+
+## Step 1: Prepare Cloud-Init Snippets
+
+First, we need to create a `vendor-data` configuration. This script ensures that the `qemu-guest-agent` is installed automatically when your new VM boots, allowing Proxmox to communicate with the guest OS.
+
+1. **SSH into your Proxmox Node**
+
+   <Terminal
+     commands={[{ input: "ssh root@192.168.x.x", output: "root@pve:~#" }]}
+   />
+
+2. **Create the Snippets Directory**
+
+```bash
+mkdir -p /var/lib/vz/snippets
+touch /var/lib/vz/snippets/vendor-data.yaml
+chmod +x /var/lib/vz/snippets/vendor-data.yaml
+```
+
+3. **Populate the Cloud-Init Config**
+   Run this block to write the configuration:
+   ```bash
+   cat << EOF > /var/lib/vz/snippets/vendor-data.yaml
+   #cloud-config
+   packages:
+     - qemu-guest-agent
+   package_update: true
+   power_state:
+     mode: reboot
+     timeout: 30
+   EOF
+   ```
+
+---
+
+## Step 2: Automate Ubuntu Templates
+
+Using community scripts, we can download the latest Ubuntu Cloud-Init images and convert them into Proxmox templates (gold images) that Terraform can clone.
+
+<FileTree
+  title="Template Script Structure"
+  structure={[
+    {
+      name: "var/lib/vz/snippets/",
+      type: "folder",
+      children: [
+        { name: "vendor-data.yaml", badge: "edit" },
+        {
+          name: "download/",
+          type: "folder",
+          children: [
+            { name: "image-update", badge: "create" },
+            { name: "build-template", badge: "create" },
+          ],
+        },
+      ],
+    },
+  ]}
+/>
+
+1. **Download Automation Scripts**
+
+```bash
+# Create the download directory and fetch the scripts
+mkdir /var/lib/vz/snippets/download && cd /var/lib/vz/snippets/download
+wget https://raw.githubusercontent.com/trfore/proxmox-template-scripts/refs/heads/main/scripts/image-update
+wget https://raw.githubusercontent.com/trfore/proxmox-template-scripts/refs/heads/main/scripts/build-template
+chmod +x image-update build-template
+```
+
+2. **Build the Ubuntu 24.04 Template**
+   This will download the image and create a template with ID `9000`.
+
+```bash
+./image-update -d ubuntu -r 24
+./build-template --id 9000 --name ubuntu24 --img /var/lib/vz/template/iso/ubuntu-24.04-server-cloudimg-amd64.img --bios ovmf
+```
+
+<Aside type="tip">
+  If `wget` fails, ensure you have internet access on your PVE node or manually
+  upload the scripts to the `/var/lib/vz/snippets/download` directory.
+</Aside>
+
+---
+
+## Step 3: Configure Terraform Permissions
+
+Following the principle of least privilege, we create a specific user and role for Terraform rather than using the root account.
+
+1. **Create the User and Role**
+   ```bash
+   # Add the user
+   pveum user add terraform@pve
+   ```
+
+# Create the 'Terraform' role with restricted privileges
+
+pveum role add Terraform -privs "Realm.AllocateUser, VM.PowerMgmt, VM.GuestAgent.Unrestricted, Sys.Console, Sys.Audit, Sys.AccessNetwork, VM.Config.Cloudinit, VM.Replicate, Pool.Allocate, SDN.Audit, Realm.Allocate, SDN.Use, Mapping.Modify, VM.Config.Memory, VM.GuestAgent.FileSystemMgmt, VM.Allocate, SDN.Allocate, VM.Console, VM.Clone, VM.Backup, Datastore.AllocateTemplate, VM.Snapshot, VM.Config.Network, Sys.Incoming, Sys.Modify, VM.Snapshot.Rollback, VM.Config.Disk, Datastore.Allocate, VM.Config.CPU, VM.Config.CDROM, Group.Allocate, Datastore.Audit, VM.Migrate, VM.GuestAgent.FileWrite, Mapping.Use, Datastore.AllocateSpace, Sys.Syslog, VM.Config.Options, Pool.Audit, User.Modify, VM.Config.HWType, VM.Audit, Sys.PowerMgmt, VM.GuestAgent.Audit, Mapping.Audit, VM.GuestAgent.FileRead, Permissions.Modify"
+
+# Apply the role to the user
+
+pveum aclmod / -user terraform@pve -role Terraform
+
+2. **Generate API Token**
+
+```bash
+pveum user token add terraform@pve provider --privsep=0
+```
+
+<Aside type="danger" title="Secure Your Secret">
+  Copy the token secret immediately. It will never be displayed again.
+</Aside>
+
+---
+
+## Step 4: Local Terraform Configuration
+
+Switch back to your local development machine to configure the provider variables.
+
+1. **Prepare Variables**
+
+```bash
+cp terraform/variable.tfvars.example terraform/variable.tfvars
+```
+
+2. **Edit `variable.tfvars`**
+   Update the following fields with your specific PVE details:
+   - `proxmox_url`: The API endpoint (e.g., `https://192.168.1.10:8006/api2/json`)
+   - `node_name`: The name of your PVE node (e.g., `pve`)
+   - `proxmox_api_token`: The token string generated in Step 3.
+
+---
+
+## Knowledge Check
+
+<Quiz
+  question="Why do we add the qemu-guest-agent to the vendor-data.yaml?"
+  options={[
+    "To allow the VM to browse the web",
+    "To enable Proxmox to see guest IP addresses and manage shutdowns",
+    "To encrypt the virtual hard drive",
+    "To speed up the CPU performance",
+  ]}
+  correct={1}
+  explanation="The QEMU Guest Agent is vital for communication between the host (Proxmox) and the guest OS for tasks like freezing filesystems for backups or reporting network status."
+/>
+
+<Flashcard
+  title="Proxmox & Terraform Terms"
+  cards={[
+    {
+      front: "Cloud-Init",
+      back: "A multi-distribution package that handles early initialization of a cloud instance.",
+    },
+    {
+      front: "pveum",
+      back: "The Proxmox VE User Management CLI tool.",
+    },
+    {
+      front: "Template (ID 9000)",
+      back: "A read-only VM used as a master copy for cloning new instances.",
+    },
+  ]}
+/>
+
+---
+
+## Progress Checklist
+
+<ProgressCheck
+  id="proxmox-tf-setup"
+  title="Setup Completion"
+  items={[
+    "Created vendor-data.yaml snippet",
+    "Built Ubuntu 24.04 Template (ID 9000)",
+    "Created terraform@pve user and role",
+    "Generated API Token and saved secret",
+    "Configured local variable.tfvars",
+  ]}
+/>
+
+---
+
+## Source
+
+Based on [Proxmox Official Documentation](https://pve.proxmox.com/wiki/Cloud-Init_Support) and [trfore's Proxmox Template Scripts](https://github.com/trfore/proxmox-template-scripts).
